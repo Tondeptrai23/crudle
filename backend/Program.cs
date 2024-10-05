@@ -1,13 +1,58 @@
+using System.Text.Json.Serialization;
+using _3w1m.Data;
+using _3w1m.Mapper;
+using _3w1m.Middlewares;
+using _3w1m.Models.Exceptions;
+using _3w1m.Services.Implementation;
+using _3w1m.Services.Interface;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//Configure connection string from environment variable
+DotNetEnv.Env.Load();
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+var database = Environment.GetEnvironmentVariable("DATABASE");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    switch (database)
+    {
+        case "SQLSERVER":
+            options.UseSqlServer(connectionString);
+            break;
+        case "MYSQL":
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            break;
+    }
+});
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+        options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    })
+    .AddCustomBadRequest(); // Configure custom BadRequest response
+    
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add services to the container.
+builder.Services.AddScoped<ICourseService, CourseService>();
+
+// Configure AutoMapper
+var config = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile<MappingProfile>();
+});
+builder.Services.AddScoped<IMapper>(sp => new Mapper(config));
+
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -15,30 +60,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapControllers();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
+// Add middleware to handle exceptions (ExceptionHandlingMiddleware)
+app.UseExceptionHandlingMiddleware();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
