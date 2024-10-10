@@ -2,13 +2,7 @@ import React, { useState } from 'react';
 import { WeatherCard } from '../components/weather/WeatherCard';
 import { SkeletonWeatherCard } from '../components/weather/SkeletonWeatherCard';
 import { useWeatherApi } from '../hooks/useWeatherApi';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/common/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/common/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/common/ui/alert"
 import { AlertCircle } from "lucide-react"
 
