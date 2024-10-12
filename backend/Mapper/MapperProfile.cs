@@ -17,5 +17,8 @@ public class MappingProfile : Profile
         CreateMap<CreateStudentRequestDto, Student>();
         CreateMap<StudentDto, Student>();
         CreateMap<Student, StudentDto>();
+        
+        CreateMap<Student, StudentDetailDto>()
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
     }
 }

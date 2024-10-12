@@ -4,6 +4,7 @@ using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace _3w1m.Services.Implementation;
 
@@ -20,59 +21,91 @@ public class StudentService : IStudentService
         _mapper = mapper;
     }
     
-    public async Task<StudentDto> GetStudentByIdAsync(int studentId)
+    public async Task<StudentDetailDto> GetStudentByIdAsync(int studentId)
     {
-        var student = await _context.Students.FindAsync(studentId);
-        
+        // Get student id associated with its user
+        var student = await _context.Students
+            .Include(s => s.User)
+            .FirstOrDefaultAsync(s => s.StudentId == studentId);
+
         if (student == null)
         {
             throw new ResourceNotFoundException("Student not found");
         }
         
-        return _mapper.Map<StudentDto>(student);
+        return _mapper.Map<StudentDetailDto>(student);
     }
 
-    public Task<IEnumerable<StudentDto>> GetStudentsAsync()
+    public async Task<IEnumerable<StudentDto>> GetStudentsAsync()
     {
-        throw new NotImplementedException();
+        var students = await _context.Students.ToListAsync();
+        
+        return _mapper.Map<IEnumerable<StudentDto>>(students);
     }
 
     public async Task<StudentDto> CreateStudentAsync(CreateStudentRequestDto studentData)
     {
-        using (var transaction = await _context.Database.BeginTransactionAsync())
+        ArgumentNullException.ThrowIfNull(studentData);
+
+        if (await _context.Students.AnyAsync(s => s.StudentId == studentData.StudentId))
         {
-            try
+            throw new ConflictException("StudentId already exists");
+        }
+        
+        if (await _context.Users.AnyAsync(u => u.Email == studentData.Email))
+        {
+            throw new ConflictException("Email already exists");
+        }
+
+        // Wrap in transaction
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var userId = await _userService.CreateStudentAsync(studentData.Email, studentData.Password);
+            if (userId == null)
             {
-                var userId = await _userService.CreateStudentAsync(studentData.Email, studentData.Password);
-                if (userId == null)
-                {
-                    throw new Exception("Failed to create student");
-                }
+                throw new Exception("Failed to create student");
+            }
 
-                var student = _mapper.Map<Student>(studentData);
-                student.UserId = userId;
+            var student = _mapper.Map<Student>(studentData);
+            student.UserId = userId;
 
-                var createdStudent =  await _context.Students.AddAsync(student);
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+            var createdStudent =  await _context.Students.AddAsync(student);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
                 
-                return _mapper.Map<StudentDto>(createdStudent.Entity);
-            }
-            catch (Exception e)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            return _mapper.Map<StudentDto>(createdStudent.Entity);
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            throw;
         }
     }
 
-    public Task<StudentDto> UpdateStudentAsync(int StudentId, UpdateStudentRequestDto student)
+    public async Task<StudentDto> UpdateStudentAsync(int StudentId, UpdateStudentRequestDto studentData)
     {
-        throw new NotImplementedException();
-    }
+        ArgumentNullException.ThrowIfNull(studentData);
 
-    public Task DeleteStudentAsync(int studentId)
-    {
-        throw new NotImplementedException();
+        var student = await _context.Students.FindAsync(StudentId);
+        if (student == null)
+        {
+            throw new ResourceNotFoundException("Student not found");
+        }
+
+        // Check null fields
+        if (studentData.Fullname != null)
+        {
+            student.Fullname = studentData.Fullname;
+        }
+        if (studentData.DateOfBirth.HasValue)
+        {
+            student.DateOfBirth = studentData.DateOfBirth.Value;
+        }
+        
+        _context.Students.Update(student);
+        await _context.SaveChangesAsync();
+        
+        return _mapper.Map<StudentDto>(student);
     }
 }

@@ -19,9 +19,9 @@ public class StudentController : ControllerBase
     
     [HttpGet]
     [Route("{StudentId:int}")]
-    public async Task<IActionResult> GetById([FromRoute] int studentId)
+    public async Task<IActionResult> GetById([FromRoute] int StudentId)
     {
-        var student = await _studentService.GetStudentByIdAsync(studentId);
+        var student = await _studentService.GetStudentByIdAsync(StudentId);
         return Ok(new ResponseDto<StudentDto>(student));
     }
 }

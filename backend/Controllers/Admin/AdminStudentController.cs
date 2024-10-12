@@ -32,7 +32,6 @@ public class StudentController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateStudentAsync([FromBody] CreateStudentRequestDto student)
     {
-        Console.WriteLine(student.DateOfBirth.Day);
         var newStudent = await _studentService.CreateStudentAsync(student);
         
         return Ok(new ResponseDto<StudentDto>(newStudent));
@@ -43,25 +42,15 @@ public class StudentController : ControllerBase
     public async Task<IActionResult> GetStudentByIdAsync([FromRoute] int StudentId)
     {
         var student = await _studentService.GetStudentByIdAsync(StudentId);
-        return Ok(new ResponseDto<StudentDto>(student));
+        return Ok(new ResponseDto<StudentDetailDto>(student));
     }
 
     [Route("{StudentId:int}")]
     [HttpPatch]
-    public async Task<IActionResult> UpdateStudentAsync([FromBody] UpdateStudentRequestDto student, [FromRoute] int StudentId)
+    public async Task<IActionResult> UpdateStudentAsync([FromBody] UpdateStudentRequestDto request, [FromRoute] int StudentId)
     {
-        var updatedStudent = await _studentService.UpdateStudentAsync(StudentId, student);
+        var updatedStudent = await _studentService.UpdateStudentAsync(StudentId, request);
         
         return Ok(new ResponseDto<StudentDto>(updatedStudent));
-    }
-    
-    [HttpDelete]
-    [Route("{StudentId:int}")]
-    public async Task<IActionResult> DeleteStudentAsync([FromRoute] int StudentId)
-    {
-        await _studentService.DeleteStudentAsync(StudentId);
-        return Ok(new {
-            Success = true
-        });
     }
 }
