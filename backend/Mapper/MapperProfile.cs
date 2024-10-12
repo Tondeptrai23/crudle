@@ -1,5 +1,6 @@
 using AutoMapper;
 using _3w1m.Dtos;
+using _3w1m.Dtos.Student;
 using _3w1m.Models;
 using _3w1m.Models.Domain;
 
@@ -12,5 +13,9 @@ public class MappingProfile : Profile
         CreateMap<CreateRequestCourseDto, Course>();
         CreateMap<CourseDto, Course>();
         CreateMap<Course, CourseDto>();
+        
+        CreateMap<CreateStudentRequestDto, Student>();
+        CreateMap<StudentDto, Student>();
+        CreateMap<Student, StudentDto>();
     }
 }
