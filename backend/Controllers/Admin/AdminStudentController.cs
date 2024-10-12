@@ -23,13 +23,14 @@ public class StudentController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetStudentsAsync()
+    public async Task<IActionResult> GetStudentsAsync([FromQuery] GetStudentsQueryDto request)
     {
-        var students = await _studentService.GetStudentsAsync();
-        return Ok(new ResponseDto<IEnumerable<StudentDto>>(students));
+        var (count, students) = await _studentService.GetStudentsAsync(request);
+        
+        return Ok(new PaginationResponseDto<IEnumerable<StudentDto>>(students, count, request.Page, request.Size));
     }
     
-    [HttpPost]
+    [HttpPost] 
     public async Task<IActionResult> CreateStudentAsync([FromBody] CreateStudentRequestDto student)
     {
         var newStudent = await _studentService.CreateStudentAsync(student);

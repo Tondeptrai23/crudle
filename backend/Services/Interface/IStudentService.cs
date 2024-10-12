@@ -1,3 +1,4 @@
+using _3w1m.Dtos;
 using _3w1m.Dtos.Student;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
@@ -16,12 +17,12 @@ public interface IStudentService
     /// <returns>The task result contains the student's detailed information.</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the student is not found.</exception>
     Task<StudentDetailDto> GetStudentByIdAsync(int studentId);
-    
+
     /// <summary>
     /// Retrieves a collection of all students.
     /// </summary>
     /// <returns>The task result contains a collection of student DTOs.</returns>
-    Task<IEnumerable<StudentDto>> GetStudentsAsync();
+    public Task<(int count, IEnumerable<StudentDto> students)> GetStudentsAsync(GetStudentsQueryDto request);
     
     /// <summary>
     /// Creates a new student record.
