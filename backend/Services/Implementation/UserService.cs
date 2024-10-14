@@ -13,9 +13,8 @@ public class UserService : IUserService
     {
         _userManager = userManager;
     }
-
     
-    public async Task<string?> CreateStudentAsync(string email, string password)
+    public async Task<string?> CreateUserAsync(string email, string password)
     {
         var user = new User
         {
@@ -25,10 +24,5 @@ public class UserService : IUserService
         
         var result = await _userManager.CreateAsync(user, password);
         return result.Succeeded ? user.Id : null;
-    }
-
-    public string? FindUserByEmailAsync(string email)
-    {
-        throw new NotImplementedException();
     }
 }

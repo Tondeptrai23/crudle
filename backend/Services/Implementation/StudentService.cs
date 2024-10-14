@@ -71,7 +71,7 @@ public class StudentService : IStudentService
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var userId = await _userService.CreateStudentAsync(studentData.Email, studentData.Password);
+            var userId = await _userService.CreateUserAsync(studentData.Email, studentData.Password);
             if (userId == null)
             {
                 throw new Exception("Failed to create student");
