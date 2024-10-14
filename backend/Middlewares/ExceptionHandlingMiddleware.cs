@@ -31,6 +31,7 @@ public class ExceptionHandlingMiddleware
         {
             Success = false,
             Message = exception.Message,
+            Status = exception.GetHttpStatusCode(),
             Error = exception.GetType().Name,
         }));
     }

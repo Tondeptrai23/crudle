@@ -2,12 +2,15 @@ using System.Text.Json.Serialization;
 using _3w1m.Data;
 using _3w1m.Mapper;
 using _3w1m.Middlewares;
+using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Implementation;
 using _3w1m.Services.Interface;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,10 +41,34 @@ builder.Services.AddControllers()
     .AddCustomBadRequest(); // Configure custom BadRequest response
     
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.MapType<DateOnly>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Format = "date"
+    });
+});
 
 // Add services to the container.
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Configure Identity
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    // Turn off password requirements
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 1;
+    options.Password.RequiredUniqueChars = 0;
+})
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+;
 
 // Configure AutoMapper
 var config = new MapperConfiguration(cfg =>
