@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json.Serialization;
 using _3w1m.Data;
 using _3w1m.Mapper;
@@ -7,9 +8,12 @@ using _3w1m.Models.Exceptions;
 using _3w1m.Services.Implementation;
 using _3w1m.Services.Interface;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,7 +43,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     })
     .AddCustomBadRequest(); // Configure custom BadRequest response
-    
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -70,6 +74,28 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddDefaultTokenProviders();
 ;
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var key = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+    var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+    var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = issuer,
+        ValidAudience = audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+    };
+});
+
 // Configure AutoMapper
 var config = new MapperConfiguration(cfg =>
 {
@@ -77,6 +103,7 @@ var config = new MapperConfiguration(cfg =>
 });
 builder.Services.AddScoped<IMapper>(sp => new Mapper(config));
 
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -87,6 +114,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapControllers();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 // Add middleware to handle exceptions (ExceptionHandlingMiddleware)

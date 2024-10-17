@@ -23,35 +23,40 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 entityType.SetTableName(tableName.Substring(6));
             }
         }
-        
+
         // Relationships
         modelBuilder.Entity<Teacher>()
-            .HasOne<User>(t=>t.User)
+            .HasOne<User>(t => t.User)
             .WithOne()
-            .HasForeignKey<Teacher>(t=>t.UserId);
-        
+            .HasForeignKey<Teacher>(t => t.UserId);
+
         modelBuilder.Entity<Student>()
-            .HasOne<User>(s=>s.User)
+            .HasOne<User>(s => s.User)
             .WithOne()
-            .HasForeignKey<Student>(s=>s.UserId);
-        
+            .HasForeignKey<Student>(s => s.UserId);
+
         modelBuilder.Entity<Course>()
-            .HasOne<Teacher>(c=>c.Teacher)
+            .HasOne<Teacher>(c => c.Teacher)
             .WithMany()
-            .HasForeignKey(c=>c.TeacherId);
-        
+            .HasForeignKey(c => c.TeacherId);
+
         modelBuilder.Entity<Enrollment>()
-            .HasKey(e=>new {e.CourseId, e.StudentId});
+            .HasKey(e => new { e.CourseId, e.StudentId });
 
         modelBuilder.Entity<Enrollment>()
             .HasOne(e => e.Course)
             .WithMany(c => c.Enrollments)
             .HasForeignKey(e => e.CourseId);
-        
+
         modelBuilder.Entity<Enrollment>()
             .HasOne(e => e.Student)
             .WithMany(s => s.Enrollments)
             .HasForeignKey(e => e.StudentId);
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithMany(u => u.RefreshTokens)
+            .HasForeignKey(rt => rt.UserId);
         
         // Seed data 
         var listTeacher = new List<Teacher>()
@@ -64,7 +69,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                ContactPhone = "0987654321",
            }
         };
-        
+
         var listCourse = new List<Course>()
         {
             new Course
@@ -86,7 +91,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 TeacherId = 1
             }
         };
-        
+
         var listStudent = new List<Student>()
         {
             new Student
@@ -102,7 +107,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 DateOfBirth = new DateOnly(2000, 1, 1),
             }
         };
-        
+
         var listEnrollment = new List<Enrollment>()
         {
             new Enrollment
@@ -118,7 +123,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 EnrolledAt = new DateOnly(2022, 2, 1),
             }
         };
-        
+
         modelBuilder.Entity<Teacher>().HasData(listTeacher);
         modelBuilder.Entity<Course>().HasData(listCourse);
         modelBuilder.Entity<Student>().HasData(listStudent);
@@ -127,8 +132,10 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
     public DbSet<Student> Students { get; set; }
     public DbSet<Course> Courses { get; set; }
-    
+
     public DbSet<Enrollment> Enrollments { get; set; }
-    
+
     public DbSet<Teacher> Teachers { get; set; }
+
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 }
