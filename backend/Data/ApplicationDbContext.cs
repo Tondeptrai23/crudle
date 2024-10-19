@@ -1,4 +1,5 @@
 using _3w1m.Models.Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,8 +58,43 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasOne(rt => rt.User)
             .WithMany(u => u.RefreshTokens)
             .HasForeignKey(rt => rt.UserId);
-        
+
         // Seed data 
+        var hasher = new PasswordHasher<User>();
+        var listUser = new List<User>()
+        {
+            new User
+            {
+                UserName = "user1",
+                Email = "test1@example.com",
+                PasswordHash = hasher.HashPassword(null, "1"),
+                Id = GuidGenerator.Generate().ToString(),
+            },
+            new User
+            {
+                UserName = "user2",
+                Email = "test2@example.com",
+                PasswordHash = hasher.HashPassword(null, "1"),
+                Id = GuidGenerator.Generate().ToString(),
+            },
+            new User
+            {
+                UserName = "user3",
+                Email = "test3@example.com",
+                PasswordHash = hasher.HashPassword(null, "1"),
+                Id = GuidGenerator.Generate().ToString(),
+            },
+            new User
+            {
+                UserName = "user4",
+                Email = "test4@example.com",
+                PasswordHash = hasher.HashPassword(null, "1"),
+                Id = GuidGenerator.Generate().ToString(),
+            },
+        };
+
+        modelBuilder.Entity<User>().HasData(listUser);
+
         var listTeacher = new List<Teacher>()
         {
            new Teacher
@@ -67,6 +103,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                Fullname = "Teacher 1",
                ContactEmail = "example@gmail.com",
                ContactPhone = "0987654321",
+               UserId = listUser[0].Id,
            }
         };
 
@@ -99,12 +136,14 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 StudentId = 1,
                 Fullname = "Student 1",
                 DateOfBirth = new DateOnly(2000, 1, 1),
+                UserId = listUser[1].Id,
             },
             new Student
             {
                 StudentId = 2,
                 Fullname = "Student 2",
                 DateOfBirth = new DateOnly(2000, 1, 1),
+                UserId = listUser[2].Id,
             }
         };
 
@@ -136,6 +175,17 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Enrollment> Enrollments { get; set; }
 
     public DbSet<Teacher> Teachers { get; set; }
-
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+    public static class GuidGenerator
+    {
+        private static int _counter = 0;
+
+        public static Guid Generate()
+        {
+            var bytes = new byte[16];
+            BitConverter.GetBytes(_counter++).CopyTo(bytes, 0);
+            return new Guid(bytes);
+        }
+    }
 }
