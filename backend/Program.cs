@@ -58,6 +58,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, TokenService>(); 
 
 // Configure Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>

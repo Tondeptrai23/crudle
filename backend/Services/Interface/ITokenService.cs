@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using _3w1m.Models.Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace _3w1m.Services.Interface;
 
@@ -12,12 +13,12 @@ public interface ITokenService
     /// </summary>
     /// <param name="user">The user for whom the access token is generated.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the generated access token as a string.</returns>
-    Task<string> GenerateAccessToken(IdentityUser user);
+    Task<string> GenerateAccessToken(User user);
 
     /// <summary>
     /// Generates a refresh token for the specified user.
     /// </summary>
-    /// <param name="user">The user for whom the refresh token is generated.</param>
+    /// <param name="userId">The user for whom the refresh token is generated.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the generated refresh token as a string.</returns>
     Task<string> GenerateRefreshToken(string userId);
 

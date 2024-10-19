@@ -13,18 +13,18 @@ namespace _3w1m.Services.Implementation;
 
 public class TokenService : ITokenService
 {
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly IConfiguration _configuration;
     private readonly ApplicationDbContext _context;
 
-    public TokenService(UserManager<IdentityUser> userManager, IConfiguration configuration, ApplicationDbContext context)
+    public TokenService(UserManager<User> userManager, IConfiguration configuration, ApplicationDbContext context)
     {
         _userManager = userManager;
         _configuration = configuration;
         _context = context;
     }
 
-    public async Task<string> GenerateAccessToken(IdentityUser user)
+    public async Task<string> GenerateAccessToken(User user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
         var authClaims = new List<Claim>
@@ -39,7 +39,7 @@ public class TokenService : ITokenService
         var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
         var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
         var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
-        var jwtExpirationMinutes = int.Parse(Environment.GetEnvironmentVariable("JWT_EXPIRATION_MINUTES"));
+        var jwtExpirationMinutes = int.Parse(Environment.GetEnvironmentVariable("JWT_ACCESS_TOKEN_EXPIRES_IN_MINUTES"));
 
         var token = new JwtSecurityToken(
             issuer: jwtIssuer,
