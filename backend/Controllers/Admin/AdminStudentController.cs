@@ -23,7 +23,7 @@ public class StudentController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetStudentsAsync([FromQuery] GetStudentsQueryDto request)
+    public async Task<IActionResult> GetStudentsAsync([FromQuery] StudentCollectionQueryDto request)
     {
         var (count, students) = await _studentService.GetStudentsAsync(request);
         

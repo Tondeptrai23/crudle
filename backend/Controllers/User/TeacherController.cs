@@ -20,6 +20,6 @@ public class TeacherController : ControllerBase
     public async Task<IActionResult> GetTeacherById([FromRoute] int teacherId)
     {
         var teacherDto = await _teacherService.GetTeacherByIdAsync(teacherId);
-        return Ok(new ResponseDto<TeacherDetailDto>(teacherDto));
+        return Ok(new ResponseDto<TeacherDto>(teacherDto));
     }
 }

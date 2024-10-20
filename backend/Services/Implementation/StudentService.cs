@@ -36,9 +36,9 @@ public class StudentService : IStudentService
         return _mapper.Map<StudentDetailDto>(student);
     }
     
-    public async Task<(int count, IEnumerable<StudentDto> students)> GetStudentsAsync(GetStudentsQueryDto request)
+    public async Task<(int count, IEnumerable<StudentDto> students)> GetStudentsAsync(StudentCollectionQueryDto request)
     {
-        request ??= new GetStudentsQueryDto();
+        request ??= new StudentCollectionQueryDto();
         
         IQueryable<Student> query = _context.Students;
         
@@ -119,7 +119,7 @@ public class StudentService : IStudentService
         return _mapper.Map<StudentDto>(student);
     }
     
-    private IQueryable<Student> ApplyFilter(IQueryable<Student> query, GetStudentsQueryDto request)
+    private IQueryable<Student> ApplyFilter(IQueryable<Student> query, StudentCollectionQueryDto request)
     {
         if (request.StudentId != null)
         {
@@ -139,7 +139,7 @@ public class StudentService : IStudentService
         return query;
     }
     
-    private IQueryable<Student> ApplyOrder(IQueryable<Student> query, GetStudentsQueryDto request)
+    private IQueryable<Student> ApplyOrder(IQueryable<Student> query, StudentCollectionQueryDto request)
     {
         var orderBy = request.OrderBy?.ToLower();
         var orderDirection = request.OrderDirection?.ToLower();
@@ -163,7 +163,7 @@ public class StudentService : IStudentService
         return query;
     }
     
-    private IQueryable<Student> ApplyPagination(IQueryable<Student> query, GetStudentsQueryDto request)
+    private IQueryable<Student> ApplyPagination(IQueryable<Student> query, StudentCollectionQueryDto request)
     {
         return query.Skip((request.Page - 1) * request.Size)
             .Take(request.Size);
