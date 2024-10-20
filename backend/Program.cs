@@ -52,13 +52,37 @@ builder.Services.AddSwaggerGen(c =>
         Type = "string",
         Format = "date"
     });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 
 // Add services to the container.
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ITokenService, TokenService>(); 
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Configure Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -85,15 +109,33 @@ builder.Services.AddAuthentication(options =>
     var key = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
     var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
     var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+    options.UseSecurityTokenValidators = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
+        ValidateIssuer = false, // TODO: https://stackoverflow.com/questions/54395859/c-sharp-asp-net-core-bearer-error-invalid-token
         ValidateAudience = true,
         ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
+        ValidateIssuerSigningKey = true, 
         ValidIssuer = issuer,
         ValidAudience = audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+    };
+    
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            // var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            Console.WriteLine($"Issuer: {issuer}");
+            Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -115,9 +157,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapControllers();
 app.UseAuthentication();
+app.UseRouting();
 app.UseAuthorization();
+
 app.MapControllers();
 
 // Add middleware to handle exceptions (ExceptionHandlingMiddleware)

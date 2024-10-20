@@ -4,9 +4,12 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using _3w1m.Models.Domain;
+using _3w1m.Services;
+using Microsoft.AspNetCore.Authorization;
+using _3w1m.Dtos.Auth;
+using System.ComponentModel.DataAnnotations;
 
 namespace _3w1m.Controllers;
-using _3w1m.Services;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -28,14 +31,8 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+    public async Task<IActionResult> Login([FromBody, Required] LoginDto loginDto)
     {
-        // if (loginDto == null || string.IsNullOrEmpty(loginDto.Username) || string.IsNullOrEmpty(loginDto.Password))
-        // {
-        //     // return BadRequest("Invalid login request.");
-        //     throw new 
-        // }
-
         var user = await _userManager.FindByNameAsync(loginDto.Username);
         if (user == null)
         {
@@ -52,12 +49,12 @@ public class AuthController : ControllerBase
         var refreshToken = await _tokenService.GenerateRefreshToken(user.Id);
 
 
-        return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+        return Ok(new ResponseDto<Object>(new { AccessToken = accessToken, RefreshToken = refreshToken }));
     }
 
     [HttpPost]
     [Route("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
+    public async Task<IActionResult> Refresh([FromBody, Required] RefreshTokenDto refreshTokenDto)
     {
         var user = await _userManager.FindByIdAsync(refreshTokenDto.UserId);
         if (user == null || !await _tokenService.ValidateRefreshToken(user.Id, refreshTokenDto.RefreshToken))
@@ -66,7 +63,7 @@ public class AuthController : ControllerBase
         }
 
         var newAccessToken = await _tokenService.GenerateAccessToken(user);
-        return Ok(new { AccessToken = newAccessToken });
+        return Ok(new ResponseDto<Object>(new { AccessToken = newAccessToken }));
     }
 
     [HttpPost("create-test-user")]
@@ -82,11 +79,18 @@ public class AuthController : ControllerBase
 
         if (result.Succeeded)
         {
-            return Ok("User created successfully.");
+            return Ok(new ResponseDto<string>("User created successfully."));
         }
         else
         {
             return BadRequest(result.Errors);
         }
+    }
+
+    [HttpPost("check-token")]
+    [Authorize]
+    public IActionResult CheckToken()
+    {
+        return Ok(new ResponseDto<string>("Token is valid."));
     }
 }

@@ -30,24 +30,27 @@ public class TokenService : ITokenService
         var authClaims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            // new Claim(JwtRegisteredClaimNames.Iss, "testissuer"),
         };
 
         authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")));
+        var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? throw new InvalidOperationException("JWT secret key is not configured.");
+        var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? throw new InvalidOperationException("JWT issuer is not configured.");
+        var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? throw new InvalidOperationException("JWT audience is not configured.");
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey));
         var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-        var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
-        var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
         var jwtExpirationMinutes = int.Parse(Environment.GetEnvironmentVariable("JWT_ACCESS_TOKEN_EXPIRES_IN_MINUTES"));
 
         var token = new JwtSecurityToken(
             issuer: jwtIssuer,
             audience: jwtAudience,
-            expires: DateTime.Now.AddMinutes(jwtExpirationMinutes),
             claims: authClaims,
+            expires: DateTime.Now.AddMinutes(jwtExpirationMinutes),
             signingCredentials: creds
         );
+        Console.WriteLine(token);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
