@@ -22,9 +22,10 @@ public class MappingProfile : Profile
         CreateMap<Student, StudentDetailDto>()
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
 
+        CreateMap<CreateTeacherRequestDto, Teacher>();
         CreateMap<Teacher, TeacherDto>();
         CreateMap<Teacher, TeacherDto>().ReverseMap();
         CreateMap<Teacher, TeacherDetailDto>()
-            .ForMember(dest => dest.ContactEmail, opt => opt.MapFrom(src => src.User.Email));
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
     }
 }
