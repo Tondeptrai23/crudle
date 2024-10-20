@@ -29,7 +29,7 @@ public class TokenService : ITokenService
         var userRoles = await _userManager.GetRolesAsync(user);
         var authClaims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             // new Claim(JwtRegisteredClaimNames.Iss, "testissuer"),
         };
@@ -67,7 +67,9 @@ public class TokenService : ITokenService
             {
                 Token = refreshToken,
                 UserId = userId,
-                ExpiryDate = DateTime.Now.AddDays(int.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRES_IN_DAYS"))),
+                ExpiryDate = Environment.GetEnvironmentVariable("TEST_ENV") == "1"
+                    ? DateTime.Now.AddMinutes(int.Parse(Environment.GetEnvironmentVariable("TEST_JWT_REFRESH_TOKEN_EXPIRES_IN_MINUTES")))
+                    : DateTime.Now.AddDays(int.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRES_IN_DAYS"))),
                 IsRevoked = false
             };
 

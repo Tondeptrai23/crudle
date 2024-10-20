@@ -8,6 +8,7 @@ using _3w1m.Services;
 using Microsoft.AspNetCore.Authorization;
 using _3w1m.Dtos.Auth;
 using System.ComponentModel.DataAnnotations;
+using _3w1m.Models.Exceptions;
 
 namespace _3w1m.Controllers;
 
@@ -36,13 +37,13 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByNameAsync(loginDto.Username);
         if (user == null)
         {
-            return Unauthorized();
+            throw new UnauthorizedExcpetion();
         }
 
         var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
         if (!result.Succeeded)
         {
-            return Unauthorized();
+            throw new UnauthorizedExcpetion();
         }
 
         var accessToken = await _tokenService.GenerateAccessToken(user);
@@ -59,7 +60,7 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByIdAsync(refreshTokenDto.UserId);
         if (user == null || !await _tokenService.ValidateRefreshToken(user.Id, refreshTokenDto.RefreshToken))
         {
-            return Unauthorized();
+            throw new UnauthorizedExcpetion();
         }
 
         var newAccessToken = await _tokenService.GenerateAccessToken(user);
