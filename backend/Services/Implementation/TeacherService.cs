@@ -33,16 +33,6 @@ public class TeacherService : ITeacherService
             throw new ConflictException("Teacher already exists");
         }
 
-        if (await _context.Teachers.AnyAsync(t => t.ContactEmail == teacherData.ContactEmail))
-        {
-            throw new ConflictException("Email already exists");
-        }
-
-        if (await _context.Teachers.AnyAsync(t => t.ContactPhone == teacherData.ContactPhone))
-        {
-            throw new ConflictException("Phone number already exists");
-        }
-
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
@@ -60,7 +50,7 @@ public class TeacherService : ITeacherService
 
             return _mapper.Map<TeacherDto>(createdTeacher.Entity);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await transaction.RollbackAsync();
             throw;
