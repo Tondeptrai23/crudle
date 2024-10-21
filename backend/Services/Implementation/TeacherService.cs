@@ -33,10 +33,15 @@ public class TeacherService : ITeacherService
             throw new ConflictException("Teacher already exists");
         }
 
+        if (await _context.Users.AnyAsync(u => u.Email == teacherData.Email))
+        {
+            throw new ConflictException("Email already exists");
+        }
+
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var userId = await _userService.CreateUserAsync(teacherData.ContactEmail, teacherData.Password);
+            var userId = await _userService.CreateUserAsync(teacherData.Email, teacherData.Password);
             if (userId == null) {
                 throw new Exception("Failed to create user");
             }
