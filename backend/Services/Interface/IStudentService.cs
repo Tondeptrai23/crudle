@@ -22,7 +22,7 @@ public interface IStudentService
     /// Retrieves a collection of all students.
     /// </summary>
     /// <returns>The task result contains a collection of student DTOs.</returns>
-    public Task<(int count, IEnumerable<StudentDto> students)> GetStudentsAsync(GetStudentsQueryDto request);
+    public Task<(int count, IEnumerable<StudentDto> students)> GetStudentsAsync(StudentCollectionQueryDto request);
     
     /// <summary>
     /// Creates a new student record.
