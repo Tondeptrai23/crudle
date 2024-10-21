@@ -9,7 +9,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Nav className='max-w-full max-h-18' />
-      <Separator className='-mt-2'/>
+      <Separator />
       <main className='flex-grow'>
         <Routes>
           <Route path='/' element={<WeatherPage />} />
