@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json.Serialization;
 using _3w1m.Data;
 using _3w1m.Mapper;
@@ -7,9 +8,12 @@ using _3w1m.Models.Exceptions;
 using _3w1m.Services.Implementation;
 using _3w1m.Services.Interface;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,7 +43,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     })
     .AddCustomBadRequest(); // Configure custom BadRequest response
-    
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -48,12 +52,37 @@ builder.Services.AddSwaggerGen(c =>
         Type = "string",
         Format = "date"
     });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 
 // Add services to the container.
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Configure Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -70,6 +99,46 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddDefaultTokenProviders();
 ;
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var key = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+    var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+    var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+    options.UseSecurityTokenValidators = true;
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false, // TODO: https://stackoverflow.com/questions/54395859/c-sharp-asp-net-core-bearer-error-invalid-token
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true, 
+        ValidIssuer = issuer,
+        ValidAudience = audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+    };
+    
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            // var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            Console.WriteLine($"Issuer: {issuer}");
+            Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+            return Task.CompletedTask;
+        }
+    };
+});
+
 // Configure AutoMapper
 var config = new MapperConfiguration(cfg =>
 {
@@ -77,6 +146,7 @@ var config = new MapperConfiguration(cfg =>
 });
 builder.Services.AddScoped<IMapper>(sp => new Mapper(config));
 
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -87,6 +157,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseRouting();
+app.UseAuthorization();
+
 app.MapControllers();
 
 // Add middleware to handle exceptions (ExceptionHandlingMiddleware)

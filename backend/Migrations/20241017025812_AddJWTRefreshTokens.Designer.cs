@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using _3w1m.Data;
 
@@ -11,9 +12,11 @@ using _3w1m.Data;
 namespace _3w1m.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241017025812_AddJWTRefreshTokens")]
+    partial class AddJWTRefreshTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -303,15 +306,13 @@ namespace _3w1m.Migrations
                         {
                             StudentId = 1,
                             DateOfBirth = new DateOnly(2000, 1, 1),
-                            Fullname = "Student 1",
-                            UserId = "00000005-0000-0000-0000-000000000000"
+                            Fullname = "Student 1"
                         },
                         new
                         {
                             StudentId = 2,
                             DateOfBirth = new DateOnly(2000, 1, 1),
-                            Fullname = "Student 2",
-                            UserId = "00000006-0000-0000-0000-000000000000"
+                            Fullname = "Student 2"
                         });
                 });
 
@@ -351,8 +352,7 @@ namespace _3w1m.Migrations
                             TeacherId = 1,
                             ContactEmail = "example@gmail.com",
                             ContactPhone = "0987654321",
-                            Fullname = "Teacher 1",
-                            UserId = "00000004-0000-0000-0000-000000000000"
+                            Fullname = "Teacher 1"
                         });
                 });
 
@@ -418,64 +418,6 @@ namespace _3w1m.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("Users", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "00000004-0000-0000-0000-000000000000",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "2c362871-1106-41e8-a2e7-a8d6bc98460a",
-                            Email = "test1@example.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAED9zmti95ILQjN8oElpmrsveI6I+wIWEfm5yA7EsGfTXJC1OXCGXwf98D2e+khu8Kg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "99b162f3-0293-46ea-b2e3-068e6262217c",
-                            TwoFactorEnabled = false,
-                            UserName = "user1"
-                        },
-                        new
-                        {
-                            Id = "00000005-0000-0000-0000-000000000000",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "e0bf716a-005a-43b7-b439-8e8ffb255e4f",
-                            Email = "test2@example.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEI77tfx5yiTlRUcOjHH/Ct6AuDo0tJ3uLcBRkLZ6wrUqmK+icQzlfUInoFgVAnvaHw==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "dea14b77-2ba5-46b5-b229-fcf19a77cd3f",
-                            TwoFactorEnabled = false,
-                            UserName = "user2"
-                        },
-                        new
-                        {
-                            Id = "00000006-0000-0000-0000-000000000000",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "90f6ed37-317d-4157-93d9-456ffa4b2a7c",
-                            Email = "test3@example.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEOBSOz8SZS6S5e/96BXt9oue2Ix5P4+tdhAQMnRY3QVp2eFsF3kVZgVnY+gNuZAWJQ==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "bcb920c1-dbdd-4f46-914a-206541405e6f",
-                            TwoFactorEnabled = false,
-                            UserName = "user3"
-                        },
-                        new
-                        {
-                            Id = "00000007-0000-0000-0000-000000000000",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "bda8744a-fb80-4d05-991a-0a60e99088e4",
-                            Email = "test4@example.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEDrOItjDMLHpYOd7PZHldgBBPHQpdFJWR6XTAj3P+HeA8mbY8avXNXNsw2y+9JPvAQ==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "581c9100-8c1c-4cd1-8322-ab20dfc3403e",
-                            TwoFactorEnabled = false,
-                            UserName = "user4"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
