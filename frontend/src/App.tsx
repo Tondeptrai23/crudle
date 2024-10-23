@@ -1,10 +1,10 @@
 import React from 'react';
-import { WeatherPage } from './pages/WeatherPage.tsx';
+import { LoginPage } from '@/pages/LoginPage.tsx';
 
 const App: React.FC = () => {
   return (
     <div>
-      <WeatherPage />
+      <LoginPage />
     </div>
   )
 };
