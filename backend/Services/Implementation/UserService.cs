@@ -14,7 +14,7 @@ public class UserService : IUserService
         _userManager = userManager;
     }
     
-    public async Task<string?> CreateUserAsync(string email, string password)
+    public async Task<string?> CreateUserAsync(string email, string password, string role)
     {
         var user = new User
         {
@@ -23,6 +23,11 @@ public class UserService : IUserService
         };
         
         var result = await _userManager.CreateAsync(user, password);
+        if (result.Succeeded)
+        {
+            result = await _userManager.AddToRoleAsync(user, role);
+        }
+        
         return result.Succeeded ? user.Id : null;
     }
 }

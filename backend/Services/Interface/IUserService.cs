@@ -14,6 +14,8 @@ public interface IUserService
     /// </summary>
     /// <param name="email">User's email to be created</param>
     /// <param name="password">User's password to be created</param>
+    /// <param name="role">User's role to be created</param>
     /// <returns>The UserId of the created user, or null if it cannot be created</returns>
-    public Task<string?> CreateUserAsync(string email, string password);
+    public Task<string?> CreateUserAsync(string email, string password, string role);
+
 }

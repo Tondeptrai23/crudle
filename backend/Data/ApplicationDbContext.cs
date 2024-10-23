@@ -1,3 +1,4 @@
+using _3w1m.Constants;
 using _3w1m.Models.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -61,6 +62,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
         // Seed data 
         var hasher = new PasswordHasher<User>();
+        
         var listUser = new List<User>()
         {
             new User
@@ -91,9 +93,29 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 PasswordHash = hasher.HashPassword(null, "1"),
                 Id = GuidGenerator.Generate().ToString(),
             },
+            new User
+            {
+                UserName = "admin",
+                Email = "admin@gmail.com",
+                PasswordHash = hasher.HashPassword(null, "pass"),
+                Id = GuidGenerator.Generate().ToString(),
+            }
         };
+        
+        // Seed role
+        var listRoles = new List<IdentityRole>()
+        {
+            new IdentityRole { Id = "1", Name = CourseRoles.Admin, NormalizedName = CourseRoles.Admin.ToUpper() },
+            new IdentityRole { Id = "2", Name = CourseRoles.Teacher, NormalizedName = CourseRoles.Teacher.ToUpper() },
+            new IdentityRole { Id = "3", Name = CourseRoles.Student, NormalizedName = CourseRoles.Student.ToUpper() }
+        };
+        modelBuilder.Entity<IdentityRole>().HasData(listRoles);
 
         modelBuilder.Entity<User>().HasData(listUser);
+
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string> { RoleId = "1", UserId = listUser[4].Id }
+        );
 
         var listTeacher = new List<Teacher>()
         {
@@ -106,7 +128,37 @@ public class ApplicationDbContext : IdentityDbContext<User>
                UserId = listUser[0].Id,
            }
         };
-
+        modelBuilder.Entity<Teacher>().HasData(listTeacher);
+        
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string> { RoleId = "2", UserId = listUser[0].Id }
+        );
+        
+        
+        var listStudent = new List<Student>()
+        {
+            new Student
+            {
+                StudentId = 1,
+                Fullname = "Student 1",
+                DateOfBirth = new DateOnly(2000, 1, 1),
+                UserId = listUser[1].Id,
+            },
+            new Student
+            {
+                StudentId = 2,
+                Fullname = "Student 2",
+                DateOfBirth = new DateOnly(2000, 1, 1),
+                UserId = listUser[2].Id,
+            }
+        };
+        modelBuilder.Entity<Student>().HasData(listStudent);
+        
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string> { RoleId = "3", UserId = listUser[1].Id },
+            new IdentityUserRole<string> { RoleId = "3", UserId = listUser[2].Id }
+        );
+        
         var listCourse = new List<Course>()
         {
             new Course
@@ -129,23 +181,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
             }
         };
 
-        var listStudent = new List<Student>()
-        {
-            new Student
-            {
-                StudentId = 1,
-                Fullname = "Student 1",
-                DateOfBirth = new DateOnly(2000, 1, 1),
-                UserId = listUser[1].Id,
-            },
-            new Student
-            {
-                StudentId = 2,
-                Fullname = "Student 2",
-                DateOfBirth = new DateOnly(2000, 1, 1),
-                UserId = listUser[2].Id,
-            }
-        };
+
 
         var listEnrollment = new List<Enrollment>()
         {
@@ -163,9 +199,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
             }
         };
 
-        modelBuilder.Entity<Teacher>().HasData(listTeacher);
         modelBuilder.Entity<Course>().HasData(listCourse);
-        modelBuilder.Entity<Student>().HasData(listStudent);
         modelBuilder.Entity<Enrollment>().HasData(listEnrollment);
     }
 

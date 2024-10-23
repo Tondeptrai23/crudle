@@ -1,3 +1,4 @@
+using _3w1m.Constants;
 using _3w1m.Data;
 using _3w1m.Dtos.Student;
 using _3w1m.Models.Domain;
@@ -71,7 +72,8 @@ public class StudentService : IStudentService
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var userId = await _userService.CreateUserAsync(studentData.Email, studentData.Password);
+            var userId = await _userService.CreateUserAsync(studentData.Email, studentData.Password, CourseRoles.Student);
+            
             if (userId == null)
             {
                 throw new Exception("Failed to create student");
@@ -81,6 +83,7 @@ public class StudentService : IStudentService
             student.UserId = userId;
 
             var createdStudent =  await _context.Students.AddAsync(student);
+            
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
                 
