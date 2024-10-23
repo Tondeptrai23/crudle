@@ -12,8 +12,8 @@ using _3w1m.Data;
 namespace _3w1m.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241019150614_AddUserSampleData")]
-    partial class AddUserSampleData
+    [Migration("20241023051430_SeedUserAndRole")]
+    partial class SeedUserAndRole
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,128 +24,6 @@ namespace _3w1m.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("_3w1m.Models.Domain.User", b =>
-               {
-                   b.Property<string>("Id")
-                       .HasColumnType("varchar(255)");
-
-                   b.Property<int>("AccessFailedCount")
-                       .HasColumnType("int");
-
-                   b.Property<string>("ConcurrencyStamp")
-                       .IsConcurrencyToken()
-                       .HasColumnType("longtext");
-
-                   b.Property<string>("Email")
-                       .HasMaxLength(256)
-                       .HasColumnType("varchar(256)");
-
-                   b.Property<bool>("EmailConfirmed")
-                       .HasColumnType("tinyint(1)");
-
-                   b.Property<bool>("LockoutEnabled")
-                       .HasColumnType("tinyint(1)");
-
-                   b.Property<DateTimeOffset?>("LockoutEnd")
-                       .HasColumnType("datetime(6)");
-
-                   b.Property<string>("NormalizedEmail")
-                       .HasMaxLength(256)
-                       .HasColumnType("varchar(256)");
-
-                   b.Property<string>("NormalizedUserName")
-                       .HasMaxLength(256)
-                       .HasColumnType("varchar(256)");
-
-                   b.Property<string>("PasswordHash")
-                       .HasColumnType("longtext");
-
-                   b.Property<string>("PhoneNumber")
-                       .HasColumnType("longtext");
-
-                   b.Property<bool>("PhoneNumberConfirmed")
-                       .HasColumnType("tinyint(1)");
-
-                   b.Property<string>("SecurityStamp")
-                       .HasColumnType("longtext");
-
-                   b.Property<bool>("TwoFactorEnabled")
-                       .HasColumnType("tinyint(1)");
-
-                   b.Property<string>("UserName")
-                       .HasMaxLength(256)
-                       .HasColumnType("varchar(256)");
-
-                   b.HasKey("Id");
-
-                   b.HasIndex("NormalizedEmail")
-                       .HasDatabaseName("EmailIndex");
-
-                   b.HasIndex("NormalizedUserName")
-                       .IsUnique()
-                       .HasDatabaseName("UserNameIndex");
-
-                   b.ToTable("Users", (string)null);
-
-                   b.HasData(
-                       new
-                       {
-                           Id = "00000004-0000-0000-0000-000000000000",
-                           AccessFailedCount = 0,
-                           ConcurrencyStamp = "2c362871-1106-41e8-a2e7-a8d6bc98460a",
-                           Email = "test1@example.com",
-                           EmailConfirmed = false,
-                           LockoutEnabled = false,
-                           PasswordHash = "AQAAAAIAAYagAAAAED9zmti95ILQjN8oElpmrsveI6I+wIWEfm5yA7EsGfTXJC1OXCGXwf98D2e+khu8Kg==",
-                           PhoneNumberConfirmed = false,
-                           SecurityStamp = "99b162f3-0293-46ea-b2e3-068e6262217c",
-                           TwoFactorEnabled = false,
-                           UserName = "user1"
-                       },
-                       new
-                       {
-                           Id = "00000005-0000-0000-0000-000000000000",
-                           AccessFailedCount = 0,
-                           ConcurrencyStamp = "e0bf716a-005a-43b7-b439-8e8ffb255e4f",
-                           Email = "test2@example.com",
-                           EmailConfirmed = false,
-                           LockoutEnabled = false,
-                           PasswordHash = "AQAAAAIAAYagAAAAEI77tfx5yiTlRUcOjHH/Ct6AuDo0tJ3uLcBRkLZ6wrUqmK+icQzlfUInoFgVAnvaHw==",
-                           PhoneNumberConfirmed = false,
-                           SecurityStamp = "dea14b77-2ba5-46b5-b229-fcf19a77cd3f",
-                           TwoFactorEnabled = false,
-                           UserName = "user2"
-                       },
-                       new
-                       {
-                           Id = "00000006-0000-0000-0000-000000000000",
-                           AccessFailedCount = 0,
-                           ConcurrencyStamp = "90f6ed37-317d-4157-93d9-456ffa4b2a7c",
-                           Email = "test3@example.com",
-                           EmailConfirmed = false,
-                           LockoutEnabled = false,
-                           PasswordHash = "AQAAAAIAAYagAAAAEOBSOz8SZS6S5e/96BXt9oue2Ix5P4+tdhAQMnRY3QVp2eFsF3kVZgVnY+gNuZAWJQ==",
-                           PhoneNumberConfirmed = false,
-                           SecurityStamp = "bcb920c1-dbdd-4f46-914a-206541405e6f",
-                           TwoFactorEnabled = false,
-                           UserName = "user3"
-                       },
-                       new
-                       {
-                           Id = "00000007-0000-0000-0000-000000000000",
-                           AccessFailedCount = 0,
-                           ConcurrencyStamp = "bda8744a-fb80-4d05-991a-0a60e99088e4",
-                           Email = "test4@example.com",
-                           EmailConfirmed = false,
-                           LockoutEnabled = false,
-                           PasswordHash = "AQAAAAIAAYagAAAAEDrOItjDMLHpYOd7PZHldgBBPHQpdFJWR6XTAj3P+HeA8mbY8avXNXNsw2y+9JPvAQ==",
-                           PhoneNumberConfirmed = false,
-                           SecurityStamp = "581c9100-8c1c-4cd1-8322-ab20dfc3403e",
-                           TwoFactorEnabled = false,
-                           UserName = "user4"
-                       });
-               });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -171,6 +49,26 @@ namespace _3w1m.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("Roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Name = "Teacher",
+                            NormalizedName = "TEACHER"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            Name = "Student",
+                            NormalizedName = "STUDENT"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -258,6 +156,28 @@ namespace _3w1m.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("UserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "00000000-0000-0000-0000-000000000005",
+                            RoleId = "1"
+                        },
+                        new
+                        {
+                            UserId = "00000000-0000-0000-0000-000000000001",
+                            RoleId = "2"
+                        },
+                        new
+                        {
+                            UserId = "00000000-0000-0000-0000-000000000002",
+                            RoleId = "3"
+                        },
+                        new
+                        {
+                            UserId = "00000000-0000-0000-0000-000000000003",
+                            RoleId = "3"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -429,14 +349,14 @@ namespace _3w1m.Migrations
                             StudentId = 1,
                             DateOfBirth = new DateOnly(2000, 1, 1),
                             Fullname = "Student 1",
-                            UserId = "00000005-0000-0000-0000-000000000000"
+                            UserId = "00000000-0000-0000-0000-000000000002"
                         },
                         new
                         {
                             StudentId = 2,
                             DateOfBirth = new DateOnly(2000, 1, 1),
                             Fullname = "Student 2",
-                            UserId = "00000006-0000-0000-0000-000000000000"
+                            UserId = "00000000-0000-0000-0000-000000000003"
                         });
                 });
 
@@ -477,7 +397,143 @@ namespace _3w1m.Migrations
                             ContactEmail = "example@gmail.com",
                             ContactPhone = "0987654321",
                             Fullname = "Teacher 1",
-                            UserId = "00000004-0000-0000-0000-000000000000"
+                            UserId = "00000000-0000-0000-0000-000000000001"
+                        });
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "00000000-0000-0000-0000-000000000001",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "b52327e6-99c5-4c73-9fea-37c70e91b0d6",
+                            Email = "test1@example.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "AQAAAAIAAYagAAAAEGY3/jZPdjlC+0rif/x/salz0lWRZBXJGex9R1lmfw/x6/KDyo51/MGMiDHVsBNspA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "c8d14d8c-ddd4-49f7-a951-5677be83f870",
+                            TwoFactorEnabled = false,
+                            UserName = "user1"
+                        },
+                        new
+                        {
+                            Id = "00000000-0000-0000-0000-000000000002",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "83b0cab4-4b16-4ae4-9dcf-21aa0e59f3a0",
+                            Email = "test2@example.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "AQAAAAIAAYagAAAAEPYKyiY4T5h752hDr1DK7BCSjaskWJIqFBHKXsszNCNV6sjpwQKGeqTRHT75v8xF9g==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "cd0ee10d-2324-4f43-bcd2-39de4b4527d9",
+                            TwoFactorEnabled = false,
+                            UserName = "user2"
+                        },
+                        new
+                        {
+                            Id = "00000000-0000-0000-0000-000000000003",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "fa61edd6-1808-4c88-afa1-18e0d55819fa",
+                            Email = "test3@example.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "AQAAAAIAAYagAAAAENSoMck5X7KdIbHJLBVerojHApoSzsRLV0DjNRmU58GJEDy2kO8Xj0332+/G+wrYgw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "9bde5fb3-71fa-4784-adf7-490057fb6129",
+                            TwoFactorEnabled = false,
+                            UserName = "user3"
+                        },
+                        new
+                        {
+                            Id = "00000000-0000-0000-0000-000000000004",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "7b677eb9-6196-48d5-bfd1-7959609a7279",
+                            Email = "test4@example.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "AQAAAAIAAYagAAAAELkuBKy/ahdaKTv7/i28NZk9aN5U4Iwy67azZAGLmI2enPVoBNrVTDvlSDlW3RqgyQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "b4340262-c812-4664-851b-385b4e6bdb43",
+                            TwoFactorEnabled = false,
+                            UserName = "user4"
+                        },
+                        new
+                        {
+                            Id = "00000000-0000-0000-0000-000000000005",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "caa60800-7b3f-4bf4-9009-341551e03cb4",
+                            Email = "admin@gmail.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "AQAAAAIAAYagAAAAEMvT1+WKmOwQy8Brm7twgtVNMjI1TTfcGz7XM4IcC1bP6d1dfOuwXO59W4amz11V7Q==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "7b762730-d6ae-4e02-99ce-73e3dac979f0",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
                         });
                 });
 
@@ -577,7 +633,8 @@ namespace _3w1m.Migrations
                 {
                     b.HasOne("_3w1m.Models.Domain.User", "User")
                         .WithOne()
-                        .HasForeignKey("_3w1m.Models.Domain.Student", "UserId");
+                        .HasForeignKey("_3w1m.Models.Domain.Student", "UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });
@@ -586,7 +643,8 @@ namespace _3w1m.Migrations
                 {
                     b.HasOne("_3w1m.Models.Domain.User", "User")
                         .WithOne()
-                        .HasForeignKey("_3w1m.Models.Domain.Teacher", "UserId");
+                        .HasForeignKey("_3w1m.Models.Domain.Teacher", "UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });
