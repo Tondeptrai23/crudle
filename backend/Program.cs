@@ -10,6 +10,7 @@ using _3w1m.Services.Interface;
 using _3w1m.Settings;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -91,7 +92,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
     .AddSignInManager<SignInManager<User>>();
-;
+
 
 builder.Services.AddAuthenticationConfig();
 builder.Services.AddAuthorization();
@@ -113,13 +114,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Add middleware to handle exceptions (ExceptionHandlingMiddleware)
+
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseExceptionHandlingMiddleware();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Add middleware to handle exceptions (ExceptionHandlingMiddleware)
-app.UseExceptionHandlingMiddleware();
 
 app.MapControllers();
 

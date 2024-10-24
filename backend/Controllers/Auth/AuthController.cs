@@ -10,7 +10,7 @@ using _3w1m.Dtos.Auth;
 using System.ComponentModel.DataAnnotations;
 using _3w1m.Models.Exceptions;
 
-namespace _3w1m.Controllers;
+namespace _3w1m.Controllers.Auth;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -38,13 +38,13 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByNameAsync(loginDto.Username);
         if (user == null)
         {
-            throw new UnauthorizedExcpetion();
+            throw new UnauthorizedException("User not found.");
         }
 
         var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
         if (!result.Succeeded)
         {
-            throw new UnauthorizedExcpetion();
+            throw new UnauthorizedException("Invalid password.");
         }
 
         var accessToken = await _tokenService.GenerateAccessToken(user);
@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByIdAsync(refreshTokenDto.UserId);
         if (user == null || !await _tokenService.ValidateRefreshToken(user.Id, refreshTokenDto.RefreshToken))
         {
-            throw new UnauthorizedExcpetion();
+            throw new UnauthorizedException("Invalid refresh token.");
         }
 
         var newAccessToken = await _tokenService.GenerateAccessToken(user);
