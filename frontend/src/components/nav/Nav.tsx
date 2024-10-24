@@ -1,29 +1,28 @@
-import React from 'react';
+import { Button } from '@/components/common/ui/button';
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/common/ui/navigation-menu';
-import Logo  from './Logo';
-import { Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Profile from './Profile';
+import { Bell } from 'lucide-react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
+import Logo from './Logo';
+import Profile, { ProfileActions } from './Profile';
 
-interface NavProps {
+export interface NavProps {
   className?: string;
+  items: { path: string; label: string }[];
+  handleNotification: () => void;
+  profileActions: ProfileActions;
 }
 
-const Nav: React.FC<NavProps> = ({ className }) => {
+const Nav: React.FC<NavProps> = (props) => {
   const { pathname } = useLocation();
 
-  const navigationItems = [
-    { path: '/', text: 'General' },
-    { path: '/course', text: 'Course' },
-  ];
-
-  const generateNavigationItem = (path: string, text: string) => {
+  const generateNavigationItem = (path: string, label: string) => {
     const baseClass = 'px-3 py-1 font-semibold cursor-pointer';
     const selectedClass = 'bg-zinc-200 rounded-lg';
 
@@ -36,7 +35,7 @@ const Nav: React.FC<NavProps> = ({ className }) => {
     return (
       <NavigationMenuItem key={path}>
         <NavigationMenuLink href={path}>
-          <div className={classValue}>{text}</div>
+          <div className={classValue}>{label}</div>
         </NavigationMenuLink>
       </NavigationMenuItem>
     );
@@ -44,20 +43,31 @@ const Nav: React.FC<NavProps> = ({ className }) => {
 
   return (
     <NavigationMenu
-      className={cn('flex justify-between px-8', className)}
+      className={cn('flex justify-between px-8', props.className)}
       orientation='horizontal'
     >
-      <div className='flex items-center gap-4'>
+      <div className='flex items-center gap-8'>
         <Logo />
         <NavigationMenuList className='gap-4'>
-          {navigationItems.map(({ path, text }) =>
-            generateNavigationItem(path, text)
+          {props.items.map(({ path, label }) =>
+            generateNavigationItem(path, label)
           )}
         </NavigationMenuList>
       </div>
       <div className='flex items-center gap-2'>
-        <Bell />
-        <Profile name='John Doe' role='Hoc Sinh' />
+        <Button
+          variant='ghost'
+          size='icon'
+          className='rounded-full'
+          onClick={props.handleNotification}
+        >
+          <Bell />
+        </Button>
+        <Profile
+          name='John Doe'
+          role='Hoc Sinh'
+          actions={props.profileActions}
+        />
       </div>
     </NavigationMenu>
   );
