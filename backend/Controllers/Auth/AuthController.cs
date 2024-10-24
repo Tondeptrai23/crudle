@@ -10,7 +10,7 @@ using _3w1m.Dtos.Auth;
 using System.ComponentModel.DataAnnotations;
 using _3w1m.Models.Exceptions;
 
-namespace _3w1m.Controllers;
+namespace _3w1m.Controllers.Auth;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -38,20 +38,22 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByNameAsync(loginDto.Username);
         if (user == null)
         {
-            throw new UnauthorizedExcpetion();
+            throw new UnauthorizedException("User not found.");
         }
 
         var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
         if (!result.Succeeded)
         {
-            throw new UnauthorizedExcpetion();
+            throw new UnauthorizedException("Invalid password.");
         }
 
         var accessToken = await _tokenService.GenerateAccessToken(user);
         var refreshToken = await _tokenService.GenerateRefreshToken(user.Id);
+        
+        var roles = await _userManager.GetRolesAsync(user);
 
-
-        return Ok(new ResponseDto<Object>(new { AccessToken = accessToken, RefreshToken = refreshToken }));
+        return Ok(new ResponseDto<Object>(new
+            { AccessToken = accessToken, RefreshToken = refreshToken, UserId = user.Id, Role = roles[0] }));
     }
 
     [HttpPost]
@@ -61,38 +63,10 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByIdAsync(refreshTokenDto.UserId);
         if (user == null || !await _tokenService.ValidateRefreshToken(user.Id, refreshTokenDto.RefreshToken))
         {
-            throw new UnauthorizedExcpetion();
+            throw new UnauthorizedException("Invalid refresh token.");
         }
 
         var newAccessToken = await _tokenService.GenerateAccessToken(user);
         return Ok(new ResponseDto<Object>(new { AccessToken = newAccessToken }));
-    }
-
-    [HttpPost("create-test-user")]
-    public async Task<IActionResult> CreateTestUser()
-    {
-        var user = new User()
-        {
-            UserName = "testuser",
-            Email = "testuser@example.com"
-        };
-
-        var result = await _userManager.CreateAsync(user, "Test@123");
-
-        if (result.Succeeded)
-        {
-            return Ok(new ResponseDto<string>("User created successfully."));
-        }
-        else
-        {
-            return BadRequest(result.Errors);
-        }
-    }
-
-    [HttpPost("check-token")]
-    [Authorize]
-    public IActionResult CheckToken()
-    {
-        return Ok(new ResponseDto<string>("Token is valid."));
     }
 }

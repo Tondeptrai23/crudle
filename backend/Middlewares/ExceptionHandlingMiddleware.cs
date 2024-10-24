@@ -14,6 +14,16 @@ public class ExceptionHandlingMiddleware
         try
         {
             await _next(context);
+            
+            if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
+            {
+                throw new UnauthorizedException("Authentication failed - invalid or missing token");
+            }
+            
+            if (context.Response.StatusCode == StatusCodes.Status403Forbidden)
+            {
+                throw new ForbiddenException("Authorization failed - insufficient permissions");
+            }
         }
         catch (Exception e)
         {

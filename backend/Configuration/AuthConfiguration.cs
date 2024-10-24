@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace _3w1m.Configuration;
 
-public static class AuthenticationExtension
+public static class AuthenticationConfigExtension
 {
     public static IServiceCollection AddAuthenticationConfig(this IServiceCollection services)
     {

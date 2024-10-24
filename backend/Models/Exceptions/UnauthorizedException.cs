@@ -2,13 +2,13 @@ using System.Net;
 
 namespace _3w1m.Models.Exceptions;
 
-public class UnauthorizedExcpetion : CustomException
+public class UnauthorizedException : CustomException
 {
-    public UnauthorizedExcpetion() : base("Unauthorized")
+    public UnauthorizedException() : base("Unauthorized")
     {
     }
 
-    public UnauthorizedExcpetion(string message) : base(message)
+    public UnauthorizedException(string message) : base(message)
     {
     }
 
