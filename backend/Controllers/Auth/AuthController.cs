@@ -14,16 +14,17 @@ namespace _3w1m.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Tags("Authentication")]
 public class AuthController : ControllerBase
 {
     private readonly ITokenService _tokenService;
-    private readonly UserManager<_3w1m.Models.Domain.User> _userManager;
-    private readonly SignInManager<_3w1m.Models.Domain.User> _signInManager;
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
 
     public AuthController(
         ITokenService tokenService,
-        UserManager<_3w1m.Models.Domain.User> userManager,
-        SignInManager<_3w1m.Models.Domain.User> signInManager)
+        UserManager<User> userManager,
+        SignInManager<User> signInManager)
     {
         _tokenService = tokenService;
         _userManager = userManager;
@@ -70,7 +71,7 @@ public class AuthController : ControllerBase
     [HttpPost("create-test-user")]
     public async Task<IActionResult> CreateTestUser()
     {
-        var user = new _3w1m.Models.Domain.User()
+        var user = new User()
         {
             UserName = "testuser",
             Email = "testuser@example.com"

@@ -2,12 +2,14 @@ using _3w1m.Dtos;
 using _3w1m.Dtos.Student;
 using _3w1m.Services.Interface;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace _3w1m.Controllers.User;
+namespace _3w1m.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class StudentController : ControllerBase
 {
     private readonly IStudentService _studentService;
