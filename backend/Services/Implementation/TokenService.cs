@@ -5,6 +5,7 @@ using System.Text;
 using _3w1m.Data;
 using _3w1m.Models.Domain;
 using _3w1m.Services.Interface;
+using _3w1m.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,13 +15,13 @@ namespace _3w1m.Services.Implementation;
 public class TokenService : ITokenService
 {
     private readonly UserManager<User> _userManager;
-    private readonly IConfiguration _configuration;
+    private readonly JwtSettings _jwtSettings;
     private readonly ApplicationDbContext _context;
 
-    public TokenService(UserManager<User> userManager, IConfiguration configuration, ApplicationDbContext context)
+    public TokenService(UserManager<User> userManager, JwtSettings jwtSettings, ApplicationDbContext context)
     {
         _userManager = userManager;
-        _configuration = configuration;
+        _jwtSettings = jwtSettings;
         _context = context;
     }
 
@@ -31,26 +32,21 @@ public class TokenService : ITokenService
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            // new Claim(JwtRegisteredClaimNames.Iss, "testissuer"),
         };
 
         authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-        var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? throw new InvalidOperationException("JWT secret key is not configured.");
-        var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? throw new InvalidOperationException("JWT issuer is not configured.");
-        var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? throw new InvalidOperationException("JWT audience is not configured.");
-        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey));
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
         var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-        var jwtExpirationMinutes = int.Parse(Environment.GetEnvironmentVariable("JWT_ACCESS_TOKEN_EXPIRES_IN_MINUTES"));
+        var jwtExpirationMinutes = _jwtSettings.AccessTokenExpiresInMinutes;
 
         var token = new JwtSecurityToken(
-            issuer: jwtIssuer,
-            audience: jwtAudience,
+            issuer: _jwtSettings.Issuer,
+            audience: _jwtSettings.Audience,
             claims: authClaims,
             expires: DateTime.Now.AddMinutes(jwtExpirationMinutes),
             signingCredentials: creds
         );
-        Console.WriteLine(token);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
@@ -67,9 +63,7 @@ public class TokenService : ITokenService
             {
                 Token = refreshToken,
                 UserId = userId,
-                ExpiryDate = Environment.GetEnvironmentVariable("TEST_ENV") == "1"
-                    ? DateTime.Now.AddMinutes(int.Parse(Environment.GetEnvironmentVariable("TEST_JWT_REFRESH_TOKEN_EXPIRES_IN_MINUTES")))
-                    : DateTime.Now.AddDays(int.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRES_IN_DAYS"))),
+                ExpiryDate = _jwtSettings.RefreshTokenExpiredTime,
                 IsRevoked = false
             };
 

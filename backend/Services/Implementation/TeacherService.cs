@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using _3w1m.Constants;
 using _3w1m.Data;
 using _3w1m.Dtos.Teacher;
 using _3w1m.Models.Domain;
@@ -41,7 +42,7 @@ public class TeacherService : ITeacherService
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var userId = await _userService.CreateUserAsync(teacherData.Email, teacherData.Password);
+            var userId = await _userService.CreateUserAsync(teacherData.Email, teacherData.Password, CourseRoles.Teacher);
             if (userId == null) {
                 throw new Exception("Failed to create user");
             }

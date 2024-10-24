@@ -1,3 +1,4 @@
+using _3w1m.Constants;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Student;
 using _3w1m.Models.Domain;
@@ -10,7 +11,8 @@ namespace _3w1m.Controllers.Admin;
 
 [ApiController]
 [Route("api/Admin/[controller]")]
-// [Authorize(Roles = "Admin")]
+[Authorize(Roles = CourseRoles.Admin)]
+[Tags("Admin Student")]
 public class StudentController : ControllerBase
 {
     private readonly IStudentService _studentService;

@@ -1,3 +1,4 @@
+using _3w1m.Constants;
 using _3w1m.Models.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -29,12 +30,14 @@ public class ApplicationDbContext : IdentityDbContext<User>
         modelBuilder.Entity<Teacher>()
             .HasOne<User>(t => t.User)
             .WithOne()
-            .HasForeignKey<Teacher>(t => t.UserId);
+            .HasForeignKey<Teacher>(t => t.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<Student>()
             .HasOne<User>(s => s.User)
             .WithOne()
-            .HasForeignKey<Student>(s => s.UserId);
+            .HasForeignKey<Student>(s => s.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<Course>()
             .HasOne<Teacher>(c => c.Teacher)
@@ -57,10 +60,12 @@ public class ApplicationDbContext : IdentityDbContext<User>
         modelBuilder.Entity<RefreshToken>()
             .HasOne(rt => rt.User)
             .WithMany(u => u.RefreshTokens)
-            .HasForeignKey(rt => rt.UserId);
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Seed data 
         var hasher = new PasswordHasher<User>();
+        
         var listUser = new List<User>()
         {
             new User
@@ -68,32 +73,52 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 UserName = "user1",
                 Email = "test1@example.com",
                 PasswordHash = hasher.HashPassword(null, "1"),
-                Id = GuidGenerator.Generate().ToString(),
+                Id = UserSeeding.User1Id
             },
             new User
             {
                 UserName = "user2",
                 Email = "test2@example.com",
                 PasswordHash = hasher.HashPassword(null, "1"),
-                Id = GuidGenerator.Generate().ToString(),
+                Id = UserSeeding.User2Id
             },
             new User
             {
                 UserName = "user3",
                 Email = "test3@example.com",
                 PasswordHash = hasher.HashPassword(null, "1"),
-                Id = GuidGenerator.Generate().ToString(),
+                Id = UserSeeding.User3Id
             },
             new User
             {
                 UserName = "user4",
                 Email = "test4@example.com",
                 PasswordHash = hasher.HashPassword(null, "1"),
-                Id = GuidGenerator.Generate().ToString(),
+                Id = UserSeeding.User4Id
             },
+            new User
+            {
+                UserName = "admin",
+                Email = "admin@gmail.com",
+                PasswordHash = hasher.HashPassword(null, "pass"),
+                Id = UserSeeding.AdminId
+            }
         };
+        
+        // Seed role
+        var listRoles = new List<IdentityRole>()
+        {
+            new IdentityRole { Id = "1", Name = CourseRoles.Admin, NormalizedName = CourseRoles.Admin.ToUpper() },
+            new IdentityRole { Id = "2", Name = CourseRoles.Teacher, NormalizedName = CourseRoles.Teacher.ToUpper() },
+            new IdentityRole { Id = "3", Name = CourseRoles.Student, NormalizedName = CourseRoles.Student.ToUpper() }
+        };
+        modelBuilder.Entity<IdentityRole>().HasData(listRoles);
 
         modelBuilder.Entity<User>().HasData(listUser);
+
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string> { RoleId = "1", UserId = listUser[4].Id }
+        );
 
         var listTeacher = new List<Teacher>()
         {
@@ -106,7 +131,37 @@ public class ApplicationDbContext : IdentityDbContext<User>
                UserId = listUser[0].Id,
            }
         };
-
+        modelBuilder.Entity<Teacher>().HasData(listTeacher);
+        
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string> { RoleId = "2", UserId = listUser[0].Id }
+        );
+        
+        
+        var listStudent = new List<Student>()
+        {
+            new Student
+            {
+                StudentId = 1,
+                Fullname = "Student 1",
+                DateOfBirth = new DateOnly(2000, 1, 1),
+                UserId = listUser[1].Id,
+            },
+            new Student
+            {
+                StudentId = 2,
+                Fullname = "Student 2",
+                DateOfBirth = new DateOnly(2000, 1, 1),
+                UserId = listUser[2].Id,
+            }
+        };
+        modelBuilder.Entity<Student>().HasData(listStudent);
+        
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string> { RoleId = "3", UserId = listUser[1].Id },
+            new IdentityUserRole<string> { RoleId = "3", UserId = listUser[2].Id }
+        );
+        
         var listCourse = new List<Course>()
         {
             new Course
@@ -129,23 +184,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
             }
         };
 
-        var listStudent = new List<Student>()
-        {
-            new Student
-            {
-                StudentId = 1,
-                Fullname = "Student 1",
-                DateOfBirth = new DateOnly(2000, 1, 1),
-                UserId = listUser[1].Id,
-            },
-            new Student
-            {
-                StudentId = 2,
-                Fullname = "Student 2",
-                DateOfBirth = new DateOnly(2000, 1, 1),
-                UserId = listUser[2].Id,
-            }
-        };
+
 
         var listEnrollment = new List<Enrollment>()
         {
@@ -163,9 +202,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
             }
         };
 
-        modelBuilder.Entity<Teacher>().HasData(listTeacher);
         modelBuilder.Entity<Course>().HasData(listCourse);
-        modelBuilder.Entity<Student>().HasData(listStudent);
         modelBuilder.Entity<Enrollment>().HasData(listEnrollment);
     }
 
@@ -177,15 +214,13 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-    public static class GuidGenerator
+    private static class UserSeeding
     {
-        private static int _counter = 0;
-
-        public static Guid Generate()
-        {
-            var bytes = new byte[16];
-            BitConverter.GetBytes(_counter++).CopyTo(bytes, 0);
-            return new Guid(bytes);
-        }
+        // Define constant GUIDs for each user
+        public static readonly string User1Id = "00000000-0000-0000-0000-000000000001";
+        public static readonly string User2Id = "00000000-0000-0000-0000-000000000002";
+        public static readonly string User3Id = "00000000-0000-0000-0000-000000000003";
+        public static readonly string User4Id = "00000000-0000-0000-0000-000000000004";
+        public static readonly string AdminId = "00000000-0000-0000-0000-000000000005";
     }
 }
