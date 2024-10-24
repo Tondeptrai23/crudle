@@ -49,9 +49,11 @@ public class AuthController : ControllerBase
 
         var accessToken = await _tokenService.GenerateAccessToken(user);
         var refreshToken = await _tokenService.GenerateRefreshToken(user.Id);
+        
+        var roles = await _userManager.GetRolesAsync(user);
 
-
-        return Ok(new ResponseDto<Object>(new { AccessToken = accessToken, RefreshToken = refreshToken }));
+        return Ok(new ResponseDto<Object>(new
+            { AccessToken = accessToken, RefreshToken = refreshToken, UserId = user.Id, Role = roles[0] }));
     }
 
     [HttpPost]
@@ -66,33 +68,5 @@ public class AuthController : ControllerBase
 
         var newAccessToken = await _tokenService.GenerateAccessToken(user);
         return Ok(new ResponseDto<Object>(new { AccessToken = newAccessToken }));
-    }
-
-    [HttpPost("create-test-user")]
-    public async Task<IActionResult> CreateTestUser()
-    {
-        var user = new User()
-        {
-            UserName = "testuser",
-            Email = "testuser@example.com"
-        };
-
-        var result = await _userManager.CreateAsync(user, "Test@123");
-
-        if (result.Succeeded)
-        {
-            return Ok(new ResponseDto<string>("User created successfully."));
-        }
-        else
-        {
-            return BadRequest(result.Errors);
-        }
-    }
-
-    [HttpPost("check-token")]
-    [Authorize]
-    public IActionResult CheckToken()
-    {
-        return Ok(new ResponseDto<string>("Token is valid."));
     }
 }
