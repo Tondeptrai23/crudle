@@ -2,7 +2,6 @@ import { Button } from "@/components/common/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/common/ui/card"
@@ -15,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/common/ui/form"
 import { Input } from "@/components/common/ui/input"
+import { Link } from "react-router-dom"
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
@@ -45,10 +45,7 @@ export function LoginForm() {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
-        <CardDescription>
-          Enter your email below to login to your account
-        </CardDescription>
+        <CardTitle className="text-2xl text-center">Login</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -71,10 +68,7 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex items-center">
-                    <FormLabel>Password</FormLabel>
-                    <a href="#" className="text-sm ml-auto"> Forgot password? </a>
-                  </div>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter your password..." {...field} />
                   </FormControl>
@@ -87,10 +81,11 @@ export function LoginForm() {
             </Button>
           </form>
         </Form>
-        <div className="mt-4 text-center text-sm">
+        {/* <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
           <a href="#" className="underline"> Sign up </a>
-        </div>
+        </div> */}
+        <Link to='/' className="text-sm underline">Forget your password?</Link>
       </CardContent>
     </Card>
   )
