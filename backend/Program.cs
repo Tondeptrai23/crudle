@@ -1,9 +1,15 @@
 using _3w1m.Configuration;
 using _3w1m.Middlewares;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
+
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.MapType<DateOnly>(() => new OpenApiSchema { Type = "string", Format = "date" });
+});
 
 builder.Services.AddDatabaseConfig()
     .AddSwaggerConfig()
