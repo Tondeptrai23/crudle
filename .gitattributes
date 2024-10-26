@@ -1,0 +1,19 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted to LF in the repository
+*.cs text
+*.cshtml text
+*.html text
+*.css text
+*.js text
+*.json text
+*.md text
+*.xml text
+
+# Declare files that will always have CRLF line endings in the working directory
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Declare files that will always have LF line endings in the working directory
+*.sh text eol=lf
