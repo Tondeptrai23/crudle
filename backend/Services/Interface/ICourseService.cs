@@ -1,14 +1,78 @@
 using _3w1m.Dtos;
+using _3w1m.Dtos.Course;
+using _3w1m.Dtos.Student;
 using _3w1m.Models.Domain;
+using _3w1m.Models.Exceptions;
 
 namespace _3w1m.Services.Interface;
 
 public interface ICourseService
 {
-    Task<CourseDto> GetByIdAsync(int id);
-    Task<IEnumerable<CourseDto>> GetAllAsync();
-    Task<CourseDto> AddAsync(CreateRequestCourseDto entity);
-    Task<CourseDto> UpdateAsync(int entityId, CourseDto entity);
-    Task DeleteAsync(int entityId);
-    Task<bool> IsCourseExists(CourseDto entity);
+    /// <summary>
+    /// Retrieves detailed information about a specific course.
+    /// </summary>
+    /// <param name="courseId">The unique identifier of the course.</param>
+    /// <returns>The task result contains the course's detailed information.</returns>
+    /// <exception cref="ResourceNotFoundException">Thrown when the student is not found.</exception>
+    Task<CourseDto> GetCourseByIdAsync(int courseId);
+
+    /// <summary>
+    /// Retrieves a collection of courses based on the query parameters.
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns>The task result contains a collection of course Dto</returns>
+    Task<(int count, IEnumerable<CourseDto> courses)> GetCoursesAsync(CourseCollectionQueryDto queryDto);
+
+    /// <summary>
+    /// Create a new course record.
+    /// </summary>
+    /// <param name="courseData">The Dto contain the information for the new course</param>
+    /// <returns>The task result contains the recently created course's information</returns>
+    /// <exception cref="ConflictException">Thrown when the course is already exist.</exception>
+    /// <exception cref="ResourceNotFoundException">Thrown when the teachers id provided from user not found.</exception>
+    Task<CourseDto> CreateCourseAsync(CreateRequestCourseDto courseData);
+
+    /// <summary>
+    /// Updates an existing course's information.
+    /// </summary>
+    /// <param name="courseId">The unique identifier of the course.</param>
+    /// <param name="courseData">The DTO contains the upcoming changes of the course's information</param>
+    /// <returns>The task result contains the updated course's information.</returns>
+    /// <exception cref="ResourceNotFoundException">Thrown when the course is not found.</exception>
+    Task<CourseDto> UpdateCourseAsync(int courseId, UpdateCourseRequestDto courseData);
+
+    /// <summary>
+    /// Get all students enrolled in the course
+    /// </summary>
+    /// <param name="courseId">The unique identifier of the course.</param>
+    /// <returns>The task contain quantity and a collection of course Dto.</returns>
+    /// <exception cref="ResourceNotFoundException">Thrown when the course is not found.</exception>
+    Task<(int count, IEnumerable<StudentDto> students)> GetStudentsInCourseAsync(int courseId);
+
+    /// <summary>
+    /// Enroll student into the course
+    /// </summary>
+    /// <param name="courseId">The unique identifier of the course</param>
+    /// <param name="studentId">The collection of unique identifier of students</param>
+    /// <returns>The task contain a collection of Student</returns>
+    /// <exception cref="ResourceNotFoundException">Thrown when the course or the student is not found</exception>
+    /// <exception cref="ConflictException">Thrown when the student is already enrolled in the course</exception>
+    Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId, List<int> studentId);
+
+    /// <summary>
+    /// Get all courses that a student is enrolled in
+    /// </summary>
+    /// <param name="studentId">The unique identifier of the student</param>
+    /// <returns>The task contains a collection of courses that a student is enrolled</returns>
+    /// <exception cref="ResourceNotFoundException">Thrown when the student is not found</exception>
+    Task<IEnumerable<CourseDto>> GetEnrolledCourseOfAStudentAsync(int studentId);
+
+    /// <summary>
+    /// Get all courses that a teacher is teaching
+    /// </summary>
+    /// <param name="teacherId">The unique identifier of the teacher</param>
+    /// <returns>The task contains a collection of courses that a teacher is teaching</returns>
+    /// <exception cref="ResourceNotFoundException">Thrown when the teacher or the course is not found</exception>
+    /// <exception cref="ForbiddenException">Thrown when the teacher is not teaching the course</exception>
+    Task<CourseDetailDto> GetCourseDetailAsync(int teacherId, int courseId);
 }
