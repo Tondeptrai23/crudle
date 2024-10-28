@@ -8,29 +8,42 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/common/ui/dropdown-menu';
-import { LogOut, Settings, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export interface ProfileProps {
+  avatar?: React.ReactNode;
   name: string;
   role: string;
-  actions: ProfileActions;
+  items: ProfileMenuItem[];
 }
 
-export interface ProfileActions {
-  handleProfile: () => void;
-  handleSettings: () => void;
-  handleLogout: () => void;
+export interface ProfileMenuItem {
+  label: string;
+  path: string;
+  icon?: React.ReactNode;
 }
 
 const Profile: React.FC<ProfileProps> = (props) => {
+  const menuItems = props.items.map((item, index) => (
+    <DropdownMenuItem key={index}>
+      <Button variant='ghost' className='h-6 p-0'>
+        <Link to={item.path} className='flex items-center'>
+          <div className='flex h-8 w-8 items-center'>{item.icon}</div>
+          <span>{item.label}</span>
+        </Link>
+      </Button>
+    </DropdownMenuItem>
+  ));
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='focus:outline-none'>
-        <div className='flex items-center space-x-4 rounded-lg p-4 hover:bg-gray-100'>
+        <div className='flex items-center space-x-3 rounded-lg px-4 py-2 hover:bg-gray-100'>
           <Avatar className='h-12 w-12 bg-gray-200'>
             <AvatarFallback>
-              <User className='h-6 w-6 text-gray-600' />
+              {props.avatar ? props.avatar : <User />}
             </AvatarFallback>
           </Avatar>
           <div className='hidden md:block'>
@@ -39,44 +52,10 @@ const Profile: React.FC<ProfileProps> = (props) => {
           </div>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='-mt-4 w-56' align='end'>
+      <DropdownMenuContent className='-mt-2 w-56' align='end'>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-
-        <DropdownMenuItem>
-          <Button
-            variant='ghost'
-            className='h-6 p-0'
-            onClick={props.actions.handleProfile}
-          >
-            <User className='mr-2 h-4 w-4' />
-            <span>Profile</span>
-          </Button>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem>
-          <Button
-            variant='ghost'
-            className='h-6 p-0'
-            onClick={props.actions.handleSettings}
-          >
-            <Settings className='mr-2 h-4 w-4' />
-            <span>Settings</span>
-          </Button>
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem>
-          <Button
-            variant='ghost'
-            className='h-6 p-0'
-            onClick={props.actions.handleLogout}
-          >
-            <LogOut className='mr-2 h-4 w-4' />
-            <span>Log out</span>s
-          </Button>
-        </DropdownMenuItem>
+        {menuItems}
       </DropdownMenuContent>
     </DropdownMenu>
   );
