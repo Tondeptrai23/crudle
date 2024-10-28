@@ -12,7 +12,6 @@ namespace _3w1m.Controllers.Student;
 [Route("api/Student/[controller]")]
 [ApiController]
 [Authorize(Roles = CourseRoles.Student)]
-[AllowAnonymous]
 [Tags("Student Course")]
 public class CourseController(UserManager<User> userManager, ICourseService courseService, IStudentService studentService) : ControllerBase
 {

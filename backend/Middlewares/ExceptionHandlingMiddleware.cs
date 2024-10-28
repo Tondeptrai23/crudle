@@ -17,7 +17,13 @@ public class ExceptionHandlingMiddleware
             
             if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
             {
-                throw new UnauthorizedException("Authentication failed - invalid or missing token");
+                if (context.Response.Headers.ContainsKey("WWW-Authenticate") 
+                    && context.Response.Headers["WWW-Authenticate"].ToString().Contains("expired"))
+                {
+                    throw new TokenExpiredException("Token expired");
+                }
+                
+                throw new UnauthorizedException("Authorization failed - invalid token");
             }
             
             if (context.Response.StatusCode == StatusCodes.Status403Forbidden)
