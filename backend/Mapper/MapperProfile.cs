@@ -1,9 +1,9 @@
-using AutoMapper;
 using _3w1m.Dtos;
+using _3w1m.Dtos.Course;
 using _3w1m.Dtos.Student;
-using _3w1m.Models;
-using _3w1m.Models.Domain;
 using _3w1m.Dtos.Teacher;
+using _3w1m.Models.Domain;
+using AutoMapper;
 
 namespace _3w1m.Mapper;
 
@@ -14,18 +14,26 @@ public class MappingProfile : Profile
         CreateMap<CreateRequestCourseDto, Course>();
         CreateMap<CourseDto, Course>();
         CreateMap<Course, CourseDto>();
-        
+
         CreateMap<CreateStudentRequestDto, Student>();
         CreateMap<StudentDto, Student>();
         CreateMap<Student, StudentDto>();
-        
         CreateMap<Student, StudentDetailDto>()
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
 
         CreateMap<CreateTeacherRequestDto, Teacher>();
         CreateMap<Teacher, TeacherDto>();
-        CreateMap<Teacher, TeacherDto>().ReverseMap();
+        CreateMap<TeacherDto, Teacher>();
         CreateMap<Teacher, TeacherDetailDto>()
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
+        CreateMap<Teacher, TeacherMinimalDto>();
+
+        CreateMap<CreateRequestCourseDto, Course>();
+        CreateMap<Course, CourseDto>()
+            .ForMember(dest => dest.Teachers, opt => opt.MapFrom(src => new List<Teacher> { src.Teacher }));
+        CreateMap<CourseDto, Course>();
+        CreateMap<Course, CourseDetailDto>()
+            .ForMember(dest => dest.Teachers, opt => opt.MapFrom(src => new List<Teacher> { src.Teacher }));
+        CreateMap<CourseDetailDto, Course>();
     }
 }

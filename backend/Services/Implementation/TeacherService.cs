@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using _3w1m.Constants;
 using _3w1m.Data;
 using _3w1m.Dtos.Teacher;
@@ -12,6 +8,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace _3w1m.Services.Implementation;
+
 public class TeacherService : ITeacherService
 {
     private readonly ApplicationDbContext _context;
@@ -42,8 +39,10 @@ public class TeacherService : ITeacherService
         await using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var userId = await _userService.CreateUserAsync(teacherData.Email, teacherData.Password, CourseRoles.Teacher);
-            if (userId == null) {
+            var userId =
+                await _userService.CreateUserAsync(teacherData.Email, teacherData.Password, CourseRoles.Teacher);
+            if (userId == null)
+            {
                 throw new Exception("Failed to create user");
             }
 
@@ -63,7 +62,7 @@ public class TeacherService : ITeacherService
         }
     }
 
-    public async Task<TeacherDetailDto > GetTeacherByIdAsync(int teacherId)
+    public async Task<TeacherDetailDto> GetTeacherByIdAsync(int teacherId)
     {
         var teacher = await _context.Teachers.Include(t => t.User).FirstOrDefaultAsync(t => t.TeacherId == teacherId);
 
@@ -75,12 +74,10 @@ public class TeacherService : ITeacherService
         return _mapper.Map<TeacherDetailDto>(teacher);
     }
 
-    public async Task<(int count, IEnumerable<TeacherDto> teachers)> GetTeachersAsync(TeacherCollectionQueryDto queryDto)
+    public async Task<(int count, IEnumerable<TeacherDto> teachers)> GetTeachersAsync(
+        TeacherCollectionQueryDto? queryDto)
     {
-        if (queryDto == null)
-        {
-            queryDto = new TeacherCollectionQueryDto();
-        }
+        queryDto ??= new TeacherCollectionQueryDto();
 
         var teachers = _context.Teachers.AsQueryable();
         teachers = ApplyFilter(teachers, queryDto);
@@ -105,10 +102,12 @@ public class TeacherService : ITeacherService
         {
             teacher.Fullname = teacherData.Fullname;
         }
+
         if (teacherData.ContactEmail != null)
         {
             teacher.ContactEmail = teacherData.ContactEmail;
         }
+
         if (teacherData.ContactPhone != null)
         {
             teacher.ContactPhone = teacherData.ContactPhone;
@@ -116,6 +115,17 @@ public class TeacherService : ITeacherService
 
         _context.Teachers.Update(teacher);
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<TeacherDto>(teacher);
+    }
+
+    public async Task<TeacherDto> GetTeacherByUserIdAsync(string userId)
+    {
+        var teacher = await _context.Teachers.FirstOrDefaultAsync(teacher => teacher.UserId == userId);
+        if (teacher == null)
+        {
+            throw new ResourceNotFoundException("Teacher not found");
+        }
 
         return _mapper.Map<TeacherDto>(teacher);
     }
@@ -132,15 +142,9 @@ public class TeacherService : ITeacherService
             teachers = teachers.Where(t => t.Fullname == queryDto.Fullname);
         }
 
-        if (queryDto.ContactEmail != null)
-        {
-            teachers = teachers.Where(t => t.ContactEmail == queryDto.ContactEmail);
-        }
+        teachers = teachers.Where(t => t.ContactEmail == queryDto.ContactEmail);
 
-        if (queryDto.ContactPhone != null)
-        {
-            teachers = teachers.Where(t => t.ContactPhone == queryDto.ContactPhone);
-        }
+        teachers = teachers.Where(t => t.ContactPhone == queryDto.ContactPhone);
 
         return teachers;
     }

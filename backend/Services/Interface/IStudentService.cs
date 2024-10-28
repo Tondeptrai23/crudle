@@ -22,7 +22,7 @@ public interface IStudentService
     /// Retrieves a collection of all students.
     /// </summary>
     /// <returns>The task result contains a collection of student DTOs.</returns>
-    public Task<(int count, IEnumerable<StudentDto> students)> GetStudentsAsync(StudentCollectionQueryDto request);
+    public Task<(int count, IEnumerable<StudentDto> students)> GetStudentsAsync(StudentCollectionQueryDto? request);
     
     /// <summary>
     /// Creates a new student record.
@@ -35,9 +35,17 @@ public interface IStudentService
     /// <summary>
     /// Updates an existing student's information.
     /// </summary>
-    /// <param name="StudentId">The unique identifier of the student to update.</param>
+    /// <param name="studentId">The unique identifier of the student to update.</param>
     /// <param name="student">The DTO containing the updated.</param>
     /// <returns>The task result contains the updated student's information.</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the student is not found.</exception>
-    Task<StudentDto> UpdateStudentAsync(int StudentId, UpdateStudentRequestDto student);
+    Task<StudentDto> UpdateStudentAsync(int studentId, UpdateStudentRequestDto student);
+    
+    /// <summary>
+    /// Get a student's information by user id
+    /// </summary>
+    /// <param name="userId">The unique identifier of the user</param>
+    /// <returns>The task contains information of student matching the userId</returns>
+    /// <exception cref="ResourceNotFoundException">Thrown when can not find a student matching the userId argument</exception>
+    Task<StudentDto> GetStudentByUserIdAsync(string userId);
 }
