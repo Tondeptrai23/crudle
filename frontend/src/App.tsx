@@ -3,9 +3,14 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import MainLayout from './components/MainLayout.tsx';
 import CoursePage from './pages/CoursePage.tsx';
 import { WeatherPage } from './pages/WeatherPage.tsx';
+import { LoginPage } from './pages/LoginPage.tsx';
+import { AuthProvider } from './hooks/useAuth.tsx';
+import RequireAuth from './components/auth/RequireAuth.tsx';
 
 const App: React.FC = () => {
+
   return (
+    <AuthProvider>
     <Router>
       <MainLayout>
         <Routes>
@@ -19,6 +24,7 @@ const App: React.FC = () => {
         </Routes>
       </MainLayout>
     </Router>
+    </AuthProvider>
   );
 };
 
