@@ -14,19 +14,22 @@ import {
   FormMessage,
 } from "@/components/common/ui/form"
 import { Input } from "@/components/common/ui/input"
-import { Link } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import useAuth from "@/hooks/useAuth"
 
 const LoginSchema = z.object({
-  email: z.string().email({ 
-    message: "Invalid email address!" 
-  }),
-  password: z.string().min(6, { 
-    message: "Password must be at least 6 characters!" 
-  }),
+  email: z.string(),
+  // .email({ 
+  //   message: "Invalid email address!" 
+  // }),
+  password: z.string()
+  // .min(6, { 
+  //   message: "Password must be at least 6 characters!" 
+  // }),
 })
 
 export function LoginForm() {
@@ -38,8 +41,14 @@ export function LoginForm() {
     },
   })
 
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { state } = useLocation();
+
   function onSubmit(data: z.infer<typeof LoginSchema>) {
-    console.log(data)
+    login(data.email, data.password).then(() => {
+      navigate(state?.path || '/');
+    });
   }
 
   return (

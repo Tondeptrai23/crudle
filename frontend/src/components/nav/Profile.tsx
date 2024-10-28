@@ -74,7 +74,7 @@ const Profile: React.FC<ProfileProps> = (props) => {
             onClick={props.actions.handleLogout}
           >
             <LogOut className='mr-2 h-4 w-4' />
-            <span>Log out</span>s
+            <span>Log out</span>
           </Button>
         </DropdownMenuItem>
       </DropdownMenuContent>

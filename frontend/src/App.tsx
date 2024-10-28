@@ -4,9 +4,14 @@ import Nav from './components/nav/Nav.tsx';
 import { Separator } from './components/common/ui/separator.tsx';
 import CoursePage from './pages/CoursePage.tsx';
 import { WeatherPage } from './pages/WeatherPage.tsx';
+import { LoginPage } from './pages/LoginPage.tsx';
+import { AuthProvider } from './hooks/useAuth.tsx';
+import RequireAuth from './components/auth/RequireAuth.tsx';
 
 const App: React.FC = () => {
+
   return (
+    <AuthProvider>
     <Router>
       <Nav
         className='max-h-18 max-w-full'
@@ -19,7 +24,7 @@ const App: React.FC = () => {
         }}
         profileActions={{
           handleLogout: () => {
-            console.log('Logout clicked');
+            console.log('Logout clicked');     
           },
 
           handleProfile: () => {
@@ -36,11 +41,27 @@ const App: React.FC = () => {
 
       <main className='flex-grow'>
         <Routes>
-          <Route path='/' element={<WeatherPage />} />
-          <Route path='/course' element={<CoursePage />} />
+          <Route path='/login' element={<LoginPage />} />
+          <Route 
+            path='/' 
+            element={
+              <RequireAuth>
+                <WeatherPage />
+              </RequireAuth>
+            } 
+          />
+          <Route 
+            path='/course' 
+            element={
+              <RequireAuth>
+                <CoursePage />
+              </RequireAuth>
+            } 
+          />
         </Routes>
       </main>
     </Router>
+    </AuthProvider>
   );
 };
 
