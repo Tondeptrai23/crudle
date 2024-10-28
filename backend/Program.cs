@@ -6,11 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
 
-builder.Services.AddSwaggerGen(opt =>
-{
-    opt.MapType<DateOnly>(() => new OpenApiSchema { Type = "string", Format = "date" });
-});
-
 builder.Services.AddDatabaseConfig()
     .AddSwaggerConfig()
     .AddApiConfig()
