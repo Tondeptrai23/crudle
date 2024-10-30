@@ -1,5 +1,7 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import Nav from './components/nav/Nav.tsx';
+import { Separator } from './components/common/ui/separator.tsx';
 import MainLayout from './components/MainLayout.tsx';
 import CoursePage from './pages/CoursePage.tsx';
 import { WeatherPage } from './pages/WeatherPage.tsx';
@@ -8,6 +10,7 @@ import { AuthProvider } from './hooks/useAuth.tsx';
 import RequireAuth from './components/auth/RequireAuth.tsx';
 
 const App: React.FC = () => {
+
 
   return (
     <AuthProvider>
