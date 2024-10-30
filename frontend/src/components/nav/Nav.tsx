@@ -24,7 +24,7 @@ const Nav: React.FC<NavProps> = (props) => {
 
   const generateNavigationItem = (path: string, label: string) => {
     const baseClass = 'px-3 py-1 font-semibold cursor-pointer';
-    const selectedClass = 'bg-zinc-200 rounded-lg';
+    const selectedClass = 'bg-blue-500 rounded-lg text-white';
 
     const isSelected =
       (path === '/' && pathname === '/') ||
