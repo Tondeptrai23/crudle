@@ -17,11 +17,11 @@ var data = [
 
 export default class MockStudentService {
   static async getStudents() {
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     var randomNumber = Math.floor(Math.random() * 10);
 
-    if (randomNumber > 5) {
+    if (randomNumber > 4) {
       throw new Error('Failed to fetch students');
     }
 
