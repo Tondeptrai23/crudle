@@ -14,15 +14,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/common/ui/table';
-import Student from '@/types/student';
 import { EllipsisVertical } from 'lucide-react';
 
-interface StudentTableProps {
-  students: Student[];
-  columns: { header: string; key: string }[];
+export interface Column<T> {
+  header: string;
+  key: keyof T;
 }
 
-const StudentTable: React.FC<StudentTableProps> = ({ students, columns }) => {
+interface GenericTableProps<T> {
+  data: T[];
+  columns: Column<T>[];
+}
+
+// T is a generic type that extends an object with an id property
+const GenericTable = <T extends { id: string | number }>({
+  data,
+  columns,
+}: GenericTableProps<T>) => {
   return (
     <Table>
       <TableHeader>
@@ -36,13 +44,15 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, columns }) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {students.map((student) => {
+        {data.map((cell) => {
           return (
-            <TableRow className='p-0' key={student.id}>
+            <TableRow className='p-0' key={cell.id}>
               {columns.map((column) => {
                 return (
                   <TableCell className='py-1'>
-                    {student[column.key as keyof Student]}
+                    {String(cell[column.key])}
+                    {/* "key" can be anything that is
+                    a key of T, we need to convert it to string that react can render */}
                   </TableCell>
                 );
               })}
@@ -70,4 +80,4 @@ const StudentTable: React.FC<StudentTableProps> = ({ students, columns }) => {
   );
 };
 
-export default StudentTable;
+export default GenericTable;

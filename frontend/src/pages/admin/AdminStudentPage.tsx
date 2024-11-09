@@ -1,4 +1,4 @@
-import StudentTable from '@/components/admin/StudentTable';
+import GenericTable, { Column } from '@/components/admin/GenericTable';
 import Student from '@/types/student';
 import React, { useState } from 'react';
 
@@ -18,30 +18,25 @@ const AdminStudentPage: React.FC = () => {
     },
   ]);
 
+  const columns: Column<Student>[] = [
+    {
+      header: 'Full Name',
+      key: 'fullname',
+    },
+    {
+      header: 'Email',
+      key: 'email',
+    },
+    {
+      header: 'Date of Birth',
+      key: 'dob',
+    },
+  ];
+
   return (
     <div className='min-h-3/4 m-auto w-3/4 border-l-2 border-r-2'>
       <h2 className='px-4 py-2 font-semibold'>Student List</h2>
-      <StudentTable
-        students={students}
-        columns={[
-          {
-            header: 'ID',
-            key: 'id',
-          },
-          {
-            header: 'Fullname',
-            key: 'fullname',
-          },
-          {
-            header: 'Email',
-            key: 'email',
-          },
-          {
-            header: 'Date of Birth',
-            key: 'dob',
-          },
-        ]}
-      />
+      <GenericTable data={students} columns={columns} />
     </div>
   );
 };
