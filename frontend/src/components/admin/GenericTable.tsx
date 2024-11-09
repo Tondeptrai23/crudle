@@ -44,9 +44,9 @@ const GenericTable = <T extends { id: string | number }>({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((cell) => {
+        {data.map((cell, index) => {
           return (
-            <TableRow className='p-0' key={cell.id}>
+            <TableRow className='p-0' key={index}>
               {columns.map((column) => {
                 return (
                   <TableCell className='py-1'>
