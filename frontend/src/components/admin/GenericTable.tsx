@@ -1,3 +1,4 @@
+import { Button } from '@/components/common/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/common/ui/dropdown-menu';
+import { Input } from '@/components/common/ui/input';
 import {
   Table,
   TableBody,
@@ -14,10 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/common/ui/table';
+
+import { useToast } from '@/hooks/use-toast';
+import { cn, getErrorMessage } from '@/lib/utils';
 import { EllipsisVertical, Loader2, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '../common/ui/button';
-import { Input } from '../common/ui/input';
 import LoadingButton from './LoadingButton';
 import SkeletonTable from './SkeletonTable';
 
@@ -25,6 +28,7 @@ export interface Column<T> {
   header: string;
   key: keyof T;
   editable?: boolean;
+  validate?: (value: string) => string | null;
 }
 
 interface GenericTableProps<T> {
@@ -36,6 +40,7 @@ interface GenericTableProps<T> {
     save: (id: string | number, updatedData: any) => void | Promise<void>;
     delete: (id: string | number) => void | Promise<void>;
     add: () => void | Promise<void>;
+    errorInEditing?: (data: any) => string | null;
   };
 }
 
@@ -45,6 +50,10 @@ interface TableState {
   isAdding?: boolean;
   isSaving?: boolean;
   isDeleting?: boolean;
+}
+
+interface FieldErrors {
+  [key: string]: string;
 }
 
 // T is a generic type that extends an object with an id property
@@ -62,8 +71,9 @@ const GenericTable = <T extends { id: string | number }>({
 }: GenericTableProps<T>) => {
   const [editingRow, setEditingRow] = useState<string | number | null>(null);
   const [editedValues, setEditedValues] = useState<T | null>(null);
-
   const [deletingRow, setDeletingRow] = useState<string | number | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const { toast } = useToast();
 
   if (isError) {
     return <div className='text-center text-red-500'>No data found</div>;
@@ -77,6 +87,48 @@ const GenericTable = <T extends { id: string | number }>({
     return <div className='text-center'>No data found</div>;
   }
 
+  const handleValidation = () => {
+    const newErrors: FieldErrors = {};
+    columns.forEach((column) => {
+      if (column.editable && column.validate) {
+        const error = column.validate(String(editedValues?.[column.key]));
+        if (error) {
+          newErrors[String(column.key)] = error;
+        }
+      }
+    });
+
+    setFieldErrors(newErrors);
+    return newErrors;
+  };
+
+  const handleAddClick = async () => {
+    try {
+      const errors = handleValidation();
+      if (Object.keys(errors).length > 0) {
+        toast({
+          title: 'Failed to add',
+          description: errors[Object.keys(errors)[0]],
+          variant: 'destructive',
+        });
+        return;
+      }
+      await actions?.add?.();
+
+      toast({
+        title: 'Added',
+        description: 'Successfully added a new row',
+      });
+    } catch (error) {
+      console.error('Failed to add:', error);
+
+      toast({
+        title: 'Failed to add',
+        description: getErrorMessage(error),
+      });
+    }
+  };
+
   const handleEditClick = (id: string | number) => {
     setEditingRow(id);
     // Find and set the entire row data
@@ -87,24 +139,60 @@ const GenericTable = <T extends { id: string | number }>({
   };
 
   const handleDeleteClick = async (id: string | number) => {
-    setDeletingRow(id);
-    await actions?.delete?.(id);
-    setDeletingRow(null);
+    try {
+      setDeletingRow(id);
+      await actions?.delete?.(id);
+      setDeletingRow(null);
+
+      toast({
+        title: 'Deleted',
+        description: 'Successfully deleted the row',
+      });
+    } catch (error) {
+      console.error('Failed to delete:', error);
+
+      toast({
+        title: 'Failed to delete',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleCancelEdit = () => {
     setEditingRow(null);
     setEditedValues(null);
+    setFieldErrors({});
   };
 
   const handleSave = async (id: string | number) => {
     try {
+      const errors = handleValidation();
+      if (Object.keys(errors).length > 0) {
+        toast({
+          title: 'Failed to save',
+          description: errors[Object.keys(errors)[0]],
+          variant: 'destructive',
+        });
+        return;
+      }
+
       await actions?.save?.(id, editedValues);
       setEditingRow(null);
       setEditedValues(null);
+
+      toast({
+        title: 'Saved',
+        description: 'Successfully saved the changes',
+      });
     } catch (error) {
       console.error('Failed to save:', error);
-      // You might want to show an error message to the user here
+
+      toast({
+        title: 'Failed to save',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
     }
   };
 
@@ -113,6 +201,13 @@ const GenericTable = <T extends { id: string | number }>({
       setEditedValues({
         ...editedValues,
         [key]: value,
+      });
+    }
+
+    if (fieldErrors[String(key)]) {
+      setFieldErrors({
+        ...fieldErrors,
+        [String(key)]: '',
       });
     }
   };
@@ -185,11 +280,12 @@ const GenericTable = <T extends { id: string | number }>({
   return (
     <>
       <div className='flex flex-row items-center gap-4 px-4'>
-        <Input placeholder='Search' className='w-1/3' />
+        <Input placeholder='Search' className='w-1/3' />{' '}
+        {/* Placeholder for future */}
         <LoadingButton
           variant='outline'
           className='items-center gap-2'
-          onClick={actions?.add}
+          onClick={handleAddClick}
           isLoading={isAdding}
         >
           <PlusCircle className='h-5 w-5' />
@@ -225,7 +321,12 @@ const GenericTable = <T extends { id: string | number }>({
                           onChange={(e) =>
                             handleCellValueChange(column.key, e.target.value)
                           }
-                          className='h-full w-full p-1'
+                          className={cn(
+                            'h-full w-full border-2 p-1 focus:border-slate-800 focus-visible:ring-transparent',
+                            fieldErrors[String(column.key)]
+                              ? 'border-red-500'
+                              : '',
+                          )}
                         />
                       ) : (
                         String(cell[column.key])

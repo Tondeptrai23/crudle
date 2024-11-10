@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/common/ui/toaster';
 import Nav from '@/components/nav/Nav.tsx';
 import { LucideLogOut, Settings, User } from 'lucide-react';
 import React from 'react';
@@ -11,6 +12,7 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <>
+      <Toaster />
       <Nav
         className='max-h-18 max-w-full'
         items={getNavItems()}

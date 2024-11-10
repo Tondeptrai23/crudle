@@ -1,6 +1,11 @@
 import GenericTable, { Column } from '@/components/admin/GenericTable';
 import AddStudentForm from '@/components/common/forms/AddStudentForm';
-import { Dialog, DialogContent } from '@/components/common/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/common/ui/dialog';
 import {
   useCreateStudent,
   useDeleteStudent,
@@ -25,6 +30,13 @@ const AdminStudentPage: React.FC = () => {
       header: 'Full Name',
       key: 'fullname',
       editable: true,
+      validate: (value) => {
+        if (!value) {
+          return 'Full Name is required';
+        }
+
+        return null;
+      },
     },
     {
       header: 'Email',
@@ -35,6 +47,16 @@ const AdminStudentPage: React.FC = () => {
       header: 'Date of Birth',
       key: 'dob',
       editable: true,
+      validate: (value) => {
+        if (!value) {
+          return 'Date of Birth is required';
+        }
+        if (value && new Date(value) > new Date()) {
+          return 'Date of Birth should not be in the future';
+        }
+
+        return null;
+      },
     },
   ];
 
@@ -80,6 +102,9 @@ const AdminStudentPage: React.FC = () => {
 
       <Dialog open={dialogOpen} onOpenChange={handleDialogChange}>
         <DialogContent>
+          <DialogHeader className='items-center'>
+            <DialogTitle>Add Student</DialogTitle>
+          </DialogHeader>
           <AddStudentForm onSubmit={handleSubmit} />
         </DialogContent>
       </Dialog>
