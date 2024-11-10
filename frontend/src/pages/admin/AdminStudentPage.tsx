@@ -1,11 +1,8 @@
-import GenericTable, { Column } from '@/components/admin/GenericTable';
-import AddStudentForm from '@/components/common/forms/AddStudentForm';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/common/ui/dialog';
+import GenericTable from '@/components/admin/GenericTable';
+import AddStudentForm, {
+  StudentFormSchema,
+} from '@/components/common/forms/AddStudentForm';
+
 import {
   useCreateStudent,
   useDeleteStudent,
@@ -13,14 +10,11 @@ import {
   useUpdateStudent,
 } from '@/hooks/useStudentApi';
 import Student, { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
+import { Column } from '@/types/table';
 import React from 'react';
 
 const AdminStudentPage: React.FC = () => {
   let { data, isLoading, isError } = useStudents();
-  const [isAdding, setIsAdding] = React.useState(false);
-  const [isSaving, setIsSaving] = React.useState(false);
-  const [isDeleting, setIsDeleting] = React.useState(false);
-  const [dialogOpen, setDialogOpen] = React.useState(false);
   const createStudent = useCreateStudent();
   const updateStudent = useUpdateStudent();
   const deleteStudent = useDeleteStudent();
@@ -30,12 +24,9 @@ const AdminStudentPage: React.FC = () => {
       header: 'Full Name',
       key: 'fullname',
       editable: true,
-      validate: (value) => {
-        if (!value) {
-          return 'Full Name is required';
-        }
-
-        return null;
+      validate: (value: string) => {
+        const result = StudentFormSchema.shape.fullname.safeParse(value);
+        return result.success ? null : result.error.errors[0].message;
       },
     },
     {
@@ -47,47 +38,23 @@ const AdminStudentPage: React.FC = () => {
       header: 'Date of Birth',
       key: 'dob',
       editable: true,
-      validate: (value) => {
-        if (!value) {
-          return 'Date of Birth is required';
-        }
-        if (value && new Date(value) > new Date()) {
-          return 'Date of Birth should not be in the future';
-        }
-
-        return null;
+      validate: (value: string) => {
+        const result = StudentFormSchema.shape.dob.safeParse(value);
+        return result.success ? null : result.error.errors[0].message;
       },
     },
   ];
 
   const actions = {
-    save: async (id: number | string, value: UpdateStudentDTO) => {
-      setIsSaving(true);
+    onSave: async (id: string, value: UpdateStudentDTO) => {
       await updateStudent.mutateAsync({ id, data: value });
-      setIsSaving(false);
     },
-    delete: async (id: number | string) => {
-      setIsDeleting(true);
+    onDelete: async (id: string) => {
       await deleteStudent.mutateAsync(id);
-      setIsDeleting(false);
     },
-    add: () => {
-      setIsAdding(true);
-      setDialogOpen(true);
+    onAdd: async (value: CreateStudentDTO) => {
+      await createStudent.mutateAsync(value);
     },
-  };
-
-  const handleSubmit = async (value: CreateStudentDTO) => {
-    setDialogOpen(false);
-    await createStudent.mutateAsync(value);
-    setIsAdding(false);
-  };
-
-  const handleDialogChange = (open: boolean) => {
-    setDialogOpen(open);
-    if (!open && !createStudent.isLoading) {
-      setIsAdding(false);
-    }
   };
 
   return (
@@ -97,17 +64,9 @@ const AdminStudentPage: React.FC = () => {
         data={data}
         columns={columns}
         actions={actions}
-        state={{ isLoading, isError, isAdding, isSaving, isDeleting }}
+        state={{ isLoading, isError }}
+        formComponent={AddStudentForm}
       />
-
-      <Dialog open={dialogOpen} onOpenChange={handleDialogChange}>
-        <DialogContent>
-          <DialogHeader className='items-center'>
-            <DialogTitle>Add Student</DialogTitle>
-          </DialogHeader>
-          <AddStudentForm onSubmit={handleSubmit} />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from '@/components/common/ui/form';
 import { Input } from '@/components/common/ui/input';
+import Student from '@/types/student';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -22,7 +23,9 @@ const formSchema = z.object({
     const birthDate = new Date(date);
     return birthDate < today;
   }, 'Date of birth must be in the past'),
-});
+}) satisfies z.ZodType<Partial<Omit<Student, 'id'>>>;
+
+export { formSchema as StudentFormSchema };
 
 type FormValues = z.infer<typeof formSchema>;
 

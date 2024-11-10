@@ -5,7 +5,7 @@ import studentService from '@/services/mock/mockStudentService';
 
 const studentKeys = {
   lists: () => ['students'],
-  detail: (id: number | string) => ['student', id],
+  detail: (id: string) => ['student', id],
 };
 
 export const useStudents = () => {
@@ -31,7 +31,7 @@ export const useCreateStudent = () => {
 export const useUpdateStudent = () => {
   const queryClient = useQueryClient();
 
-  type UpdateStudentParams = { id: number | string; data: UpdateStudentDTO };
+  type UpdateStudentParams = { id: string; data: UpdateStudentDTO };
 
   return useMutation({
     mutationFn: async ({ id, data }: UpdateStudentParams) => {
@@ -47,7 +47,7 @@ export const useDeleteStudent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number | string) => {
+    mutationFn: async (id: string) => {
       await studentService.deleteStudent(id);
 
       queryClient.invalidateQueries({ queryKey: studentKeys.lists() });
