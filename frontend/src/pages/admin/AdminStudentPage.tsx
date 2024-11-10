@@ -1,10 +1,15 @@
 import GenericTable, { Column } from '@/components/admin/GenericTable';
-import useStudents from '@/hooks/useStudentApi';
-import Student from '@/types/student';
+import AddStudentForm from '@/components/common/forms/AddStudentForm';
+import { Dialog, DialogContent } from '@/components/common/ui/dialog';
+import { useCreateStudent, useStudents } from '@/hooks/useStudentApi';
+import Student, { CreateStudentDTO } from '@/types/student';
 import React from 'react';
 
 const AdminStudentPage: React.FC = () => {
   let { data, isLoading, isError } = useStudents();
+  const [isAdding, setIsAdding] = React.useState(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const createStudent = useCreateStudent();
 
   const columns: Column<Student>[] = [
     {
@@ -29,8 +34,22 @@ const AdminStudentPage: React.FC = () => {
       console.log('Delete student', id);
     },
     add: () => {
-      console.log('Add student');
+      setIsAdding(true);
+      setDialogOpen(true);
     },
+  };
+
+  const handleSubmit = async (value: CreateStudentDTO) => {
+    setDialogOpen(false);
+    await createStudent.mutateAsync(value);
+    setIsAdding(false);
+  };
+
+  const handleDialogChange = (open: boolean) => {
+    setDialogOpen(open);
+    if (!open && !createStudent.isLoading) {
+      setIsAdding(false);
+    }
   };
 
   return (
@@ -40,9 +59,14 @@ const AdminStudentPage: React.FC = () => {
         data={data}
         columns={columns}
         actions={actions}
-        isLoading={isLoading}
-        isError={isError}
+        state={{ isLoading, isError, isAdding }}
       />
+
+      <Dialog open={dialogOpen} onOpenChange={handleDialogChange}>
+        <DialogContent>
+          <AddStudentForm onSubmit={handleSubmit} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

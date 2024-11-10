@@ -1,4 +1,4 @@
-import Student from '@/types/student';
+import Student, { CreateStudentDTO } from '@/types/student';
 
 var data = [
   {
@@ -19,20 +19,17 @@ export default class MockStudentService {
   static async getStudents() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    var randomNumber = Math.floor(Math.random() * 10);
-
-    if (randomNumber > 4) {
-      throw new Error('Failed to fetch students');
-    }
-
     return data;
   }
 
-  static async addStudent(student: Student) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    data.push(student);
+  static async addStudent(student: CreateStudentDTO) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const id = data.length + 1;
 
-    return student;
+    const newStudent: Student = { ...student, id };
+    data.push(newStudent);
+
+    return newStudent;
   }
 
   static async updateStudent(studentId: Number, studentData: Student) {

@@ -4,3 +4,10 @@ export default interface Student {
   email: string;
   dob: string;
 }
+
+export interface CreateStudentDTO {
+  fullname: string;
+  password: string;
+  email: string;
+  dob: string;
+}

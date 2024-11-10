@@ -15,8 +15,8 @@ import {
   TableRow,
 } from '@/components/common/ui/table';
 import { EllipsisVertical, PlusCircle } from 'lucide-react';
-import { Button } from '../common/ui/button';
 import { Input } from '../common/ui/input';
+import LoadingButton from './LoadingButton';
 import SkeletonTable from './SkeletonTable';
 
 export interface Column<T> {
@@ -27,8 +27,7 @@ export interface Column<T> {
 interface GenericTableProps<T> {
   data?: T[];
   columns: Column<T>[];
-  isLoading?: boolean;
-  isError?: boolean;
+  state: TableState;
   actions?: {
     edit: (id: string | number) => void | Promise<void>;
     delete: (id: string | number) => void | Promise<void>;
@@ -36,12 +35,17 @@ interface GenericTableProps<T> {
   };
 }
 
+interface TableState {
+  isLoading?: boolean;
+  isError?: boolean;
+  isAdding?: boolean;
+}
+
 // T is a generic type that extends an object with an id property
 const GenericTable = <T extends { id: string | number }>({
   data = [],
   columns,
-  isLoading = false,
-  isError = false,
+  state: { isLoading = false, isError = false, isAdding = false },
   actions,
 }: GenericTableProps<T>) => {
   if (isError) {
@@ -56,14 +60,15 @@ const GenericTable = <T extends { id: string | number }>({
     <>
       <div className='flex flex-row items-center gap-4 px-4'>
         <Input placeholder='Search' className='w-1/3' />
-        <Button
+        <LoadingButton
           variant='outline'
           className='items-center gap-2'
           onClick={actions?.add}
+          isLoading={isAdding}
         >
           <PlusCircle className='h-5 w-5' />
           Add
-        </Button>
+        </LoadingButton>
       </div>
 
       <Table>
@@ -78,9 +83,9 @@ const GenericTable = <T extends { id: string | number }>({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((cell, index) => {
+          {data.map((cell) => {
             return (
-              <TableRow className='p-0' key={index}>
+              <TableRow className='p-0' key={cell.id}>
                 {columns.map((column) => {
                   return (
                     <TableCell className='py-1'>
