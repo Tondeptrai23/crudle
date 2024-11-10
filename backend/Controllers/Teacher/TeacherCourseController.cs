@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using _3w1m.Constants;
 using _3w1m.Dtos;
+using _3w1m.Dtos.Article;
 using _3w1m.Dtos.Course;
 using _3w1m.Models.Domain;
 using _3w1m.Services.Interface;
@@ -19,13 +20,15 @@ public class CourseController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly ICourseService _courseService;
     private readonly ITeacherService _teacherService;
+    private readonly IArticleService _articleService;
 
     public CourseController(UserManager<User> userManager, ICourseService courseService,
-        ITeacherService teacherService)
+        ITeacherService teacherService, IArticleService articleService)
     {
         _userManager = userManager;
         _courseService = courseService;
         _teacherService = teacherService;
+        _articleService = articleService;
     }
 
     [HttpGet]
@@ -50,5 +53,37 @@ public class CourseController : ControllerBase
     {
         var course = await _courseService.GetCourseByIdAsync(courseId);
         return Ok(new ResponseDto<CourseDto>(course));
+    }
+    
+    [HttpGet]
+    [Route("{courseId:int}/Articles")]
+    public async Task<IActionResult> GetArticles(int courseId, [FromQuery] ArticleCollectionQueryDto queryDto)
+    {
+        var (count, articles) = await _articleService.GetArticlesAsync(courseId, queryDto);
+        return Ok(new PaginationResponseDto<IEnumerable<ArticleDto>>(articles, count, queryDto.Page, queryDto.Size));
+    }
+    
+    [HttpPost]
+    [Route("{courseId:int}/Article")]
+    public async Task<IActionResult> CreateArticle([FromRoute] int courseId, CreateRequestArticleDto articleDto)
+    {
+        var article = await _articleService.CreateArticleAsync(courseId, articleDto);
+        return Ok(new ResponseDto<ArticleDetailDto>(article));
+    }
+    
+    [HttpPut]
+    [Route("{courseId:int}/Article/{articleId:int}")]
+    public async Task<IActionResult> UpdateArticle([FromRoute] int courseId, [FromRoute] int articleId, UpdateRequestArticleDto articleDto)
+    {
+        var article = await _articleService.UpdateArticleAsync(courseId, articleId, articleDto);
+        return Ok(new ResponseDto<ArticleDetailDto>(article));
+    }
+    
+    [HttpDelete] 
+    [Route("{courseId:int}/Article/{articleId:int}")]
+    public async Task<IActionResult> DeleteArticle([FromRoute] int courseId, [FromRoute] int articleId)
+    {
+        var result = await _articleService.DeleteArticleAsync(courseId, articleId);
+        return Ok(result);
     }
 }

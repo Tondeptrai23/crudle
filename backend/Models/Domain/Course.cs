@@ -19,4 +19,6 @@ public class Course
     public Teacher? Teacher { get; set; }
     
     public ICollection<Enrollment> Enrollments { get; set; }
+    
+    public ICollection<Article> Articles { get; set; }
 }

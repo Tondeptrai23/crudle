@@ -1,6 +1,6 @@
-using System.Security.Claims;
 using _3w1m.Constants;
 using _3w1m.Dtos;
+using _3w1m.Dtos.Article;
 using _3w1m.Models.Domain;
 using _3w1m.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -13,19 +13,28 @@ namespace _3w1m.Controllers.Student;
 [ApiController]
 [Authorize(Roles = CourseRoles.Student)]
 [Tags("Student Course")]
-public class CourseController(UserManager<User> userManager, ICourseService courseService, IStudentService studentService) : ControllerBase
+public class CourseController : ControllerBase
 {
-    private readonly UserManager<User> _userManager = userManager;
-    private readonly ICourseService _courseService = courseService;
-    private readonly IStudentService _studentService = studentService;
+    private readonly UserManager<User> _userManager;
+    private readonly ICourseService _courseService;
+    private readonly IStudentService _studentService;
+    private readonly IArticleService _articleService;
+
+    public CourseController(UserManager<User> userManager, ICourseService courseService, IStudentService studentService,
+        IArticleService articleService)
+    {
+        _userManager = userManager;
+        _courseService = courseService;
+        _studentService = studentService;
+        _articleService = articleService;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetEnrolledCourseAsync()
     {
-        var user = await _userManager.GetUserAsync(this.User);
-        //TODO: Check null user.
+        var user = await _userManager.GetUserAsync(User);
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-        
+
         var enrolledCourse = await _courseService.GetEnrolledCourseOfAStudentAsync(student.StudentId);
         return Ok(new ResponseDto<IEnumerable<CourseDto>>(enrolledCourse));
     }
@@ -36,5 +45,22 @@ public class CourseController(UserManager<User> userManager, ICourseService cour
     {
         var course = await _courseService.GetCourseByIdAsync(courseId);
         return Ok(new ResponseDto<CourseDto>(course));
+    }
+
+    [HttpGet]
+    [Route("{courseId:int}/Article/{articleId:int}")]
+    public async Task<IActionResult> GetArticleByIdAsync([FromRoute] int courseId, [FromRoute] int articleId)
+    {
+        var article = await _articleService.GetArticleByIdAsync(articleId, courseId);
+        return Ok(new ResponseDto<ArticleDetailDto>(article));
+    }
+
+    [HttpGet]
+    [Route("{courseId:int}/Articles")]
+    public async Task<IActionResult> GetArticlesAsync([FromRoute] int courseId,
+        [FromQuery] ArticleCollectionQueryDto queryDto)
+    {
+        var (articleCount, articles) = await _articleService.GetArticlesAsync(courseId, queryDto);
+        return Ok(new PaginationResponseDto<IEnumerable<ArticleDto>>(articles, articleCount, queryDto.Page, queryDto.Size));
     }
 }
