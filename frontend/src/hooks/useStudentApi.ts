@@ -42,3 +42,16 @@ export const useUpdateStudent = () => {
     },
   });
 };
+
+export const useDeleteStudent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: number | string) => {
+      await studentService.deleteStudent(id);
+
+      queryClient.invalidateQueries({ queryKey: studentKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: studentKeys.detail(id) });
+    },
+  });
+};

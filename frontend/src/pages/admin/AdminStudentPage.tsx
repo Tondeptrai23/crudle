@@ -3,6 +3,7 @@ import AddStudentForm from '@/components/common/forms/AddStudentForm';
 import { Dialog, DialogContent } from '@/components/common/ui/dialog';
 import {
   useCreateStudent,
+  useDeleteStudent,
   useStudents,
   useUpdateStudent,
 } from '@/hooks/useStudentApi';
@@ -13,9 +14,11 @@ const AdminStudentPage: React.FC = () => {
   let { data, isLoading, isError } = useStudents();
   const [isAdding, setIsAdding] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const createStudent = useCreateStudent();
   const updateStudent = useUpdateStudent();
+  const deleteStudent = useDeleteStudent();
 
   const columns: Column<Student>[] = [
     {
@@ -41,8 +44,10 @@ const AdminStudentPage: React.FC = () => {
       await updateStudent.mutateAsync({ id, data: value });
       setIsSaving(false);
     },
-    delete: (id: number | string) => {
-      console.log('Delete student', id);
+    delete: async (id: number | string) => {
+      setIsDeleting(true);
+      await deleteStudent.mutateAsync(id);
+      setIsDeleting(false);
     },
     add: () => {
       setIsAdding(true);
@@ -70,7 +75,7 @@ const AdminStudentPage: React.FC = () => {
         data={data}
         columns={columns}
         actions={actions}
-        state={{ isLoading, isError, isAdding, isSaving }}
+        state={{ isLoading, isError, isAdding, isSaving, isDeleting }}
       />
 
       <Dialog open={dialogOpen} onOpenChange={handleDialogChange}>

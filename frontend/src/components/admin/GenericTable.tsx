@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/common/ui/table';
-import { EllipsisVertical, PlusCircle } from 'lucide-react';
+import { EllipsisVertical, Loader2, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../common/ui/button';
 import { Input } from '../common/ui/input';
@@ -44,6 +44,7 @@ interface TableState {
   isError?: boolean;
   isAdding?: boolean;
   isSaving?: boolean;
+  isDeleting?: boolean;
 }
 
 // T is a generic type that extends an object with an id property
@@ -55,11 +56,14 @@ const GenericTable = <T extends { id: string | number }>({
     isError = false,
     isAdding = false,
     isSaving = false,
+    isDeleting = false,
   },
   actions,
 }: GenericTableProps<T>) => {
   const [editingRow, setEditingRow] = useState<string | number | null>(null);
   const [editedValues, setEditedValues] = useState<T | null>(null);
+
+  const [deletingRow, setDeletingRow] = useState<string | number | null>(null);
 
   if (isError) {
     return <div className='text-center text-red-500'>No data found</div>;
@@ -69,6 +73,10 @@ const GenericTable = <T extends { id: string | number }>({
     return <SkeletonTable rows={10} />;
   }
 
+  if (data.length === 0) {
+    return <div className='text-center'>No data found</div>;
+  }
+
   const handleEditClick = (id: string | number) => {
     setEditingRow(id);
     // Find and set the entire row data
@@ -76,6 +84,12 @@ const GenericTable = <T extends { id: string | number }>({
     if (currentRow) {
       setEditedValues(currentRow);
     }
+  };
+
+  const handleDeleteClick = async (id: string | number) => {
+    setDeletingRow(id);
+    await actions?.delete?.(id);
+    setDeletingRow(null);
   };
 
   const handleCancelEdit = () => {
@@ -102,6 +116,7 @@ const GenericTable = <T extends { id: string | number }>({
       });
     }
   };
+
   const saveChangeButton = (id: number | string) => {
     return (
       <div className='flex gap-2'>
@@ -124,6 +139,47 @@ const GenericTable = <T extends { id: string | number }>({
         </LoadingButton>
       </div>
     );
+  };
+
+  const renderActionCell = (id: number | string) => {
+    if (deletingRow === id && isDeleting) {
+      return (
+        <div className='flex p-1'>
+          <Loader2 className='h-6 w-6 animate-spin' />;
+        </div>
+      );
+    } else if (editingRow === id) {
+      return saveChangeButton(id);
+    } else {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className='rounded-full p-1 hover:bg-gray-200'>
+              <EllipsisVertical />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                handleEditClick(id);
+              }}
+            >
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                handleDeleteClick(id);
+              }}
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
   };
 
   return (
@@ -180,36 +236,7 @@ const GenericTable = <T extends { id: string | number }>({
                   );
                 })}
                 <TableCell className='min-w-52 py-1'>
-                  {editingRow === cell.id ? (
-                    saveChangeButton(cell.id)
-                  ) : (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button className='rounded-full p-1 hover:bg-gray-200'>
-                          <EllipsisVertical />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align='end'>
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => {
-                            handleEditClick(cell.id);
-                          }}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => {
-                            actions?.delete(cell.id);
-                          }}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
+                  {renderActionCell(cell.id)}
                 </TableCell>
               </TableRow>
             );
