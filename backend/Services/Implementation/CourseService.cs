@@ -62,12 +62,12 @@ public class CourseService : ICourseService
     {
         var courses = _context.Courses;
 
-        if (await _context.Courses.AnyAsync(c => c.CourseId == courseData.CourseId))
+        if (await courses.AnyAsync(c => c.CourseId == courseData.CourseId))
         {
             throw new ConflictException($"Course with id {courseData.CourseId} already exists.");
         }
 
-        if (await _context.Courses.AnyAsync(c => c.Code == courseData.Code))
+        if (await courses.AnyAsync(c => c.Code == courseData.Code))
         {
             throw new ConflictException($"Course with code {courseData.Code} already exists.");
         }

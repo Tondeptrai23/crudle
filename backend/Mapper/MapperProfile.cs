@@ -1,4 +1,5 @@
 using _3w1m.Dtos;
+using _3w1m.Dtos.Article;
 using _3w1m.Dtos.Course;
 using _3w1m.Dtos.Student;
 using _3w1m.Dtos.Teacher;
@@ -35,5 +36,12 @@ public class MappingProfile : Profile
         CreateMap<Course, CourseDetailDto>()
             .ForMember(dest => dest.Teachers, opt => opt.MapFrom(src => new List<Teacher> { src.Teacher }));
         CreateMap<CourseDetailDto, Course>();
+
+        CreateMap<ArticleDto, Article>();
+        CreateMap<Article, ArticleDto>();
+        
+        CreateMap<CreateRequestArticleDto, Article>();
+        CreateMap<Article, ArticleDetailDto>();
+        CreateMap<ArticleDetailDto, Article>();
     }
 }

@@ -1,3 +1,4 @@
+using _3w1m.Models.Domain;
 using _3w1m.Services.Implementation;
 using _3w1m.Services.Interface;
 using _3w1m.Settings;
@@ -13,6 +14,7 @@ public static class AppServicesConfigExtension
         services.AddScoped<ITeacherService, TeacherService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IArticleService, ArticleService>();
         services.AddSingleton(new JwtSettings().ReadFromEnvironment());
 
         return services;
