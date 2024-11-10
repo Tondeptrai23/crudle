@@ -11,3 +11,8 @@ export interface CreateStudentDTO {
   email: string;
   dob: string;
 }
+
+export interface UpdateStudentDTO {
+  fullname?: string;
+  dob?: string;
+}

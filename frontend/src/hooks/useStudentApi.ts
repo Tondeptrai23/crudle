@@ -1,10 +1,11 @@
-import { CreateStudentDTO } from '@/types/student';
+import { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import studentService from '@/services/mock/mockStudentService';
 
 const studentKeys = {
   lists: () => ['students'],
+  detail: (id: number | string) => ['student', id],
 };
 
 export const useStudents = () => {
@@ -20,10 +21,24 @@ export const useCreateStudent = () => {
 
   return useMutation({
     mutationFn: async (data: CreateStudentDTO) => {
-      const newStudent = await studentService.addStudent(data);
+      await studentService.addStudent(data);
 
       queryClient.invalidateQueries({ queryKey: studentKeys.lists() });
-      return newStudent;
+    },
+  });
+};
+
+export const useUpdateStudent = () => {
+  const queryClient = useQueryClient();
+
+  type UpdateStudentParams = { id: number | string; data: UpdateStudentDTO };
+
+  return useMutation({
+    mutationFn: async ({ id, data }: UpdateStudentParams) => {
+      await studentService.updateStudent(id, data);
+
+      queryClient.invalidateQueries({ queryKey: studentKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: studentKeys.detail(id) });
     },
   });
 };

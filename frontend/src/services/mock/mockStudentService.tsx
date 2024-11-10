@@ -1,4 +1,4 @@
-import Student, { CreateStudentDTO } from '@/types/student';
+import Student, { CreateStudentDTO, UpdateSudentDTO } from '@/types/student';
 
 var data = [
   {
@@ -22,6 +22,12 @@ export default class MockStudentService {
     return data;
   }
 
+  static async getStudent(studentId: number | string) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    return data.find((student) => student.id === studentId);
+  }
+
   static async addStudent(student: CreateStudentDTO) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     const id = data.length + 1;
@@ -32,19 +38,23 @@ export default class MockStudentService {
     return newStudent;
   }
 
-  static async updateStudent(studentId: Number, studentData: Student) {
+  static async updateStudent(
+    studentId: number | string,
+    studentData: UpdateSudentDTO,
+  ) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     let student = data.find((student) => student.id === studentId);
 
     if (student) {
-      student = { ...student, ...studentData };
+      student.fullname = studentData.fullname;
+      student.dob = studentData.dob;
     }
 
     return student;
   }
 
-  static async deleteStudent(studentId: Number) {
+  static async deleteStudent(studentId: number | string) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     let studentIndex = data.findIndex((student) => student.id === studentId);

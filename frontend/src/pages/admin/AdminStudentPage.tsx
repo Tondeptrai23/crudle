@@ -1,34 +1,45 @@
 import GenericTable, { Column } from '@/components/admin/GenericTable';
 import AddStudentForm from '@/components/common/forms/AddStudentForm';
 import { Dialog, DialogContent } from '@/components/common/ui/dialog';
-import { useCreateStudent, useStudents } from '@/hooks/useStudentApi';
-import Student, { CreateStudentDTO } from '@/types/student';
+import {
+  useCreateStudent,
+  useStudents,
+  useUpdateStudent,
+} from '@/hooks/useStudentApi';
+import Student, { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 import React from 'react';
 
 const AdminStudentPage: React.FC = () => {
   let { data, isLoading, isError } = useStudents();
   const [isAdding, setIsAdding] = React.useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const createStudent = useCreateStudent();
+  const updateStudent = useUpdateStudent();
 
   const columns: Column<Student>[] = [
     {
       header: 'Full Name',
       key: 'fullname',
+      editable: true,
     },
     {
       header: 'Email',
       key: 'email',
+      editable: false,
     },
     {
       header: 'Date of Birth',
       key: 'dob',
+      editable: true,
     },
   ];
 
   const actions = {
-    edit: (id: number | string) => {
-      console.log('Edit student', id);
+    save: async (id: number | string, value: UpdateStudentDTO) => {
+      setIsSaving(true);
+      await updateStudent.mutateAsync({ id, data: value });
+      setIsSaving(false);
     },
     delete: (id: number | string) => {
       console.log('Delete student', id);
@@ -59,7 +70,7 @@ const AdminStudentPage: React.FC = () => {
         data={data}
         columns={columns}
         actions={actions}
-        state={{ isLoading, isError, isAdding }}
+        state={{ isLoading, isError, isAdding, isSaving }}
       />
 
       <Dialog open={dialogOpen} onOpenChange={handleDialogChange}>
