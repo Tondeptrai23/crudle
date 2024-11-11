@@ -20,6 +20,7 @@ import ActionCell from './ActionCell';
 import LoadingButton from './LoadingButton';
 import SkeletonTable from './SkeletonTable';
 
+import TablePagination from '@/components/admin/TablePagination';
 import {
   useTableAdd,
   useTableDelete,
@@ -33,6 +34,7 @@ const GenericTable = <T extends { id: string }>({
   columns,
   state: { isLoading = false, isError = false },
   actions,
+  pagination,
   formComponent: CreateForm,
 }: GenericTableProps<T>) => {
   const {
@@ -115,8 +117,6 @@ const GenericTable = <T extends { id: string }>({
                       ) : (
                         String(cell[column.key])
                       )}
-                      {/* "key" can be anything that is
-                    a key of T, we need to convert it to string that react can render */}
                     </TableCell>
                   );
                 })}
@@ -136,6 +136,8 @@ const GenericTable = <T extends { id: string }>({
           })}
         </TableBody>
       </Table>
+
+      <TablePagination {...pagination} />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

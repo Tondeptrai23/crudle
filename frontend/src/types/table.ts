@@ -16,11 +16,21 @@ export interface TableActions {
   onAdd: (data: any) => void | Promise<void>;
 }
 
+export interface TablePaginationProps {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+}
+
 export interface GenericTableProps<T extends { id: string }> {
   data?: T[];
   columns: Column<T>[];
   state: TableState;
   actions?: TableActions;
+  pagination: TablePaginationProps;
   formComponent: React.ComponentType<{
     onSubmit: (data: any) => void;
   }>;

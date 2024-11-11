@@ -64,6 +64,14 @@ const AdminStudentPage: React.FC = () => {
         data={data}
         columns={columns}
         actions={actions}
+        pagination={{
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 1,
+          pageSize: 10,
+          onPageChange: () => {},
+          onPageSizeChange: () => {},
+        }}
         state={{ isLoading, isError }}
         formComponent={AddStudentForm}
       />
