@@ -8,6 +8,7 @@ export interface Column<T> {
 export interface TableState {
   isLoading?: boolean;
   isError?: boolean;
+  isFetching?: boolean;
 }
 
 export interface TableActions {

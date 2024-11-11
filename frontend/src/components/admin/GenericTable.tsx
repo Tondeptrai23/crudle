@@ -16,8 +16,8 @@ import {
 
 import { cn } from '@/lib/utils';
 import { PlusCircle } from 'lucide-react';
+import LoadingButton from '../common/ui/LoadingButton';
 import ActionCell from './ActionCell';
-import LoadingButton from './LoadingButton';
 import SkeletonTable from './SkeletonTable';
 
 import TablePagination from '@/components/admin/TablePagination';
@@ -32,7 +32,7 @@ import { GenericTableProps } from '@/types/table';
 const GenericTable = <T extends { id: string }>({
   data = [],
   columns,
-  state: { isLoading = false, isError = false },
+  state: { isLoading = false, isError = false, isFetching = false },
   actions,
   pagination,
   formComponent: CreateForm,
@@ -61,6 +61,58 @@ const GenericTable = <T extends { id: string }>({
 
   if (data.length === 0) {
     return <div className='text-center'>No data found</div>;
+  }
+
+  let tableBody: React.ReactNode = null;
+
+  if (isFetching) {
+    tableBody = <SkeletonTable rows={pagination.pageSize} variant='body' />;
+  } else {
+    tableBody = (
+      <TableBody>
+        {data.map((cell) => {
+          return (
+            <TableRow className='p-0' key={cell.id}>
+              {columns.map((column) => {
+                return (
+                  <TableCell className='py-1'>
+                    {editingRow === cell.id && column.editable ? (
+                      <Input
+                        value={String(
+                          editedValues?.[column.key] ?? cell[column.key],
+                        )}
+                        onChange={(e) =>
+                          handleCellValueChange(column.key, e.target.value)
+                        }
+                        className={cn(
+                          'h-full w-full border-2 p-1 focus:border-slate-800 focus-visible:ring-transparent',
+                          fieldErrors[String(column.key)]
+                            ? 'border-red-500'
+                            : '',
+                        )}
+                      />
+                    ) : (
+                      String(cell[column.key])
+                    )}
+                  </TableCell>
+                );
+              })}
+              <TableCell className='min-w-52 py-1'>
+                <ActionCell
+                  isEditing={editingRow === cell.id}
+                  isDeleting={deletingRow === cell.id && isDeleting}
+                  isSaving={isSaving}
+                  onEdit={() => handleEdit(cell.id)}
+                  onDelete={() => handleDelete(cell.id)}
+                  onSave={() => handleSave(cell.id)}
+                  onCancel={handleCancel}
+                />
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    );
   }
 
   return (
@@ -92,49 +144,8 @@ const GenericTable = <T extends { id: string }>({
             <TableHead className='w-4 text-blue-500'>Action</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {data.map((cell) => {
-            return (
-              <TableRow className='p-0' key={cell.id}>
-                {columns.map((column) => {
-                  return (
-                    <TableCell className='py-1'>
-                      {editingRow === cell.id && column.editable ? (
-                        <Input
-                          value={String(
-                            editedValues?.[column.key] ?? cell[column.key],
-                          )}
-                          onChange={(e) =>
-                            handleCellValueChange(column.key, e.target.value)
-                          }
-                          className={cn(
-                            'h-full w-full border-2 p-1 focus:border-slate-800 focus-visible:ring-transparent',
-                            fieldErrors[String(column.key)]
-                              ? 'border-red-500'
-                              : '',
-                          )}
-                        />
-                      ) : (
-                        String(cell[column.key])
-                      )}
-                    </TableCell>
-                  );
-                })}
-                <TableCell className='min-w-52 py-1'>
-                  <ActionCell
-                    isEditing={editingRow === cell.id}
-                    isDeleting={deletingRow === cell.id && isDeleting}
-                    isSaving={isSaving}
-                    onEdit={() => handleEdit(cell.id)}
-                    onDelete={() => handleDelete(cell.id)}
-                    onSave={() => handleSave(cell.id)}
-                    onCancel={handleCancel}
-                  />
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
+
+        {tableBody}
       </Table>
 
       <TablePagination {...pagination} />

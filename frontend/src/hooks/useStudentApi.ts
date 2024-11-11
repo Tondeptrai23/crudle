@@ -8,10 +8,12 @@ const studentKeys = {
   detail: (id: string) => ['student', id],
 };
 
-export const useStudents = () => {
+export const useStudents = (page: number, pageSize: number) => {
   return useQuery({
-    queryKey: ['students'],
-    queryFn: studentService.getStudents,
+    queryKey: ['students', page, pageSize],
+    queryFn: () => studentService.getStudents(page, pageSize),
+    staleTime: 5 * 60 * 1000,
+    keepPreviousData: true, // Optional: Keeps previous data while fetching new data
   });
 };
 

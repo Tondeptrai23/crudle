@@ -14,7 +14,9 @@ import { Column } from '@/types/table';
 import React from 'react';
 
 const AdminStudentPage: React.FC = () => {
-  let { data, isLoading, isError } = useStudents();
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(10);
+  let { data, isLoading, isError, isFetching } = useStudents(page, pageSize);
   const createStudent = useCreateStudent();
   const updateStudent = useUpdateStudent();
   const deleteStudent = useDeleteStudent();
@@ -57,22 +59,31 @@ const AdminStudentPage: React.FC = () => {
     },
   };
 
+  if (!data) {
+    data = {
+      currentPage: 1,
+      students: [],
+      totalPages: 0,
+      totalItems: 0,
+    };
+  }
+
   return (
     <div className='min-h-3/4 m-auto w-3/4 border-l-2 border-r-2'>
       <h2 className='px-4 py-2 font-semibold'>Student List</h2>
       <GenericTable
-        data={data}
+        data={data.students}
         columns={columns}
         actions={actions}
         pagination={{
-          currentPage: 1,
-          totalPages: 1,
-          totalItems: 1,
-          pageSize: 10,
-          onPageChange: () => {},
-          onPageSizeChange: () => {},
+          currentPage: page,
+          totalPages: data.totalPages,
+          totalItems: data.totalItems,
+          pageSize: pageSize,
+          onPageChange: setPage,
+          onPageSizeChange: setPageSize,
         }}
-        state={{ isLoading, isError }}
+        state={{ isLoading, isError, isFetching }}
         formComponent={AddStudentForm}
       />
     </div>

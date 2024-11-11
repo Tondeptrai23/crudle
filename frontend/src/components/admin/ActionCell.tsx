@@ -9,7 +9,7 @@ import {
 } from '@/components/common/ui/dropdown-menu';
 import { EllipsisVertical, Loader2 } from 'lucide-react';
 import React from 'react';
-import LoadingButton from './LoadingButton';
+import LoadingButton from '../common/ui/LoadingButton';
 
 interface ActionCellProps {
   isEditing: boolean;
