@@ -1,12 +1,24 @@
 import Student, { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 
 export default class MockStudentService {
-  static async getStudents(page = 1, pageSize = 10) {
+  static async getStudents(page = 1, pageSize = 10, searchQuery = '') {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     const paginatedData = data.slice(startIndex, endIndex);
+
+    if (searchQuery) {
+      const filteredData = data.filter((student) =>
+        student.fullname.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+      return {
+        students: filteredData,
+        totalItems: filteredData.length,
+        totalPages: Math.ceil(filteredData.length / pageSize),
+        currentPage: page,
+      };
+    }
 
     return {
       students: paginatedData,

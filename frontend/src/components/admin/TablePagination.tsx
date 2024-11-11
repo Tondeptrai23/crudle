@@ -18,9 +18,9 @@ import { cn } from '@/lib/utils';
 import { TablePaginationProps } from '@/types/table';
 
 const TablePagination = ({
-  currentPage,
-  totalPages,
-  totalItems,
+  currentPage = 1,
+  totalPages = 1,
+  totalItems = 0,
   pageSize,
   onPageChange,
   onPageSizeChange,
@@ -31,10 +31,6 @@ const TablePagination = ({
       onPageChange(totalPages);
     }
   }, [currentPage, totalPages, onPageChange]);
-
-  if (totalItems === 0 || totalPages === 0) {
-    return null;
-  }
 
   const getPageNumbers = () => {
     const pages = [];
@@ -80,8 +76,10 @@ const TablePagination = ({
         </div>
 
         <span className='pl-2 text-sm text-gray-700'>
-          Showing {Math.min((currentPage - 1) * pageSize + 1, totalItems)} to{' '}
-          {Math.min(currentPage * pageSize, totalItems)} of {totalItems} entries
+          Showing{' '}
+          {Math.min(Math.max(0, (currentPage - 1) * pageSize + 1), totalItems)}{' '}
+          to {Math.min(currentPage * pageSize, totalItems)} of {totalItems}{' '}
+          entries
         </span>
       </div>
 
@@ -90,7 +88,7 @@ const TablePagination = ({
           variant='outline'
           size='icon'
           onClick={() => onPageChange(1)}
-          disabled={currentPage === 1}
+          disabled={currentPage === 1 || totalItems === 0}
           aria-label='First page'
           className='h-8 w-8'
         >
@@ -101,7 +99,7 @@ const TablePagination = ({
           variant='outline'
           size='icon'
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          disabled={currentPage === 1 || totalItems === 0}
           aria-label='Previous page'
           className='h-8 w-8'
         >
@@ -130,7 +128,7 @@ const TablePagination = ({
           variant='outline'
           size='icon'
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          disabled={currentPage === totalPages || totalItems === 0}
           aria-label='Next page'
           className='h-8 w-8'
         >
@@ -141,7 +139,7 @@ const TablePagination = ({
           variant='outline'
           size='icon'
           onClick={() => onPageChange(totalPages)}
-          disabled={currentPage === totalPages}
+          disabled={currentPage === totalPages || totalItems === 0}
           aria-label='Last page'
           className='h-8 w-8'
         >

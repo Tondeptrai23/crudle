@@ -16,48 +16,62 @@ import React from 'react';
 const AdminStudentPage: React.FC = () => {
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
-  let { data, isLoading, isError, isFetching } = useStudents(page, pageSize);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  let { data, isLoading, isError, isFetching } = useStudents(
+    page,
+    pageSize,
+    searchQuery,
+  );
   const createStudent = useCreateStudent();
   const updateStudent = useUpdateStudent();
   const deleteStudent = useDeleteStudent();
 
-  const columns: Column<Student>[] = [
-    {
-      header: 'Full Name',
-      key: 'fullname',
-      editable: true,
-      validate: (value: string) => {
-        const result = StudentFormSchema.shape.fullname.safeParse(value);
-        return result.success ? null : result.error.errors[0].message;
+  const columns: Column<Student>[] = React.useMemo(
+    () => [
+      {
+        header: 'Full Name',
+        key: 'fullname',
+        editable: true,
+        validate: (value: string) => {
+          const result = StudentFormSchema.shape.fullname.safeParse(value);
+          return result.success ? null : result.error.errors[0].message;
+        },
       },
-    },
-    {
-      header: 'Email',
-      key: 'email',
-      editable: false,
-    },
-    {
-      header: 'Date of Birth',
-      key: 'dob',
-      editable: true,
-      validate: (value: string) => {
-        const result = StudentFormSchema.shape.dob.safeParse(value);
-        return result.success ? null : result.error.errors[0].message;
+      {
+        header: 'Email',
+        key: 'email',
+        editable: false,
       },
-    },
-  ];
-
-  const actions = {
-    onSave: async (id: string, value: UpdateStudentDTO) => {
-      await updateStudent.mutateAsync({ id, data: value });
-    },
-    onDelete: async (id: string) => {
-      await deleteStudent.mutateAsync(id);
-    },
-    onAdd: async (value: CreateStudentDTO) => {
-      await createStudent.mutateAsync(value);
-    },
-  };
+      {
+        header: 'Date of Birth',
+        key: 'dob',
+        editable: true,
+        validate: (value: string) => {
+          const result = StudentFormSchema.shape.dob.safeParse(value);
+          return result.success ? null : result.error.errors[0].message;
+        },
+      },
+    ],
+    [],
+  );
+  const actions = React.useMemo(
+    () => ({
+      onSave: async (id: string, value: UpdateStudentDTO) => {
+        await updateStudent.mutateAsync({ id, data: value });
+      },
+      onDelete: async (id: string) => {
+        await deleteStudent.mutateAsync(id);
+      },
+      onAdd: async (value: CreateStudentDTO) => {
+        await createStudent.mutateAsync(value);
+      },
+      onSearch: (value: string) => {
+        setSearchQuery(value);
+        setPage(1);
+      },
+    }),
+    [updateStudent, deleteStudent, createStudent],
+  );
 
   if (!data) {
     data = {

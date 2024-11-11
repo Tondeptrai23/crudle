@@ -20,6 +20,7 @@ import {
   useTableAdd,
   useTableDelete,
   useTableEdit,
+  useTableSearch,
 } from '@/hooks/table/useTableDataOperation';
 import { GenericTableProps } from '@/types/table';
 import { Separator } from '../common/ui/separator';
@@ -47,6 +48,7 @@ const GenericTable = <T extends { id: string }>({
   const { isDeleting, deletingRow, handleDelete } = useTableDelete(actions);
   const { isAdding, dialogOpen, setDialogOpen, handleAdd, handleShowDialog } =
     useTableAdd(actions);
+  const { handleInputChange } = useTableSearch(actions);
 
   if (isError) {
     return <div className='text-center text-red-500'>No data found</div>;
@@ -56,14 +58,23 @@ const GenericTable = <T extends { id: string }>({
     return <SkeletonTable rows={10} />;
   }
 
-  if (data.length === 0) {
-    return <div className='text-center'>No data found</div>;
-  }
-
   let tableBody: React.ReactNode = null;
 
   if (isFetching) {
     tableBody = <SkeletonTable rows={pagination.pageSize} variant='body' />;
+  } else if (data.length === 0 || isError) {
+    tableBody = (
+      <TableBody>
+        <TableRow>
+          <TableCell
+            className='text-center text-red-500'
+            colSpan={columns.length + 1}
+          >
+            {isError ? 'An error occurred' : 'No data found'}
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    );
   } else {
     tableBody = (
       <TableBody>
@@ -126,8 +137,11 @@ const GenericTable = <T extends { id: string }>({
           Add
         </LoadingButton>
         <div className='flex-grow' />
-        <Input placeholder='Search' className='w-1/4' />{' '}
-        {/* Placeholder for future */}
+        <Input
+          placeholder='Search'
+          className='w-1/4'
+          onChange={handleInputChange}
+        />
         <LoadingButton variant='outline' className='items-center gap-2'>
           <Filter className='h-5 w-5' />
           DoB

@@ -1,7 +1,7 @@
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/lib/utils';
 import { Column, TableActions } from '@/types/table';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useTableAdd = <T extends { id: string }>(
   actions?: TableActions,
@@ -161,5 +161,50 @@ export const useTableDelete = (actions?: TableActions) => {
     isDeleting,
     deletingRow,
     handleDelete,
+  };
+};
+
+export const useTableSearch = (actions?: TableActions) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  // Debounce delay in milliseconds
+  const DEBOUNCE_DELAY = 200;
+
+  // Debounced search function
+  useEffect(() => {
+    setIsTyping(true);
+
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      setIsTyping(false);
+    }, DEBOUNCE_DELAY);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
+
+  useEffect(() => {
+    handleSearch(debouncedQuery);
+  }, [debouncedQuery]);
+
+  const handleSearch = async (query: string) => {
+    try {
+      await actions?.onSearch?.(query);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  return {
+    debouncedQuery,
+    isTyping,
+    handleInputChange,
   };
 };

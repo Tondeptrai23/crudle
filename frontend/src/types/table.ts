@@ -15,6 +15,7 @@ export interface TableActions {
   onSave: (id: string, updatedData: any) => void | Promise<void>;
   onDelete: (id: string) => void | Promise<void>;
   onAdd: (data: any) => void | Promise<void>;
+  onSearch: (query: string) => void | Promise<void>;
 }
 
 export interface TablePaginationProps {
