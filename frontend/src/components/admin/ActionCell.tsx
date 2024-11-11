@@ -7,28 +7,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/common/ui/dropdown-menu';
+import { ActionCellProps } from '@/types/table';
 import { EllipsisVertical, Loader2 } from 'lucide-react';
 import React from 'react';
 import LoadingButton from '../common/ui/LoadingButton';
 
-interface ActionCellProps {
-  isEditing: boolean;
-  isDeleting: boolean;
-  isSaving: boolean;
-  onEdit: () => void;
-  onDelete: () => void;
-  onSave: () => void;
-  onCancel: () => void;
-}
-
 const ActionCell: React.FC<ActionCellProps> = ({
-  isEditing,
-  isDeleting,
-  isSaving,
-  onEdit,
-  onDelete,
-  onSave,
-  onCancel,
+  isEditing = false,
+  isDeleting = false,
+  isSaving = false,
+  onEdit = () => {},
+  onDelete = () => {},
+  onSave = () => {},
+  onCancel = () => {},
+  disabledActions = {
+    edit: false,
+    delete: true,
+  },
 }) => {
   if (isDeleting) {
     return (
@@ -64,16 +59,31 @@ const ActionCell: React.FC<ActionCellProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className='rounded-full p-1 hover:bg-gray-200'>
+        <Button
+          className='h-8 w-8 rounded-full border-0 p-1 hover:bg-gray-200 data-[state=open]:bg-gray-200'
+          variant={'outline'}
+        >
           <EllipsisVertical />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
+      <DropdownMenuContent
+        align='start'
+        side='right'
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onDelete}>Delete</DropdownMenuItem>
+        {!disabledActions.edit && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
+          </>
+        )}
+        {!disabledActions.delete && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onDelete}>Delete</DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

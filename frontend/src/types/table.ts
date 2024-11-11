@@ -26,6 +26,20 @@ export interface TablePaginationProps {
   onPageSizeChange?: (pageSize: number) => void;
 }
 
+export interface ActionCellProps {
+  isEditing?: boolean;
+  isDeleting?: boolean;
+  isSaving?: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onSave?: () => void;
+  onCancel?: () => void;
+  disabledActions?: {
+    edit?: boolean;
+    delete?: boolean;
+  };
+}
+
 export interface GenericTableProps<T extends { id: string }> {
   data?: T[];
   columns: Column<T>[];
@@ -35,4 +49,5 @@ export interface GenericTableProps<T extends { id: string }> {
   formComponent: React.ComponentType<{
     onSubmit: (data: any) => void;
   }>;
+  disabledActions: ActionCellProps['disabledActions'];
 }

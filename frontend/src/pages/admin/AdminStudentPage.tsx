@@ -69,8 +69,8 @@ const AdminStudentPage: React.FC = () => {
   }
 
   return (
-    <div className='min-h-3/4 m-auto w-3/4 border-l-2 border-r-2'>
-      <h2 className='px-4 py-2 font-semibold'>Student List</h2>
+    <div className='min-h-3/4 m-auto w-3/4 rounded-md border-2'>
+      <h2 className='px-4 py-4 text-2xl font-semibold'>Student List</h2>
       <GenericTable
         data={data.students}
         columns={columns}
@@ -85,6 +85,10 @@ const AdminStudentPage: React.FC = () => {
         }}
         state={{ isLoading, isError, isFetching }}
         formComponent={AddStudentForm}
+        disabledActions={{
+          edit: false,
+          delete: true,
+        }}
       />
     </div>
   );

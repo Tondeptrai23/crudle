@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
+import { cn } from '@/lib/utils';
 import { TablePaginationProps } from '@/types/table';
 
 const TablePagination = ({
@@ -54,7 +55,7 @@ const TablePagination = ({
   };
 
   return (
-    <div className='flex items-center justify-between px-2 py-4'>
+    <div className='flex items-center justify-between px-4 py-4'>
       <div className='flex items-center space-x-6'>
         <div className='flex items-center space-x-2'>
           <span className='text-sm text-gray-700'>Rows per page:</span>
@@ -78,7 +79,7 @@ const TablePagination = ({
           </Select>
         </div>
 
-        <span className='text-sm text-gray-700'>
+        <span className='pl-2 text-sm text-gray-700'>
           Showing {Math.min((currentPage - 1) * pageSize + 1, totalItems)} to{' '}
           {Math.min(currentPage * pageSize, totalItems)} of {totalItems} entries
         </span>
@@ -114,7 +115,12 @@ const TablePagination = ({
             onClick={() => onPageChange(page)}
             aria-label={`Page ${page}`}
             aria-current={currentPage === page ? 'page' : undefined}
-            className='h-8 w-8'
+            className={cn(
+              'h-8 w-8',
+              currentPage === page
+                ? 'bg-blue-500 text-white hover:bg-blue-400'
+                : '',
+            )}
           >
             {page}
           </Button>

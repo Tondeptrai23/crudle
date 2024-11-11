@@ -49,6 +49,9 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onSubmit }) => {
         onSubmit={form.handleSubmit(onSubmit)}
         className='mx-auto w-full max-w-md space-y-6 p-6'
       >
+        <span className='block text-center text-2xl font-bold'>
+          Add Student
+        </span>
         <FormField
           control={form.control}
           name='email'
@@ -105,8 +108,8 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onSubmit }) => {
           )}
         />
 
-        <Button type='submit' className='w-full'>
-          Sign Up
+        <Button type='submit' className='w-full bg-blue-500'>
+          Add Student
         </Button>
       </form>
     </Form>

@@ -1,9 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/common/ui/dialog';
+import { Dialog, DialogContent } from '@/components/common/ui/dialog';
 import { Input } from '@/components/common/ui/input';
 import {
   Table,
@@ -15,7 +10,7 @@ import {
 } from '@/components/common/ui/table';
 
 import { cn } from '@/lib/utils';
-import { PlusCircle } from 'lucide-react';
+import { Filter, PlusCircle } from 'lucide-react';
 import LoadingButton from '../common/ui/LoadingButton';
 import ActionCell from './ActionCell';
 import SkeletonTable from './SkeletonTable';
@@ -27,6 +22,7 @@ import {
   useTableEdit,
 } from '@/hooks/table/useTableDataOperation';
 import { GenericTableProps } from '@/types/table';
+import { Separator } from '../common/ui/separator';
 
 // T is a generic type that extends an object with an id property
 const GenericTable = <T extends { id: string }>({
@@ -36,6 +32,7 @@ const GenericTable = <T extends { id: string }>({
   actions,
   pagination,
   formComponent: CreateForm,
+  disabledActions = {},
 }: GenericTableProps<T>) => {
   const {
     editingRow,
@@ -97,7 +94,7 @@ const GenericTable = <T extends { id: string }>({
                   </TableCell>
                 );
               })}
-              <TableCell className='min-w-52 py-1'>
+              <TableCell className='min-w-40 py-1'>
                 <ActionCell
                   isEditing={editingRow === cell.id}
                   isDeleting={deletingRow === cell.id && isDeleting}
@@ -106,6 +103,7 @@ const GenericTable = <T extends { id: string }>({
                   onDelete={() => handleDelete(cell.id)}
                   onSave={() => handleSave(cell.id)}
                   onCancel={handleCancel}
+                  disabledActions={disabledActions}
                 />
               </TableCell>
             </TableRow>
@@ -118,8 +116,6 @@ const GenericTable = <T extends { id: string }>({
   return (
     <>
       <div className='flex flex-row items-center gap-4 px-4'>
-        <Input placeholder='Search' className='w-1/3' />{' '}
-        {/* Placeholder for future */}
         <LoadingButton
           variant='outline'
           className='items-center gap-2'
@@ -128,6 +124,19 @@ const GenericTable = <T extends { id: string }>({
         >
           <PlusCircle className='h-5 w-5' />
           Add
+        </LoadingButton>
+        <div className='flex-grow' />
+        <Input placeholder='Search' className='w-1/4' />{' '}
+        {/* Placeholder for future */}
+        <LoadingButton variant='outline' className='items-center gap-2'>
+          <Filter className='h-5 w-5' />
+          DoB
+        </LoadingButton>
+        <div className='flex-grow' />
+        {/* PLACEHOLDER */}
+        <LoadingButton variant='outline' className='items-center gap-2'>
+          <PlusCircle className='h-5 w-5' />
+          Options
         </LoadingButton>
       </div>
 
@@ -148,13 +157,11 @@ const GenericTable = <T extends { id: string }>({
         {tableBody}
       </Table>
 
+      <Separator />
       <TablePagination {...pagination} />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
-          <DialogHeader className='items-center'>
-            <DialogTitle>Add Student</DialogTitle>
-          </DialogHeader>
           <CreateForm onSubmit={handleAdd} />
         </DialogContent>
       </Dialog>
