@@ -1,19 +1,25 @@
+import IStudentService from '@/services/interfaces/IStudentService';
+import { ApiResponse } from '@/types/paginationApiResponse';
 import Student, { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 
-export default class MockStudentService {
-  static async getStudents(page = 1, pageSize = 10, searchQuery = '') {
+export default class MockStudentService implements IStudentService {
+  async getStudents(
+    page = 1,
+    pageSize = 10,
+    search = '',
+  ): Promise<ApiResponse<Student>> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     const paginatedData = data.slice(startIndex, endIndex);
 
-    if (searchQuery) {
+    if (search) {
       const filteredData = data.filter((student) =>
-        student.fullname.toLowerCase().includes(searchQuery.toLowerCase()),
+        student.fullname.toLowerCase().includes(search.toLowerCase()),
       );
       return {
-        students: filteredData,
+        data: filteredData,
         totalItems: filteredData.length,
         totalPages: Math.ceil(filteredData.length / pageSize),
         currentPage: page,
@@ -21,20 +27,20 @@ export default class MockStudentService {
     }
 
     return {
-      students: paginatedData,
+      data: paginatedData,
       totalItems: data.length ?? 0,
       totalPages: Math.ceil(data.length / pageSize) ?? 1,
       currentPage: page ?? 1,
     };
   }
 
-  static async getStudent(studentId: string) {
+  async getStudent(studentId: string) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     return data.find((student) => student.id === studentId);
   }
 
-  static async addStudent(student: CreateStudentDTO) {
+  async addStudent(student: CreateStudentDTO) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     const id = String(data.length + 1);
 
@@ -44,7 +50,7 @@ export default class MockStudentService {
     return newStudent;
   }
 
-  static async updateStudent(studentId: string, studentData: UpdateStudentDTO) {
+  async updateStudent(studentId: string, studentData: UpdateStudentDTO) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     let student = data.find((student) => student.id === studentId);
@@ -57,7 +63,7 @@ export default class MockStudentService {
     return student;
   }
 
-  static async deleteStudent(studentId: string) {
+  async deleteStudent(studentId: string) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     let studentIndex = data.findIndex((student) => student.id === studentId);

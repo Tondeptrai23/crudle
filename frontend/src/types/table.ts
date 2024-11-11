@@ -1,3 +1,6 @@
+import { UseQueryResult } from 'react-query';
+import { ApiResponse } from './paginationApiResponse';
+
 export interface Column<T> {
   header: string;
   key: keyof T;
@@ -5,17 +8,10 @@ export interface Column<T> {
   validate?: (value: any) => string | null;
 }
 
-export interface TableState {
-  isLoading?: boolean;
-  isError?: boolean;
-  isFetching?: boolean;
-}
-
 export interface TableActions {
   onSave: (id: string, updatedData: any) => void | Promise<void>;
   onDelete: (id: string) => void | Promise<void>;
   onAdd: (data: any) => void | Promise<void>;
-  onSearch: (query: string) => void | Promise<void>;
 }
 
 export interface TablePaginationProps {
@@ -41,14 +37,19 @@ export interface ActionCellProps {
   };
 }
 
+export type QueryHook<T> = (
+  page: number,
+  pageSize: number,
+  search: string,
+) => UseQueryResult<ApiResponse<T>>;
+
 export interface GenericTableProps<T extends { id: string }> {
   data?: T[];
   columns: Column<T>[];
-  state: TableState;
   actions?: TableActions;
-  pagination: TablePaginationProps;
   formComponent: React.ComponentType<{
     onSubmit: (data: any) => void;
   }>;
   disabledActions: ActionCellProps['disabledActions'];
+  queryHook: QueryHook<T>;
 }

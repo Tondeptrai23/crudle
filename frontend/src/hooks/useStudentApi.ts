@@ -1,23 +1,19 @@
 import { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
-import studentService from '@/services/mock/mockStudentService';
+import MockStudentService from '@/services/mock/mockStudentService';
 
 const studentKeys = {
   lists: () => ['students'],
   detail: (id: string) => ['student', id],
 };
 
-export const useStudents = (
-  page: number,
-  pageSize: number,
-  searchQuery: string,
-) => {
-  console.log('useStudents', page, pageSize, searchQuery);
+const studentService = new MockStudentService();
 
+export const useStudents = (page: number, pageSize: number, search: string) => {
   return useQuery({
-    queryKey: ['students', page, pageSize, searchQuery],
-    queryFn: () => studentService.getStudents(page, pageSize, searchQuery),
+    queryKey: ['students', page, pageSize, search],
+    queryFn: () => studentService.getStudents(page, pageSize, search),
     staleTime: 5 * 60 * 1000,
     keepPreviousData: true, // Optional: Keeps previous data while fetching new data
   });

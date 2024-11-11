@@ -17,6 +17,7 @@ import SkeletonTable from './SkeletonTable';
 
 import TablePagination from '@/components/admin/TablePagination';
 import {
+  useGenericTableData,
   useTableAdd,
   useTableDelete,
   useTableEdit,
@@ -27,14 +28,16 @@ import { Separator } from '../common/ui/separator';
 
 // T is a generic type that extends an object with an id property
 const GenericTable = <T extends { id: string }>({
-  data = [],
   columns,
-  state: { isLoading = false, isError = false, isFetching = false },
   actions,
-  pagination,
   formComponent: CreateForm,
   disabledActions = {},
+  queryHook,
 }: GenericTableProps<T>) => {
+  let { data, pagination, state, search } = useGenericTableData({
+    useQueryHook: queryHook,
+  });
+
   const {
     editingRow,
     editedValues,
@@ -48,21 +51,21 @@ const GenericTable = <T extends { id: string }>({
   const { isDeleting, deletingRow, handleDelete } = useTableDelete(actions);
   const { isAdding, dialogOpen, setDialogOpen, handleAdd, handleShowDialog } =
     useTableAdd(actions);
-  const { handleInputChange } = useTableSearch(actions);
+  const { handleInputChange } = useTableSearch(search.onChange);
 
-  if (isError) {
+  if (state.isError) {
     return <div className='text-center text-red-500'>No data found</div>;
   }
 
-  if (isLoading) {
+  if (state.isLoading) {
     return <SkeletonTable rows={10} />;
   }
 
   let tableBody: React.ReactNode = null;
 
-  if (isFetching) {
+  if (state.isFetching) {
     tableBody = <SkeletonTable rows={pagination.pageSize} variant='body' />;
-  } else if (data.length === 0 || isError) {
+  } else if (data.length === 0 || state.isError) {
     tableBody = (
       <TableBody>
         <TableRow>
@@ -70,7 +73,7 @@ const GenericTable = <T extends { id: string }>({
             className='text-center text-red-500'
             colSpan={columns.length + 1}
           >
-            {isError ? 'An error occurred' : 'No data found'}
+            {state.isError ? 'An error occurred' : 'No data found'}
           </TableCell>
         </TableRow>
       </TableBody>

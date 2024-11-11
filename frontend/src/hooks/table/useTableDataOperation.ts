@@ -1,6 +1,6 @@
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/lib/utils';
-import { Column, TableActions } from '@/types/table';
+import { Column, QueryHook, TableActions } from '@/types/table';
 import { useEffect, useState } from 'react';
 
 export const useTableAdd = <T extends { id: string }>(
@@ -164,7 +164,7 @@ export const useTableDelete = (actions?: TableActions) => {
   };
 };
 
-export const useTableSearch = (actions?: TableActions) => {
+export const useTableSearch = (hanldeSearch: (value: string) => void) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -187,16 +187,8 @@ export const useTableSearch = (actions?: TableActions) => {
   }, [searchQuery]);
 
   useEffect(() => {
-    handleSearch(debouncedQuery);
+    hanldeSearch(debouncedQuery);
   }, [debouncedQuery]);
-
-  const handleSearch = async (query: string) => {
-    try {
-      await actions?.onSearch?.(query);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -208,3 +200,39 @@ export const useTableSearch = (actions?: TableActions) => {
     handleInputChange,
   };
 };
+
+export function useGenericTableData<T>({
+  useQueryHook,
+}: {
+  useQueryHook: QueryHook<T>;
+}) {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const query = useQueryHook(page, pageSize, searchQuery);
+
+  return {
+    data: query.data?.data ?? [], // adjust based on your API response structure
+    pagination: {
+      currentPage: page,
+      totalPages: query.data?.totalPages ?? 0,
+      totalItems: query.data?.totalItems ?? 0,
+      pageSize,
+      onPageChange: setPage,
+      onPageSizeChange: setPageSize,
+    },
+    state: {
+      isLoading: query.isLoading,
+      isError: query.isError,
+      isFetching: query.isFetching,
+    },
+    search: {
+      value: searchQuery,
+      onChange: (value: string) => {
+        setSearchQuery(value);
+        setPage(1);
+      },
+    },
+  };
+}
