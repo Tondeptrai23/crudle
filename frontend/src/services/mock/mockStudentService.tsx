@@ -8,8 +8,10 @@ export default class MockStudentService implements IStudentService {
     pageSize = 10,
     search = '',
     filters: string[] = [],
+    rangeFilters: [number, number] = [-Infinity, Infinity],
   ): Promise<ApiResponse<Student>> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log('getStudents', page, pageSize, search, filters, rangeFilters);
 
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
@@ -24,13 +26,20 @@ export default class MockStudentService implements IStudentService {
     }
 
     if (filters.length > 0) {
-      // Filter by dob
-      console.log(filters);
-      filteredData = data.filter((student) => {
+      filteredData = filteredData.filter((student) => {
         const dob = new Date(student.dob);
         const year = dob.getFullYear();
 
         return filters.includes(String(year));
+      });
+    }
+
+    if (rangeFilters[0] !== -Infinity && rangeFilters[1] !== Infinity) {
+      filteredData = filteredData.filter((student) => {
+        const dob = new Date(student.dob);
+        const year = dob.getFullYear();
+
+        return year >= rangeFilters[0] && year <= rangeFilters[1];
       });
     }
 

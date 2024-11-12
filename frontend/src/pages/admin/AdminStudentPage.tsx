@@ -9,7 +9,7 @@ import {
   useStudents,
   useUpdateStudent,
 } from '@/hooks/useStudentApi';
-import { FilterOption } from '@/types/filter';
+import { EnumFilterOption, RangeFilterOption } from '@/types/filter';
 import Student, { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 import { Column } from '@/types/table';
 import { Bell, Filter, Heart, Mail, Settings, Star, User } from 'lucide-react';
@@ -63,7 +63,8 @@ const AdminStudentPage: React.FC = () => {
     [updateStudent, deleteStudent, createStudent],
   );
 
-  const filterOption: FilterOption = {
+  const filterOption: EnumFilterOption = {
+    type: 'enum',
     items: [
       { id: '1990', label: '1990', icon: Settings },
       { id: '1991', label: '1991', icon: Bell },
@@ -74,6 +75,15 @@ const AdminStudentPage: React.FC = () => {
     ],
     label: 'Filter',
     labelIcon: Filter,
+  };
+
+  const rangeFilterOption: RangeFilterOption = {
+    label: 'Range Filter',
+    labelIcon: Filter,
+    type: 'range',
+    step: 1,
+    min: 1990,
+    max: 2000,
   };
 
   return (
@@ -88,7 +98,8 @@ const AdminStudentPage: React.FC = () => {
           edit: false,
           delete: true,
         }}
-        filterOption={filterOption}
+        enumFilterOption={filterOption}
+        rangeFilterOption={rangeFilterOption}
       />
     </div>
   );

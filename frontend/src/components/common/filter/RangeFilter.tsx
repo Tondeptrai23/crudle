@@ -6,16 +6,9 @@ import {
   PopoverTrigger,
 } from '@/components/common/ui/popover';
 import { Slider } from '@/components/common/ui/slider';
-import { useEffect, useState } from 'react';
-
-interface RangeFilterOption {
-  label: string;
-  labelIcon?: React.ComponentType<{ className?: string }>;
-  min: number;
-  max: number;
-  step?: number;
-  onChange?: (range: [number, number]) => void;
-}
+import { useDebounce } from '@/hooks/useDebounce';
+import { RangeFilterOption } from '@/types/filter';
+import { useCallback, useEffect, useState } from 'react';
 
 const RangeFilter: React.FC<RangeFilterOption> = ({
   label,
@@ -31,6 +24,12 @@ const RangeFilter: React.FC<RangeFilterOption> = ({
     max: range[1].toString(),
   });
 
+  const debouncedRange = useDebounce(range, 500);
+
+  useEffect(() => {
+    onChange?.(debouncedRange);
+  }, [debouncedRange, onChange]);
+
   useEffect(() => {
     setInputValues({
       min: range[0].toString(),
@@ -38,37 +37,46 @@ const RangeFilter: React.FC<RangeFilterOption> = ({
     });
   }, [range]);
 
-  const handleSliderChange = (newValues: number[]) => {
+  const handleSliderChange = useCallback((newValues: number[]) => {
     const newRange: [number, number] = [newValues[0], newValues[1]];
     setRange(newRange);
-    onChange?.(newRange);
-  };
+  }, []);
 
-  const handleInputChange = (value: string, isMin: boolean) => {
-    setInputValues((prev) => ({
-      ...prev,
-      [isMin ? 'min' : 'max']: value,
-    }));
+  const handleInputChange = useCallback(
+    (value: string, isMin: boolean) => {
+      setInputValues((prev) => ({
+        ...prev,
+        [isMin ? 'min' : 'max']: value,
+      }));
 
-    const numValue = parseFloat(value);
-    if (isNaN(numValue)) return;
+      const numValue = parseFloat(value);
+      if (isNaN(numValue)) return;
 
-    let newRange: [number, number];
-    if (isMin) {
-      newRange = [Math.min(Math.max(numValue, min), range[1]), range[1]];
-    } else {
-      newRange = [range[0], Math.max(Math.min(numValue, max), range[0])];
-    }
+      setRange((currentRange) => {
+        if (isMin) {
+          return [
+            Math.min(Math.max(numValue, min), currentRange[1]),
+            currentRange[1],
+          ] as [number, number];
+        } else {
+          return [
+            currentRange[0],
+            Math.max(Math.min(numValue, max), currentRange[0]),
+          ] as [number, number];
+        }
+      });
+    },
+    [min, max],
+  );
 
-    setRange(newRange);
-    onChange?.(newRange);
-  };
-
-  const clearRange = () => {
+  const clearRange = useCallback(() => {
     const defaultRange: [number, number] = [min, max];
     setRange(defaultRange);
-    onChange?.(defaultRange);
-  };
+    setInputValues({
+      min: min.toString(),
+      max: max.toString(),
+    });
+  }, [min, max]);
 
   const hasCustomRange = range[0] !== min || range[1] !== max;
 

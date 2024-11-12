@@ -15,10 +15,12 @@ export const useStudents = (
   pageSize: number,
   search: string,
   filters: string[],
+  rangeFilters: [number, number],
 ) => {
   return useQuery({
-    queryKey: ['students', page, pageSize, search, filters],
-    queryFn: () => studentService.getStudents(page, pageSize, search, filters),
+    queryKey: ['students', page, pageSize, search, filters, rangeFilters],
+    queryFn: () =>
+      studentService.getStudents(page, pageSize, search, filters, rangeFilters),
     staleTime: 5 * 60 * 1000,
     keepPreviousData: true,
   });

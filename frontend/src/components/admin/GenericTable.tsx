@@ -35,11 +35,13 @@ const GenericTable = <T extends { id: string }>({
   formComponent: CreateForm,
   disabledActions = {},
   queryHook,
-  filterOption,
+  enumFilterOption,
+  rangeFilterOption,
 }: GenericTableProps<T>) => {
-  let { data, pagination, state, search, filters } = useGenericTableData({
-    useQueryHook: queryHook,
-  });
+  let { data, pagination, state, search, filters, rangeFilters } =
+    useGenericTableData({
+      useQueryHook: queryHook,
+    });
 
   const {
     editingRow,
@@ -150,17 +152,20 @@ const GenericTable = <T extends { id: string }>({
         />
 
         <EnumFilter
-          items={filterOption.items}
-          label={filterOption.label}
+          type='enum'
+          items={enumFilterOption.items}
+          label={enumFilterOption.label}
           onChange={filters.onChange}
-          labelIcon={filterOption.labelIcon}
+          labelIcon={enumFilterOption.labelIcon}
         />
 
         <RangeFilter
+          type='range'
           label='Range'
-          min={1000}
-          max={2000}
-          onChange={console.log}
+          min={rangeFilterOption.min}
+          max={rangeFilterOption.max}
+          step={rangeFilterOption.step}
+          onChange={rangeFilters.onChange}
         />
 
         <div className='flex-grow' />

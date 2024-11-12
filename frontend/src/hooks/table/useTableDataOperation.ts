@@ -210,8 +210,18 @@ export function useGenericTableData<T>({
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<string[]>([]);
+  const [rangeFilters, setRangeFilters] = useState<[number, number]>([
+    -Infinity,
+    Infinity,
+  ]);
 
-  const query = useQueryHook(page, pageSize, searchQuery, filters);
+  const query = useQueryHook(
+    page,
+    pageSize,
+    searchQuery,
+    filters,
+    rangeFilters,
+  );
 
   return {
     data: query.data?.data ?? [], // adjust based on your API response structure
@@ -229,16 +239,20 @@ export function useGenericTableData<T>({
       isFetching: query.isFetching,
     },
     search: {
-      value: searchQuery,
       onChange: (value: string) => {
         setSearchQuery(value);
         setPage(1);
       },
     },
     filters: {
-      value: filters,
       onChange: (value: string[]) => {
         setFilters(value);
+        setPage(1);
+      },
+    },
+    rangeFilters: {
+      onChange: (value: [number, number]) => {
+        setRangeFilters(value);
         setPage(1);
       },
     },

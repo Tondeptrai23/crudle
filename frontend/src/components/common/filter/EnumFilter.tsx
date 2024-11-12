@@ -4,16 +4,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/common/ui/popover';
-import { FilterOption } from '@/types/filter';
+import { EnumFilterOption } from '@/types/filter';
 import { useState } from 'react';
 import { Checkbox } from '../ui/checkbox';
 
-const EnumFilter: React.FC<FilterOption> = ({
+const EnumFilter: React.FC<EnumFilterOption> = ({
   label,
   labelIcon: LabelIcon,
   items,
   onChange,
-}: FilterOption) => {
+}: EnumFilterOption) => {
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const handleCheckboxChange = (id: string) => {
