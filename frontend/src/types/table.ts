@@ -1,4 +1,5 @@
 import { UseQueryResult } from 'react-query';
+import { FilterOption } from './filter';
 import { ApiResponse } from './paginationApiResponse';
 
 export interface Column<T> {
@@ -52,4 +53,5 @@ export interface GenericTableProps<T extends { id: string }> {
   }>;
   disabledActions: ActionCellProps['disabledActions'];
   queryHook: QueryHook<T>;
+  filterOption: FilterOption;
 }

@@ -24,6 +24,7 @@ import {
   useTableSearch,
 } from '@/hooks/table/useTableDataOperation';
 import { GenericTableProps } from '@/types/table';
+import EnumFilter from '../common/filter/EnumFilter';
 import { Separator } from '../common/ui/separator';
 
 // T is a generic type that extends an object with an id property
@@ -33,6 +34,7 @@ const GenericTable = <T extends { id: string }>({
   formComponent: CreateForm,
   disabledActions = {},
   queryHook,
+  filterOption,
 }: GenericTableProps<T>) => {
   let { data, pagination, state, search } = useGenericTableData({
     useQueryHook: queryHook,
@@ -150,11 +152,13 @@ const GenericTable = <T extends { id: string }>({
           DoB
         </LoadingButton>
         <div className='flex-grow' />
-        {/* PLACEHOLDER */}
-        <LoadingButton variant='outline' className='items-center gap-2'>
-          <PlusCircle className='h-5 w-5' />
-          Options
-        </LoadingButton>
+
+        <EnumFilter
+          items={filterOption.items}
+          label={filterOption.label}
+          onChange={filterOption.onChange}
+          labelIcon={filterOption.labelIcon}
+        />
       </div>
 
       <Table>
