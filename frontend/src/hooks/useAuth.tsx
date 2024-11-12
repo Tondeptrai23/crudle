@@ -1,5 +1,5 @@
-import { createContext, useContext, useMemo } from "react";
-import { checkAuth } from "@/utils/api";
+import { createContext, useContext, useState } from "react";
+import { authenticate, isAuthenticated } from "@/utils/api";
 
 interface AuthContextType {
   authed: boolean;
@@ -14,15 +14,14 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 function useAuth() {
-  const authed = useMemo(() => {
-    return !!sessionStorage.getItem('access-token');
-  }, []);
+  const [authed, setAuthed] = useState<boolean>(!!isAuthenticated());
 
   return {
-    authed,
+    authed: authed,
     login: async (username: string, password: string) => {
       try {
-        await checkAuth(username, password);
+        await authenticate(username, password);
+        setAuthed(true);
       } catch {
         console.error('Login failed');
         return false;
@@ -30,6 +29,7 @@ function useAuth() {
       return true;
     },
     logout: async () => {
+      setAuthed(false);
       return true;
     },
   };

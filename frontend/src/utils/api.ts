@@ -4,20 +4,54 @@ const api = axios.create({
   baseURL: 'http://localhost:5262',
 });
 
-export const checkAuth = async (username: string, password: string) => {
-  console.log('checkAuth', username, password);
-  const response = await api.post('/api/Auth/login', {
+const publicApi = axios.create({
+  baseURL: 'http://localhost:5262',
+});
+
+export const isExpired = (token: string) => {
+  const decodedToken = JSON.parse(atob(token.split('.')[1]));
+  const expirationDate = new Date(decodedToken.exp * 1000);
+  return new Date() > expirationDate;
+};
+
+export const authenticate = async (username: string, password: string) => {
+  const response = await publicApi.post('/api/Auth/login', {
     Username: username,
     Password: password,
   });
 
   sessionStorage.setItem('access-token', response.data.Data.AccessToken);
+  sessionStorage.setItem('user-id', response.data.Data.UserId);
   sessionStorage.setItem('refresh-token', response.data.Data.RefreshToken);
-}
+};
 
 export const isAuthenticated = () => {
-  return !!sessionStorage.getItem('access-token');
-}
+  const token = sessionStorage.getItem('access-token');
+
+  if (!token || isExpired(token)) {
+    const refreshToken = sessionStorage.getItem('refresh-token');
+    const userId = sessionStorage.getItem('user-id');
+    if (!refreshToken) {
+      return false;
+    }
+    publicApi
+      .post('/api/Auth/refresh', {
+        UserId: userId,
+        RefreshToken: refreshToken,
+      })
+      .then((response) => {
+        sessionStorage.setItem('access-token', response.data.Data.AccessToken);
+        return true;
+      })
+      .catch(() => {
+        console.error('Failed to refresh token');
+        return false;
+      });
+  }
+  else {
+    return true;
+  }
+};
 
 api.interceptors.request.use(
   (config) => {
@@ -27,7 +61,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
@@ -39,11 +73,14 @@ api.interceptors.response.use(
       !originalRequest._retry &&
       sessionStorage.getItem('refresh-token')
     ) {
+      originalRequest._retry = true;
       try {
-        originalRequest._retry = true;
-        const response = await api.post('/api/Auth/refresh', {
+        const response = await publicApi.post('/api/Auth/refresh', {
+          UserId: sessionStorage.getItem('user-id'),
           RefreshToken: sessionStorage.getItem('refresh-token'),
         });
+
+        console.log('refreshed token');
 
         const newAccessToken = response.data.Data.AccessToken;
         sessionStorage.setItem('access-token', newAccessToken);
@@ -51,10 +88,12 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
+        console.error('Failed to refresh token 2');
+
         return Promise.reject(refreshError);
       }
     }
-  }
+  },
 );
 
 export default api;
