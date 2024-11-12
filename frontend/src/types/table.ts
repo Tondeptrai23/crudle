@@ -42,6 +42,7 @@ export type QueryHook<T> = (
   page: number,
   pageSize: number,
   search: string,
+  filters: string[],
 ) => UseQueryResult<ApiResponse<T>>;
 
 export interface GenericTableProps<T extends { id: string }> {

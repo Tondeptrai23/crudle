@@ -36,7 +36,7 @@ const GenericTable = <T extends { id: string }>({
   queryHook,
   filterOption,
 }: GenericTableProps<T>) => {
-  let { data, pagination, state, search } = useGenericTableData({
+  let { data, pagination, state, search, filters } = useGenericTableData({
     useQueryHook: queryHook,
   });
 
@@ -156,7 +156,7 @@ const GenericTable = <T extends { id: string }>({
         <EnumFilter
           items={filterOption.items}
           label={filterOption.label}
-          onChange={filterOption.onChange}
+          onChange={filters.onChange}
           labelIcon={filterOption.labelIcon}
         />
       </div>

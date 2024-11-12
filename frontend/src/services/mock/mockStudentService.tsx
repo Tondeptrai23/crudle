@@ -7,6 +7,7 @@ export default class MockStudentService implements IStudentService {
     page = 1,
     pageSize = 10,
     search = '',
+    filters: string[] = [],
   ): Promise<ApiResponse<Student>> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -14,23 +15,30 @@ export default class MockStudentService implements IStudentService {
     const endIndex = startIndex + pageSize;
     const paginatedData = data.slice(startIndex, endIndex);
 
+    let filteredData = paginatedData;
+
     if (search) {
-      const filteredData = data.filter((student) =>
+      filteredData = data.filter((student) =>
         student.fullname.toLowerCase().includes(search.toLowerCase()),
       );
-      return {
-        data: filteredData,
-        totalItems: filteredData.length,
-        totalPages: Math.ceil(filteredData.length / pageSize),
-        currentPage: page,
-      };
+    }
+
+    if (filters.length > 0) {
+      // Filter by dob
+      console.log(filters);
+      filteredData = data.filter((student) => {
+        const dob = new Date(student.dob);
+        const year = dob.getFullYear();
+
+        return filters.includes(String(year));
+      });
     }
 
     return {
-      data: paginatedData,
-      totalItems: data.length ?? 0,
-      totalPages: Math.ceil(data.length / pageSize) ?? 1,
-      currentPage: page ?? 1,
+      data: filteredData,
+      totalItems: filteredData.length,
+      totalPages: Math.ceil(filteredData.length / pageSize),
+      currentPage: page,
     };
   }
 

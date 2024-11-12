@@ -65,16 +65,13 @@ const AdminStudentPage: React.FC = () => {
 
   const filterOption: FilterOption = {
     items: [
-      { id: 'settings', label: 'Settings', icon: Settings },
-      { id: 'notifications', label: 'Notifications', icon: Bell },
-      { id: 'messages', label: 'Messages', icon: Mail },
-      { id: 'profile', label: 'Profile', icon: User },
-      { id: 'favorites', label: 'Favorites', icon: Star },
-      { id: 'likes', label: 'Likes', icon: Heart },
+      { id: '1990', label: '1990', icon: Settings },
+      { id: '1991', label: '1991', icon: Bell },
+      { id: '1992', label: '1992', icon: Heart },
+      { id: '1993', label: '1993', icon: Mail },
+      { id: '1994', label: '1994', icon: Star },
+      { id: '1995', label: '1995', icon: User },
     ],
-    onChange: (ids) => {
-      console.log(ids);
-    },
     label: 'Filter',
     labelIcon: Filter,
   };

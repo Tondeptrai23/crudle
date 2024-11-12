@@ -10,12 +10,17 @@ const studentKeys = {
 
 const studentService = new MockStudentService();
 
-export const useStudents = (page: number, pageSize: number, search: string) => {
+export const useStudents = (
+  page: number,
+  pageSize: number,
+  search: string,
+  filters: string[],
+) => {
   return useQuery({
-    queryKey: ['students', page, pageSize, search],
-    queryFn: () => studentService.getStudents(page, pageSize, search),
+    queryKey: ['students', page, pageSize, search, filters],
+    queryFn: () => studentService.getStudents(page, pageSize, search, filters),
     staleTime: 5 * 60 * 1000,
-    keepPreviousData: true, // Optional: Keeps previous data while fetching new data
+    keepPreviousData: true,
   });
 };
 
