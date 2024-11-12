@@ -26,20 +26,20 @@ public interface ICourseService
     /// <summary>
     /// Create a new course record.
     /// </summary>
-    /// <param name="courseData">The Dto contain the information for the new course</param>
+    /// <param name="data">The Dto contain the information for the new course</param>
     /// <returns>The task result contains the recently created course's information</returns>
     /// <exception cref="ConflictException">Thrown when the course is already exist.</exception>
     /// <exception cref="ResourceNotFoundException">Thrown when the teachers id provided from user not found.</exception>
-    Task<CourseDto> CreateCourseAsync(CreateRequestCourseDto courseData);
+    Task<CourseDto> CreateCourseAsync(CreateCourseRequestDto data);
 
     /// <summary>
     /// Updates an existing course's information.
     /// </summary>
     /// <param name="courseId">The unique identifier of the course.</param>
-    /// <param name="courseData">The DTO contains the upcoming changes of the course's information</param>
+    /// <param name="requestCourseData">The DTO contains the upcoming changes of the course's information</param>
     /// <returns>The task result contains the updated course's information.</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the course is not found.</exception>
-    Task<CourseDto> UpdateCourseAsync(int courseId, UpdateCourseRequestDto courseData);
+    Task<CourseDto> UpdateCourseAsync(int courseId, UpdateRequestCourseDto requestCourseData);
 
     /// <summary>
     /// Get all students enrolled in the course

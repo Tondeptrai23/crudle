@@ -12,7 +12,7 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<CreateRequestCourseDto, Course>();
+        CreateMap<CreateCourseRequestDto, Course>();
         CreateMap<CourseDto, Course>();
         CreateMap<Course, CourseDto>();
 
@@ -29,7 +29,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
         CreateMap<Teacher, TeacherMinimalDto>();
 
-        CreateMap<CreateRequestCourseDto, Course>();
+        CreateMap<CreateCourseRequestDto, Course>();
         CreateMap<Course, CourseDto>()
             .ForMember(dest => dest.Teachers, opt => opt.MapFrom(src => new List<Teacher> { src.Teacher }));
         CreateMap<CourseDto, Course>();
@@ -40,7 +40,7 @@ public class MappingProfile : Profile
         CreateMap<ArticleDto, Article>();
         CreateMap<Article, ArticleDto>();
         
-        CreateMap<CreateRequestArticleDto, Article>();
+        CreateMap<CreateArticleRequestDto, Article>();
         CreateMap<Article, ArticleDetailDto>();
         CreateMap<ArticleDetailDto, Article>();
     }

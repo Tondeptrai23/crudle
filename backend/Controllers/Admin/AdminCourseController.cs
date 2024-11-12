@@ -29,17 +29,17 @@ public class CourseController(ICourseService courseService) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateCourse([FromBody] CreateRequestCourseDto courseData)
+    public async Task<IActionResult> CreateCourse([FromBody] CreateCourseRequestDto data)
     {
-        var course = await courseService.CreateCourseAsync(courseData);
+        var course = await courseService.CreateCourseAsync(data);
         return Ok(new ResponseDto<CourseDto>(course));
     }
 
     [HttpPatch]
     [Route("{courseId:int}")]
-    public async Task<IActionResult> UpdateCourse([FromRoute] int courseId, [FromBody] UpdateCourseRequestDto courseData)
+    public async Task<IActionResult> UpdateCourse([FromRoute] int courseId, [FromBody] UpdateRequestCourseDto requestCourseData)
     {
-        var course = await courseService.UpdateCourseAsync(courseId, courseData);
+        var course = await courseService.UpdateCourseAsync(courseId, requestCourseData);
         return Ok(new ResponseDto<CourseDto>(course));
     } 
 

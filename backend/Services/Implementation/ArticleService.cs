@@ -59,7 +59,7 @@ public class ArticleService : IArticleService
         return _mapper.Map<ArticleDetailDto>(article);
     }
 
-    public async Task<ArticleDetailDto> CreateArticleAsync(int courseId, CreateRequestArticleDto article)
+    public async Task<ArticleDetailDto> CreateArticleAsync(int courseId, CreateArticleRequestDto article)
     {
         var course = await _dbContext.Set<Course>().FirstOrDefaultAsync(x => x.CourseId == courseId);
         if (course == null)
@@ -79,7 +79,7 @@ public class ArticleService : IArticleService
     }
 
     public async Task<ArticleDetailDto> UpdateArticleAsync(int courseId, int articleId,
-        UpdateRequestArticleDto updateDto)
+        UpdateArticleRequestDto updateArticleDto)
     {
         var course = await _dbContext.Set<Course>().FirstOrDefaultAsync(c => c.CourseId == courseId);
         if (course == null)
@@ -94,19 +94,19 @@ public class ArticleService : IArticleService
             throw new ResourceNotFoundException("Article not found");
         }
 
-        if (updateDto.Title != null)
+        if (updateArticleDto.Title != null)
         {
-            article.Title = updateDto.Title;
+            article.Title = updateArticleDto.Title;
         }
 
-        if (updateDto.Content != null)
+        if (updateArticleDto.Content != null)
         {
-            article.Content = updateDto.Content;
+            article.Content = updateArticleDto.Content;
         }
 
-        if (updateDto.Summary != null)
+        if (updateArticleDto.Summary != null)
         {
-            article.Summary = updateDto.Summary;
+            article.Summary = updateArticleDto.Summary;
         }
 
         article.UpdatedAt = DateTime.Now;
@@ -114,7 +114,7 @@ public class ArticleService : IArticleService
         return _mapper.Map<ArticleDetailDto>(article);
     }
 
-    public async Task<DeleteResponseArticleDto> DeleteArticleAsync(int courseId, int articleId)
+    public async Task<DeleteArticleResponseDto> DeleteArticleAsync(int courseId, int articleId)
     {
         var course = await _dbContext.Set<Course>().FirstOrDefaultAsync(c => c.CourseId == courseId);
         if (course == null)
@@ -130,7 +130,7 @@ public class ArticleService : IArticleService
         }
 
         _dbContext.Remove(article);
-        var response = new DeleteResponseArticleDto
+        var response = new DeleteArticleResponseDto
         {
             Success = await _dbContext.SaveChangesAsync() > 0
         };

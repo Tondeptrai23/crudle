@@ -65,17 +65,17 @@ public class CourseController : ControllerBase
     
     [HttpPost]
     [Route("{courseId:int}/Article")]
-    public async Task<IActionResult> CreateArticle([FromRoute] int courseId, CreateRequestArticleDto articleDto)
+    public async Task<IActionResult> CreateArticle([FromRoute] int courseId, CreateArticleRequestDto dto)
     {
-        var article = await _articleService.CreateArticleAsync(courseId, articleDto);
+        var article = await _articleService.CreateArticleAsync(courseId, dto);
         return Ok(new ResponseDto<ArticleDetailDto>(article));
     }
     
     [HttpPut]
     [Route("{courseId:int}/Article/{articleId:int}")]
-    public async Task<IActionResult> UpdateArticle([FromRoute] int courseId, [FromRoute] int articleId, UpdateRequestArticleDto articleDto)
+    public async Task<IActionResult> UpdateArticle([FromRoute] int courseId, [FromRoute] int articleId, UpdateArticleRequestDto dto)
     {
-        var article = await _articleService.UpdateArticleAsync(courseId, articleId, articleDto);
+        var article = await _articleService.UpdateArticleAsync(courseId, articleId, dto);
         return Ok(new ResponseDto<ArticleDetailDto>(article));
     }
     

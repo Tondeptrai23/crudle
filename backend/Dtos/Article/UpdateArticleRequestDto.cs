@@ -1,6 +1,6 @@
 ﻿namespace _3w1m.Dtos.Article;
 
-public class UpdateRequestArticleDto
+public class UpdateArticleRequestDto
 {
     public string? Title { get; set; }
     public string? Content { get; set; }
