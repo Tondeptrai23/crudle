@@ -80,4 +80,22 @@ public class TokenService : ITokenService
             .FirstOrDefaultAsync(rt => rt.UserId == userId && rt.Token == refreshToken && !rt.IsRevoked);
         return storedToken != null && storedToken.ExpiryDate > DateTime.Now;
     }
+    
+    public async Task RevokeRefreshToken(string userId, string refreshToken)
+    {
+        var hashedToken = Convert.ToBase64String(
+            SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(refreshToken))
+        );
+
+        var refreshTokenEntity = await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Token == hashedToken && rt.UserId == userId && rt.IsRevoked == false);
+
+        if (refreshTokenEntity == null)
+        {
+            throw new ResourceNotFoundException("Refresh token not found.");
+        }
+
+        refreshTokenEntity.IsRevoked = true;
+        await _context.SaveChangesAsync();
+    }
 }
