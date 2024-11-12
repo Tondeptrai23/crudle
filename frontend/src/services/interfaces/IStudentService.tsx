@@ -6,7 +6,13 @@ export default interface IStudentService {
     page: number,
     pageSize: number,
     search: string,
-    filters: string[],
-    rangeFilters: [number, number],
+  ) => Promise<ApiResponse<Student>>;
+
+  getStudentsWithFilters: (
+    page: number,
+    pageSize: number,
+    searchByName: string,
+    filterByEmailDomain: string[],
+    rangeFilterByYear: [number, number],
   ) => Promise<ApiResponse<Student>>;
 }

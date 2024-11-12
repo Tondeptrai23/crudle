@@ -2,6 +2,7 @@ import { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import MockStudentService from '@/services/mock/mockStudentService';
+import { FilterParams } from '@/types/filter';
 
 const studentKeys = {
   lists: () => ['students'],
@@ -10,17 +11,34 @@ const studentKeys = {
 
 const studentService = new MockStudentService();
 
-export const useStudents = (
+export const useStudents = (page: number, pageSize: number, search: string) => {
+  return useQuery({
+    queryKey: ['students', page, pageSize, search],
+    queryFn: () => studentService.getStudents(page, pageSize, search),
+    staleTime: 5 * 60 * 1000,
+    keepPreviousData: true,
+  });
+};
+
+export const useStudentsWithFilters = (
   page: number,
   pageSize: number,
   search: string,
-  filters: string[],
-  rangeFilters: [number, number],
+  filters: Record<string, FilterParams>,
 ) => {
+  const emailDomainFilter = filters.email as string[];
+  const dobRangeFilter = filters.dob as [number, number];
+
   return useQuery({
-    queryKey: ['students', page, pageSize, search, filters, rangeFilters],
+    queryKey: ['students', page, pageSize, search, filters],
     queryFn: () =>
-      studentService.getStudents(page, pageSize, search, filters, rangeFilters),
+      studentService.getStudentsWithFilters(
+        page,
+        pageSize,
+        search,
+        emailDomainFilter,
+        dobRangeFilter,
+      ),
     staleTime: 5 * 60 * 1000,
     keepPreviousData: true,
   });

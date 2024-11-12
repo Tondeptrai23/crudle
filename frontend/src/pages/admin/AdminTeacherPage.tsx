@@ -76,8 +76,9 @@ const AdminTeacherPage: React.FC = () => {
         formComponent={AddTeacherForm}
         disabledActions={{
           edit: false,
-          delete: false, // Allowing delete operations for teachers
+          delete: false,
         }}
+        filterOptions={[]}
       />
     </div>
   );

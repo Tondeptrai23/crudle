@@ -35,13 +35,12 @@ const GenericTable = <T extends { id: string }>({
   formComponent: CreateForm,
   disabledActions = {},
   queryHook,
-  enumFilterOption,
-  rangeFilterOption,
+  filterOptions,
 }: GenericTableProps<T>) => {
-  let { data, pagination, state, search, filters, rangeFilters } =
-    useGenericTableData({
-      useQueryHook: queryHook,
-    });
+  let { data, pagination, state, search, filters } = useGenericTableData({
+    useQueryHook: queryHook,
+    filterOptions,
+  });
 
   const {
     editingRow,
@@ -151,22 +150,33 @@ const GenericTable = <T extends { id: string }>({
           onChange={handleInputChange}
         />
 
-        <EnumFilter
-          type='enum'
-          items={enumFilterOption.items}
-          label={enumFilterOption.label}
-          onChange={filters.onChange}
-          labelIcon={enumFilterOption.labelIcon}
-        />
-
-        <RangeFilter
-          type='range'
-          label='Range'
-          min={rangeFilterOption.min}
-          max={rangeFilterOption.max}
-          step={rangeFilterOption.step}
-          onChange={rangeFilters.onChange}
-        />
+        {filterOptions.map((filterOption) => {
+          switch (filterOption.type) {
+            case 'enum':
+              return (
+                <EnumFilter
+                  key={filterOption.id}
+                  onChange={(value) => {
+                    filters.onChange(filterOption.id, value);
+                  }}
+                  {...filterOption}
+                />
+              );
+            case 'range':
+              return (
+                <RangeFilter
+                  key={filterOption.id}
+                  value={filters.value[filterOption.id] as [number, number]}
+                  onChange={(value) => {
+                    filters.onChange(filterOption.id, value);
+                  }}
+                  {...filterOption}
+                />
+              );
+            default:
+              return null;
+          }
+        })}
 
         <div className='flex-grow' />
         <div />

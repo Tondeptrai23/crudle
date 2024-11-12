@@ -1,7 +1,9 @@
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/lib/utils';
+import { FilterOption, FilterParams } from '@/types/filter';
 import { Column, QueryHook, TableActions } from '@/types/table';
 import { useEffect, useState } from 'react';
+import { useDebounce } from '../useDebounce';
 
 export const useTableAdd = <T extends { id: string }>(
   actions?: TableActions,
@@ -166,25 +168,8 @@ export const useTableDelete = (actions?: TableActions) => {
 
 export const useTableSearch = (hanldeSearch: (value: string) => void) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
 
-  // Debounce delay in milliseconds
-  const DEBOUNCE_DELAY = 200;
-
-  // Debounced search function
-  useEffect(() => {
-    setIsTyping(true);
-
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-      setIsTyping(false);
-    }, DEBOUNCE_DELAY);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [searchQuery]);
+  const debouncedQuery = useDebounce(searchQuery, 300);
 
   useEffect(() => {
     hanldeSearch(debouncedQuery);
@@ -196,32 +181,31 @@ export const useTableSearch = (hanldeSearch: (value: string) => void) => {
 
   return {
     debouncedQuery,
-    isTyping,
     handleInputChange,
   };
 };
 
 export function useGenericTableData<T>({
   useQueryHook,
+  filterOptions,
 }: {
   useQueryHook: QueryHook<T>;
+  filterOptions: FilterOption[];
 }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<string[]>([]);
-  const [rangeFilters, setRangeFilters] = useState<[number, number]>([
-    -Infinity,
-    Infinity,
-  ]);
-
-  const query = useQueryHook(
-    page,
-    pageSize,
-    searchQuery,
-    filters,
-    rangeFilters,
+  const [filters, setFilters] = useState<Record<string, FilterParams>>(
+    filterOptions.reduce(
+      (acc, option) => {
+        acc[option.id] = option.type === 'enum' ? [] : [option.min, option.max];
+        return acc;
+      },
+      {} as Record<string, FilterParams>,
+    ),
   );
+
+  const query = useQueryHook(page, pageSize, searchQuery, filters);
 
   return {
     data: query.data?.data ?? [], // adjust based on your API response structure
@@ -245,14 +229,10 @@ export function useGenericTableData<T>({
       },
     },
     filters: {
-      onChange: (value: string[]) => {
-        setFilters(value);
-        setPage(1);
-      },
-    },
-    rangeFilters: {
-      onChange: (value: [number, number]) => {
-        setRangeFilters(value);
+      value: filters,
+      onChange: (key: string, value: FilterParams) => {
+        console.log(key, value);
+        setFilters((prev) => ({ ...prev, [key]: value }));
         setPage(1);
       },
     },

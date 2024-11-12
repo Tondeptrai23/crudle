@@ -17,29 +17,39 @@ const RangeFilter: React.FC<RangeFilterOption> = ({
   max,
   step = 1,
   onChange,
+  value = [min, max],
 }) => {
-  const [range, setRange] = useState<[number, number]>([min, max]);
+  const [localRange, setLocalRange] = useState<[number, number]>(value);
   const [inputValues, setInputValues] = useState({
-    min: range[0].toString(),
-    max: range[1].toString(),
+    min: value[0].toString(),
+    max: value[1].toString(),
   });
 
-  const debouncedRange = useDebounce(range, 500);
+  const debouncedRange = useDebounce(localRange, 500);
 
+  // Only update parent when debounced value changes
   useEffect(() => {
-    onChange?.(debouncedRange);
-  }, [debouncedRange, onChange]);
+    if (debouncedRange[0] !== value[0] || debouncedRange[1] !== value[1]) {
+      onChange?.(debouncedRange);
+    }
+  }, [debouncedRange, onChange, value]);
 
+  // Sync with parent value changes
   useEffect(() => {
+    setLocalRange(value);
     setInputValues({
-      min: range[0].toString(),
-      max: range[1].toString(),
+      min: value[0].toString(),
+      max: value[1].toString(),
     });
-  }, [range]);
+  }, [value]);
 
   const handleSliderChange = useCallback((newValues: number[]) => {
     const newRange: [number, number] = [newValues[0], newValues[1]];
-    setRange(newRange);
+    setLocalRange(newRange);
+    setInputValues({
+      min: newRange[0].toString(),
+      max: newRange[1].toString(),
+    });
   }, []);
 
   const handleInputChange = useCallback(
@@ -52,7 +62,7 @@ const RangeFilter: React.FC<RangeFilterOption> = ({
       const numValue = parseFloat(value);
       if (isNaN(numValue)) return;
 
-      setRange((currentRange) => {
+      setLocalRange((currentRange) => {
         if (isMin) {
           return [
             Math.min(Math.max(numValue, min), currentRange[1]),
@@ -71,14 +81,15 @@ const RangeFilter: React.FC<RangeFilterOption> = ({
 
   const clearRange = useCallback(() => {
     const defaultRange: [number, number] = [min, max];
-    setRange(defaultRange);
+    setLocalRange(defaultRange);
     setInputValues({
       min: min.toString(),
       max: max.toString(),
     });
-  }, [min, max]);
+    onChange?.(defaultRange);
+  }, [min, max, onChange]);
 
-  const hasCustomRange = range[0] !== min || range[1] !== max;
+  const hasCustomRange = localRange[0] !== min || localRange[1] !== max;
 
   return (
     <Popover>
@@ -88,27 +99,24 @@ const RangeFilter: React.FC<RangeFilterOption> = ({
           {label}
           {hasCustomRange && (
             <span className='ml-2 text-sm text-muted-foreground'>
-              {range[0]} - {range[1]}
+              {localRange[0]} - {localRange[1]}
             </span>
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-[280px] p-4'>
         <div className='space-y-5'>
-          {/* Slider */}
           <div className='pt-4'>
             <Slider
-              defaultValue={[25, 75]}
               min={min}
               max={max}
               step={step}
-              value={[range[0], range[1]]}
+              value={[localRange[0], localRange[1]]}
               onValueChange={handleSliderChange}
               className='mt-6'
             />
           </div>
 
-          {/* Number Inputs */}
           <div className='flex items-center space-x-2'>
             <Input
               type='number'

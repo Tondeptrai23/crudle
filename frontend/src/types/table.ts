@@ -1,5 +1,5 @@
 import { UseQueryResult } from 'react-query';
-import { EnumFilterOption, RangeFilterOption } from './filter';
+import { FilterOption, FilterParams } from './filter';
 import { ApiResponse } from './paginationApiResponse';
 
 export interface Column<T> {
@@ -42,8 +42,7 @@ export type QueryHook<T> = (
   page: number,
   pageSize: number,
   search: string,
-  filters: string[],
-  rangeFilters: [number, number],
+  filters: Record<string, FilterParams>,
 ) => UseQueryResult<ApiResponse<T>>;
 
 export interface GenericTableProps<T extends { id: string }> {
@@ -55,6 +54,5 @@ export interface GenericTableProps<T extends { id: string }> {
   }>;
   disabledActions: ActionCellProps['disabledActions'];
   queryHook: QueryHook<T>;
-  enumFilterOption: EnumFilterOption;
-  rangeFilterOption: RangeFilterOption;
+  filterOptions: FilterOption[];
 }

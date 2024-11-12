@@ -7,11 +7,8 @@ export default class MockStudentService implements IStudentService {
     page = 1,
     pageSize = 10,
     search = '',
-    filters: string[] = [],
-    rangeFilters: [number, number] = [-Infinity, Infinity],
   ): Promise<ApiResponse<Student>> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log('getStudents', page, pageSize, search, filters, rangeFilters);
 
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
@@ -25,22 +22,49 @@ export default class MockStudentService implements IStudentService {
       );
     }
 
-    if (filters.length > 0) {
-      filteredData = filteredData.filter((student) => {
-        const dob = new Date(student.dob);
-        const year = dob.getFullYear();
+    return {
+      data: filteredData,
+      totalItems: data.length,
+      totalPages: Math.ceil(data.length / pageSize),
+      currentPage: page,
+    };
+  }
 
-        return filters.includes(String(year));
+  async getStudentsWithFilters(
+    page = 1,
+    pageSize = 10,
+    searchByName = '',
+    filterByEmailDomain: string[] = [],
+    rangeFilterByYear = [0, 0],
+  ): Promise<ApiResponse<Student>> {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    let filteredData = paginatedData;
+
+    if (searchByName) {
+      filteredData = filteredData.filter((student) =>
+        student.fullname.toLowerCase().includes(searchByName.toLowerCase()),
+      );
+    }
+
+    if (filterByEmailDomain.length) {
+      filteredData = filteredData.filter((student) => {
+        return filterByEmailDomain.some((domain) =>
+          student.email.includes(domain),
+        );
       });
     }
 
-    if (rangeFilters[0] !== -Infinity && rangeFilters[1] !== Infinity) {
-      filteredData = filteredData.filter((student) => {
-        const dob = new Date(student.dob);
-        const year = dob.getFullYear();
-
-        return year >= rangeFilters[0] && year <= rangeFilters[1];
-      });
+    if (rangeFilterByYear[0] && rangeFilterByYear[1]) {
+      filteredData = filteredData.filter(
+        (student) =>
+          new Date(student.dob).getFullYear() >= rangeFilterByYear[0] &&
+          new Date(student.dob).getFullYear() <= rangeFilterByYear[1],
+      );
     }
 
     return {
@@ -95,37 +119,37 @@ let data = [
   {
     id: '1',
     fullname: 'John Doe',
-    email: 'test@gmail.com',
+    email: 'john.doe@gmail.com',
     dob: '1990-01-01',
   },
   {
     id: '2',
     fullname: 'Jane Doe',
-    email: 'test2@gmail.com',
+    email: 'jane.doe@gmail.com',
     dob: '1991-01-01',
   },
   {
     id: '3',
     fullname: 'Alice Smith',
-    email: 'alice.smith@gmail.com',
+    email: 'alice.smith@facebook.com',
     dob: '1992-02-02',
   },
   {
     id: '4',
     fullname: 'Bob Johnson',
-    email: 'bob.johnson@gmail.com',
+    email: 'bob.johnson@facebook.com',
     dob: '1993-03-03',
   },
   {
     id: '5',
     fullname: 'Charlie Brown',
-    email: 'charlie.brown@gmail.com',
+    email: 'charlie.brown@outlook.com',
     dob: '1994-04-04',
   },
   {
     id: '6',
     fullname: 'David Wilson',
-    email: 'david.wilson@gmail.com',
+    email: 'david.wilson@outlook.com',
     dob: '1995-05-05',
   },
   {
