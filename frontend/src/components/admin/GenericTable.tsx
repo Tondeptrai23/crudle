@@ -27,6 +27,7 @@ import { GenericTableProps } from '@/types/table';
 import EnumFilter from '../common/filter/EnumFilter';
 import RangeFilter from '../common/filter/RangeFilter';
 import { Separator } from '../common/ui/separator';
+import TableSort from './TableSort';
 
 // T is a generic type that extends an object with an id property
 const GenericTable = <T extends { id: string }>({
@@ -37,9 +38,14 @@ const GenericTable = <T extends { id: string }>({
   queryHook,
   filterOptions,
 }: GenericTableProps<T>) => {
-  let { data, pagination, state, search, filters } = useGenericTableData({
+  const defaultSortColumn = columns.find(
+    (column) => column.isDefaultSort,
+  )?.header;
+
+  let { data, pagination, state, sort, search, filters } = useGenericTableData({
     useQueryHook: queryHook,
     filterOptions,
+    defaultSortColumn,
   });
 
   const {
@@ -188,7 +194,12 @@ const GenericTable = <T extends { id: string }>({
             {columns.map((column) => {
               return (
                 <TableHead key={column.header} className='text-blue-500'>
-                  {column.header}
+                  <TableSort
+                    columnKey={column.header}
+                    sortConfig={sort.sortConfig}
+                    onSort={sort.onSort}
+                    sortable={column.sortable}
+                  />
                 </TableHead>
               );
             })}

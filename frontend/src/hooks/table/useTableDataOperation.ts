@@ -1,8 +1,9 @@
+import { SortConfig } from '@/components/admin/TableSort';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/lib/utils';
 import { FilterOption, FilterParams } from '@/types/filter';
 import { Column, QueryHook, TableActions } from '@/types/table';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDebounce } from '../useDebounce';
 
 export const useTableAdd = <T extends { id: string }>(
@@ -188,12 +189,18 @@ export const useTableSearch = (hanldeSearch: (value: string) => void) => {
 export function useGenericTableData<T>({
   useQueryHook,
   filterOptions,
+  defaultSortColumn,
 }: {
   useQueryHook: QueryHook<T>;
   filterOptions: FilterOption[];
+  defaultSortColumn?: string;
 }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: defaultSortColumn,
+    direction: 'asc',
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<Record<string, FilterParams>>(
     filterOptions.reduce(
@@ -203,6 +210,26 @@ export function useGenericTableData<T>({
       },
       {} as Record<string, FilterParams>,
     ),
+  );
+
+  const handleSort = useCallback(
+    (key: string, forcedDirection?: 'asc' | 'desc' | null) => {
+      setSortConfig((prevConfig) => {
+        if (forcedDirection) {
+          return { key, direction: forcedDirection };
+        }
+
+        let direction: 'asc' | 'desc' | null = 'asc';
+        if (prevConfig.key === key && prevConfig.direction === 'asc') {
+          direction = 'desc';
+        } else if (prevConfig.key === key && prevConfig.direction === 'desc') {
+          direction = null;
+        }
+
+        return { key, direction };
+      });
+    },
+    [],
   );
 
   const query = useQueryHook(page, pageSize, searchQuery, filters);
@@ -221,6 +248,12 @@ export function useGenericTableData<T>({
       isLoading: query.isLoading,
       isError: query.isError,
       isFetching: query.isFetching,
+    },
+    sort: {
+      sortConfig: sortConfig,
+      onSort: (key: string, direction: 'asc' | 'desc' | null) => {
+        handleSort(key, direction);
+      },
     },
     search: {
       onChange: (value: string) => {

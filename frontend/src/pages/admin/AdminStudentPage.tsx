@@ -26,6 +26,8 @@ const AdminStudentPage: React.FC = () => {
         header: 'Full Name',
         key: 'fullname',
         editable: true,
+        isDefaultSort: true,
+        sortable: true,
         validate: (value: string) => {
           const result = StudentFormSchema.shape.fullname.safeParse(value);
           return result.success ? null : result.error.errors[0].message;
@@ -34,11 +36,13 @@ const AdminStudentPage: React.FC = () => {
       {
         header: 'Email',
         key: 'email',
+        sortable: false,
         editable: false,
       },
       {
         header: 'Date of Birth',
         key: 'dob',
+        sortable: true,
         editable: true,
         validate: (value: string) => {
           const result = StudentFormSchema.shape.dob.safeParse(value);

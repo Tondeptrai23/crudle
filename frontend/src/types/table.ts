@@ -6,6 +6,8 @@ export interface Column<T> {
   header: string;
   key: keyof T;
   editable?: boolean;
+  isDefaultSort?: boolean;
+  sortable?: boolean;
   validate?: (value: any) => string | null;
 }
 
