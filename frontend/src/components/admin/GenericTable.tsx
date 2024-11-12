@@ -10,7 +10,7 @@ import {
 } from '@/components/common/ui/table';
 
 import { cn } from '@/lib/utils';
-import { Filter, PlusCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import LoadingButton from '../common/ui/LoadingButton';
 import ActionCell from './ActionCell';
 import SkeletonTable from './SkeletonTable';
@@ -25,6 +25,7 @@ import {
 } from '@/hooks/table/useTableDataOperation';
 import { GenericTableProps } from '@/types/table';
 import EnumFilter from '../common/filter/EnumFilter';
+import RangeFilter from '../common/filter/RangeFilter';
 import { Separator } from '../common/ui/separator';
 
 // T is a generic type that extends an object with an id property
@@ -147,11 +148,6 @@ const GenericTable = <T extends { id: string }>({
           className='w-1/4'
           onChange={handleInputChange}
         />
-        <LoadingButton variant='outline' className='items-center gap-2'>
-          <Filter className='h-5 w-5' />
-          DoB
-        </LoadingButton>
-        <div className='flex-grow' />
 
         <EnumFilter
           items={filterOption.items}
@@ -159,6 +155,16 @@ const GenericTable = <T extends { id: string }>({
           onChange={filters.onChange}
           labelIcon={filterOption.labelIcon}
         />
+
+        <RangeFilter
+          label='Range'
+          min={1000}
+          max={2000}
+          onChange={console.log}
+        />
+
+        <div className='flex-grow' />
+        <div />
       </div>
 
       <Table>
