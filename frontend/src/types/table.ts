@@ -63,14 +63,13 @@ export type QueryHookParams = {
 };
 
 export interface GenericTableProps<T extends { id: string }> {
-  data?: T[];
   columns: Column<T>[];
   actions?: TableActions;
   formComponent: React.ComponentType<{
     onSubmit: (data: any) => void;
   }>;
   requireDeleteConfirmation?: boolean;
-  disabledActions: ActionCellProps['disabledActions'];
+  disabledActions?: ActionCellProps['disabledActions'];
   queryHook: QueryHook<T>;
   filterOptions: FilterOption[];
 }

@@ -86,7 +86,7 @@ const AdminStudentPageWithNoFilter: React.FC = () => {
         formComponent={AddStudentForm}
         disabledActions={{
           edit: false,
-          delete: true,
+          delete: false,
         }}
         filterOptions={[]}
       />
