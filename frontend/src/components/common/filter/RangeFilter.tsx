@@ -1,3 +1,8 @@
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/common/ui/accordion';
 import { Button } from '@/components/common/ui/button';
 import { Input } from '@/components/common/ui/input'; // Add this import
 import {
@@ -8,7 +13,7 @@ import {
 import { Slider } from '@/components/common/ui/slider';
 import { useDebounce } from '@/hooks/useDebounce';
 import { RangeFilterOption } from '@/types/filter';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const RangeFilter: React.FC<RangeFilterOption> = ({
   label,
@@ -18,6 +23,7 @@ const RangeFilter: React.FC<RangeFilterOption> = ({
   step = 1,
   onChange,
   value = [min, max],
+  componentType = 'popover',
 }) => {
   const [localRange, setLocalRange] = useState<[number, number]>(value);
   const [inputValues, setInputValues] = useState({
@@ -86,71 +92,93 @@ const RangeFilter: React.FC<RangeFilterOption> = ({
       min: min.toString(),
       max: max.toString(),
     });
-    onChange?.(defaultRange);
   }, [min, max, onChange]);
 
   const hasCustomRange = localRange[0] !== min || localRange[1] !== max;
 
+  const filterContent = useMemo(
+    () => (
+      <>
+        <Slider
+          min={min}
+          max={max}
+          step={step}
+          value={[localRange[0], localRange[1]]}
+          onValueChange={handleSliderChange}
+          className='pt-4'
+        />
+
+        <div className='flex items-center space-x-2'>
+          <Input
+            type='number'
+            value={inputValues.min}
+            onChange={(e) => handleInputChange(e.target.value, true)}
+            min={min}
+            max={max}
+            step={step}
+            className='w-20'
+          />
+          <span className='text-muted-foreground'>to</span>
+          <Input
+            type='number'
+            value={inputValues.max}
+            onChange={(e) => handleInputChange(e.target.value, false)}
+            min={min}
+            max={max}
+            step={step}
+            className='w-20'
+          />
+        </div>
+
+        {hasCustomRange && (
+          <Button onClick={clearRange} variant='outline' className='h-8 w-full'>
+            Clear Range
+          </Button>
+        )}
+      </>
+    ),
+    [localRange],
+  );
+
+  if (componentType === 'popover') {
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant='outline'>
+            {LabelIcon && <LabelIcon className='mr-2 h-4 w-4' />}
+            {label}
+            {hasCustomRange && (
+              <span className='ml-2 text-sm text-muted-foreground'>
+                {localRange[0]} - {localRange[1]}
+              </span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className='w-[280px] p-4'>
+          <div className='space-y-5'>{filterContent}</div>
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant='outline'>
+    <AccordionItem value={String(label)} className='w-full'>
+      <AccordionTrigger>
+        <div className='flex items-center gap-2'>
           {LabelIcon && <LabelIcon className='mr-2 h-4 w-4' />}
           {label}
           {hasCustomRange && (
-            <span className='ml-2 text-sm text-muted-foreground'>
+            <span className='mx-2 text-sm text-muted-foreground'>
               {localRange[0]} - {localRange[1]}
             </span>
           )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className='w-[280px] p-4'>
-        <div className='space-y-5'>
-          <div className='pt-4'>
-            <Slider
-              min={min}
-              max={max}
-              step={step}
-              value={[localRange[0], localRange[1]]}
-              onValueChange={handleSliderChange}
-              className='mt-6'
-            />
-          </div>
-
-          <div className='flex items-center space-x-2'>
-            <Input
-              type='number'
-              value={inputValues.min}
-              onChange={(e) => handleInputChange(e.target.value, true)}
-              min={min}
-              max={max}
-              step={step}
-              className='w-20'
-            />
-            <span className='text-muted-foreground'>to</span>
-            <Input
-              type='number'
-              value={inputValues.max}
-              onChange={(e) => handleInputChange(e.target.value, false)}
-              min={min}
-              max={max}
-              step={step}
-              className='w-20'
-            />
-          </div>
-
-          {hasCustomRange && (
-            <Button
-              onClick={clearRange}
-              variant='outline'
-              className='h-8 w-full'
-            >
-              Clear Range
-            </Button>
-          )}
         </div>
-      </PopoverContent>
-    </Popover>
+      </AccordionTrigger>
+
+      <AccordionContent>
+        <div className='space-y-5'>{filterContent}</div>
+      </AccordionContent>
+    </AccordionItem>
   );
 };
 

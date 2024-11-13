@@ -10,8 +10,6 @@ import {
 } from '@/components/common/ui/table';
 
 import { cn } from '@/lib/utils';
-import { PlusCircle } from 'lucide-react';
-import LoadingButton from '../common/ui/LoadingButton';
 import ActionCell from './ActionCell';
 import SkeletonTable from './SkeletonTable';
 
@@ -24,13 +22,17 @@ import {
   useTableSearch,
 } from '@/hooks/table/useTableDataOperation';
 import { GenericTableProps } from '@/types/table';
+import { PlusCircle } from 'lucide-react';
 import { useMemo } from 'react';
 import EnumFilter from '../common/filter/EnumFilter';
 import RangeFilter from '../common/filter/RangeFilter';
+import { Accordion } from '../common/ui/accordion';
+import LoadingButton from '../common/ui/LoadingButton';
 import { Separator } from '../common/ui/separator';
 import TableSort from './TableSort';
 
 const GenericTable = <T extends { id: string }>({
+  tableTitle,
   columns,
   actions,
   formComponent: CreateForm,
@@ -86,7 +88,7 @@ const GenericTable = <T extends { id: string }>({
 
     return (
       <TableBody>
-        {data.map((cell) => (
+        {data.map((cell: T) => (
           <TableRow className='p-0' key={cell.id}>
             {columns.map((column) => (
               <TableCell
@@ -185,6 +187,7 @@ const GenericTable = <T extends { id: string }>({
                 key={filterOption.id}
                 onChange={(value) => filters.onChange(filterOption.id, value)}
                 {...filterOption}
+                componentType='accordion'
               />
             );
           case 'range':
@@ -194,6 +197,7 @@ const GenericTable = <T extends { id: string }>({
                 value={filters.value[filterOption.id] as [number, number]}
                 onChange={(value) => filters.onChange(filterOption.id, value)}
                 {...filterOption}
+                componentType='accordion'
               />
             );
           default:
@@ -209,37 +213,48 @@ const GenericTable = <T extends { id: string }>({
 
   return (
     <>
-      <div className='flex flex-row items-center gap-4 px-4'>
+      <div className='flex min-w-64 flex-col gap-4 rounded-md border-2 px-4'>
+        <h2 className='pt-4 text-center text-2xl font-semibold'>
+          {tableTitle} List
+        </h2>
+        <div className='flex items-center justify-center gap-2'>
+          <Input
+            placeholder={`Search ${tableTitle.toLowerCase()}...`}
+            className='w-full'
+            onChange={handleInputChange}
+          />
+        </div>
         <LoadingButton
           variant='outline'
-          className='items-center gap-2'
+          className='w-full items-center gap-2'
           onClick={handleShowDialog}
           isLoading={isAdding}
         >
           <PlusCircle className='h-5 w-5' />
-          Add
+          Add {tableTitle}
         </LoadingButton>
-        <div className='flex-grow' />
-        <Input
-          placeholder='Search'
-          className='w-1/4'
-          onChange={handleInputChange}
-        />
+        <Separator />
 
-        {renderFilters}
-
-        <div className='flex-grow' />
-        <div />
+        {filterOptions.length > 0 && (
+          <>
+            <p className='font-semibold text-gray-400'>Filters</p>
+            <Accordion type='multiple' className='flex w-full flex-col gap-2'>
+              {renderFilters}
+            </Accordion>
+          </>
+        )}
       </div>
 
-      <Table>
-        {tableHeader}
+      <div className='flex-grow rounded-md border-2'>
+        <Table>
+          {tableHeader}
 
-        {tableBody}
-      </Table>
+          {tableBody}
+        </Table>
 
-      <Separator />
-      <TablePagination {...pagination} />
+        <Separator />
+        <TablePagination {...pagination} />
+      </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

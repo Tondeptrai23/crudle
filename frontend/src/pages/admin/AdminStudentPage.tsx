@@ -94,7 +94,7 @@ const AdminStudentPage: React.FC = () => {
 
   const rangeFilterOption: RangeFilterOption = {
     id: 'dob',
-    label: 'Year of Birth',
+    label: 'Birth Year',
     labelIcon: Calendar,
     type: 'range',
     step: 1,
@@ -103,9 +103,9 @@ const AdminStudentPage: React.FC = () => {
   };
 
   return (
-    <div className='min-h-3/4 m-auto w-3/4 rounded-md border-2'>
-      <h2 className='px-4 py-4 text-2xl font-semibold'>Student List</h2>
+    <div className='min-h-3/4 w m-auto flex flex-row gap-4'>
       <GenericTable
+        tableTitle='Student'
         queryHook={useStudentsWithFilters}
         columns={columns}
         actions={actions}

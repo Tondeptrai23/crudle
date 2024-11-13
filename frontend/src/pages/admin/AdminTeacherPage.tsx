@@ -67,9 +67,9 @@ const AdminTeacherPage: React.FC = () => {
   );
 
   return (
-    <div className='min-h-3/4 m-auto w-3/4 rounded-md border-2'>
-      <h2 className='px-4 py-4 text-2xl font-semibold'>Teacher List</h2>
+    <div className='min-h-3/4 w m-auto flex flex-row gap-4'>
       <GenericTable
+        tableTitle='Teacher'
         queryHook={useTeachers}
         columns={columns}
         actions={actions}

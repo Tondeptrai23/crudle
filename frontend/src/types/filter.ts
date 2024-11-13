@@ -9,6 +9,7 @@ export interface BaseFilterOption {
   label?: string;
   labelIcon?: React.FC<React.SVGProps<SVGSVGElement>>;
   type: 'enum' | 'range';
+  componentType?: 'popover' | 'accordion';
 }
 
 export interface RangeFilterOption extends BaseFilterOption {

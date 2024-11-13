@@ -1,5 +1,5 @@
 import { SortConfig } from '@/components/admin/TableSort';
-import { UseQueryResult } from 'react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 import { FilterOption, FilterParams } from './filter';
 import { ApiResponse } from './paginationApiResponse';
 
@@ -63,6 +63,7 @@ export type QueryHookParams = {
 };
 
 export interface GenericTableProps<T extends { id: string }> {
+  tableTitle: string;
   columns: Column<T>[];
   actions?: TableActions;
   formComponent: React.ComponentType<{
