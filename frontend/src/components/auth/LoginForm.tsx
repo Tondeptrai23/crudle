@@ -20,6 +20,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useAuth from "@/hooks/useAuth"
+import { useState } from "react"
 
 const LoginSchema = z.object({
   email: z.string(),
@@ -41,13 +42,19 @@ export function LoginForm() {
     },
   })
 
+  const [ isLoading, setIsLoading ] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
   const { state } = useLocation();
 
   function onSubmit(data: z.infer<typeof LoginSchema>) {
+    setIsLoading(true);
     login(data.email, data.password).then(() => {
       navigate(state?.path || '/');
+    }).catch(() => {
+      setIsLoading(false);
+      // TODO: ?
+      console.log('Login failed!');
     });
   }
 
@@ -86,14 +93,10 @@ export function LoginForm() {
               )}
             />
             <Button type="submit" className="w-full">
-              Login
+              {isLoading ? 'Loading...' : 'Login'}
             </Button>
           </form>
         </Form>
-        {/* <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <a href="#" className="underline"> Sign up </a>
-        </div> */}
         <Link to='/' className="text-sm underline">Forget your password?</Link>
       </CardContent>
     </Card>

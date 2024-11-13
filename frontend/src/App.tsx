@@ -7,6 +7,7 @@ import { WeatherPage } from './pages/WeatherPage.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { AuthProvider } from './hooks/useAuth.tsx';
 import RequireAuth from './components/auth/RequireAuth.tsx';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const queryClient = new QueryClient();  
 
@@ -37,6 +38,9 @@ const App: React.FC = () => {
           </Routes>
         </MainLayout>
       </Router>
+      
+      {/* Debugging */}
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
     </AuthProvider>
   );
