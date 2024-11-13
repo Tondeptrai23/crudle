@@ -3,12 +3,19 @@ import { UseQueryResult } from 'react-query';
 import { FilterOption, FilterParams } from './filter';
 import { ApiResponse } from './paginationApiResponse';
 
+export type ColumnStyle = {
+  width?: string;
+  minWidth?: string;
+  maxWidth?: string;
+};
+
 export interface Column<T> {
   header: string;
   key: keyof T;
   editable?: boolean;
   isDefaultSort?: boolean;
   sortable?: boolean;
+  style?: ColumnStyle;
   validate?: (value: T[keyof T]) => string | null;
 }
 

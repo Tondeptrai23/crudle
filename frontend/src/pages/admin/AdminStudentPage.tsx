@@ -28,6 +28,9 @@ const AdminStudentPage: React.FC = () => {
         editable: true,
         isDefaultSort: true,
         sortable: true,
+        style: {
+          maxWidth: '200px',
+        },
         validate: (value: string) => {
           const result = StudentFormSchema.shape.fullname.safeParse(value);
           return result.success ? null : result.error.errors[0].message;
@@ -36,6 +39,9 @@ const AdminStudentPage: React.FC = () => {
       {
         header: 'Email',
         key: 'email',
+        style: {
+          minWidth: '200px',
+        },
         sortable: false,
         editable: false,
       },
@@ -44,6 +50,9 @@ const AdminStudentPage: React.FC = () => {
         key: 'dob',
         sortable: true,
         editable: true,
+        style: {
+          width: '150px',
+        },
         validate: (value: string) => {
           const result = StudentFormSchema.shape.dob.safeParse(value);
           return result.success ? null : result.error.errors[0].message;

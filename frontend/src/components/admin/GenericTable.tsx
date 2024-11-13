@@ -90,7 +90,15 @@ const GenericTable = <T extends { id: string }>({
         {data.map((cell) => (
           <TableRow className='p-0' key={cell.id}>
             {columns.map((column) => (
-              <TableCell key={column.key.toString()} className='py-1'>
+              <TableCell
+                key={column.key.toString()}
+                className='py-1'
+                style={{
+                  minWidth: column.style?.minWidth,
+                  maxWidth: column.style?.maxWidth,
+                  width: column.style?.width,
+                }}
+              >
                 {editingRow === cell.id && column.editable ? (
                   <Input
                     value={String(
