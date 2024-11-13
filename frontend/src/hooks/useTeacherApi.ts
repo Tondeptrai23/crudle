@@ -1,6 +1,11 @@
 import MockTeacherService from '@/services/mock/mockTeacherService';
 import { CreateTeacherDTO, UpdateTeacherDTO } from '@/types/teacher';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 const teacherKeys = {
   lists: () => ['teachers'],
@@ -19,7 +24,7 @@ export const useTeachers = (data: {
     queryKey: ['teachers', page, pageSize, search],
     queryFn: () => teacherService.getTeachers(page, pageSize, search),
     staleTime: 5 * 60 * 1000,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 };
 

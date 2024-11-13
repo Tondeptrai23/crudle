@@ -1,5 +1,10 @@
 import { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import MockStudentService from '@/services/mock/mockStudentService';
 import { QueryHookParams } from '@/types/table';
@@ -21,7 +26,7 @@ export const useStudents = (data: {
     queryKey: ['students', page, pageSize, search],
     queryFn: () => studentService.getStudents(page, pageSize, search),
     staleTime: 5 * 60 * 1000,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     retry: false,
   });
 };
@@ -40,10 +45,10 @@ export const useStudentsWithFilters = (data: QueryHookParams) => {
         search,
         emailDomainFilter,
         dobRangeFilter,
-        [sort.key || '', sort.direction || 'asc'],
+        [sort.key, sort.direction || 'asc'],
       ),
     staleTime: 5 * 60 * 1000,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     retry: false,
   });
 };

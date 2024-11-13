@@ -36,7 +36,7 @@ export default class MockStudentService implements IStudentService {
     searchByName = '',
     filterByEmailDomain: string[] = [],
     rangeFilterByYear = [0, 0],
-    sort: [string, 'asc' | 'desc'] = ['fullname', 'asc'],
+    sort: [string | null, 'asc' | 'desc'] = ['fullname', 'asc'],
   ): Promise<ApiResponse<Student>> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 

@@ -214,20 +214,11 @@ export function useGenericTableData<T>({
 
   const handleSort = useCallback(
     (key: string, forcedDirection?: 'asc' | 'desc' | null) => {
-      setSortConfig((prevConfig) => {
-        if (forcedDirection) {
-          return { key, direction: forcedDirection };
-        }
-
-        let direction: 'asc' | 'desc' | null = 'asc';
-        if (prevConfig.key === key && prevConfig.direction === 'asc') {
-          direction = 'desc';
-        } else if (prevConfig.key === key && prevConfig.direction === 'desc') {
-          direction = null;
-        }
-
-        return { key, direction };
-      });
+      if (forcedDirection) {
+        setSortConfig({ key, direction: forcedDirection });
+      } else {
+        setSortConfig({ key: null, direction: null });
+      }
     },
     [],
   );

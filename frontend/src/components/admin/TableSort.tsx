@@ -7,7 +7,7 @@ export type SortProps = {
   columnKey: string;
   columnHeader: string;
   sortConfig: SortConfig;
-  onSort: (key: string, direction: 'asc' | 'desc') => void;
+  onSort: (key: string, direction: 'asc' | 'desc' | null) => void;
   sortable?: boolean;
 };
 
@@ -15,9 +15,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/common/ui/dropdown-menu';
-import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronsUpDown, X } from 'lucide-react';
 
 const TableSort = ({
   columnKey,
@@ -39,6 +40,8 @@ const TableSort = ({
     return <ChevronsUpDown className='h-4 w-4' />;
   };
 
+  const isCurrentColumn = sortConfig.key === columnKey;
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className='flex items-center gap-1 focus:outline-none'>
@@ -48,12 +51,21 @@ const TableSort = ({
       <DropdownMenuContent align='start'>
         <DropdownMenuItem onClick={() => onSort(columnKey, 'asc')}>
           <ArrowUp className='h-4 w-4' />
-          Asc
+          Ascending
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onSort(columnKey, 'desc')}>
           <ArrowDown className='h-4 w-4' />
-          Desc
+          Descending
         </DropdownMenuItem>
+        {isCurrentColumn && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onSort(columnKey, null)}>
+              <X className='h-4 w-4' />
+              Clear
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
