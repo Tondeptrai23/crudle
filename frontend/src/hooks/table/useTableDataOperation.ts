@@ -55,7 +55,7 @@ export const useTableEdit = <T extends { id: string }>(
     const newErrors: Record<string, string> = {};
     columns.forEach((column) => {
       if (column.editable && column.validate) {
-        const error = column.validate(String(editedValues?.[column.key]));
+        const error = column.validate(editedValues?.[column.key] as T[keyof T]);
         if (error) {
           newErrors[String(column.key)] = error;
         }
@@ -240,8 +240,14 @@ export function useGenericTableData<T>({
     sort: sortConfig,
   });
 
+  useEffect(() => {
+    if (query.data?.data.length === 1 && page > 1) {
+      setPage(1);
+    }
+  }, [query.data?.data.length, page]);
+
   return {
-    data: query.data?.data ?? [], // adjust based on your API response structure
+    data: query.data?.data ?? [],
     pagination: {
       currentPage: page,
       totalPages: query.data?.totalPages ?? 0,
@@ -259,6 +265,7 @@ export function useGenericTableData<T>({
       sortConfig: sortConfig,
       onSort: (key: string, direction: 'asc' | 'desc' | null) => {
         handleSort(key, direction);
+        setPage(1);
       },
     },
     search: {
@@ -270,7 +277,6 @@ export function useGenericTableData<T>({
     filters: {
       value: filters,
       onChange: (key: string, value: FilterParams) => {
-        console.log(key, value);
         setFilters((prev) => ({ ...prev, [key]: value }));
         setPage(1);
       },

@@ -41,7 +41,7 @@ const TableSort = ({
 
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger className='flex items-center focus:outline-none'>
+      <DropdownMenuTrigger className='flex items-center gap-1 focus:outline-none'>
         {columnHeader}
         {getSortIcon()}
       </DropdownMenuTrigger>

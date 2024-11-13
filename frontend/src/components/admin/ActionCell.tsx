@@ -8,11 +8,23 @@ import {
   DropdownMenuTrigger,
 } from '@/components/common/ui/dropdown-menu';
 import { ActionCellProps } from '@/types/table';
+
 import { EllipsisVertical, Loader2 } from 'lucide-react';
 import React from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../common/ui/alert-dialog';
 import LoadingButton from '../common/ui/LoadingButton';
 
 const ActionCell: React.FC<ActionCellProps> = ({
+  requireDeleteConfirmation = true,
   isEditing = false,
   isDeleting = false,
   isSaving = false,
@@ -25,6 +37,16 @@ const ActionCell: React.FC<ActionCellProps> = ({
     delete: true,
   },
 }) => {
+  const handleDeleteClick = () => {
+    if (requireDeleteConfirmation) {
+      setShowDeleteDialog(true);
+    } else {
+      onDelete?.();
+    }
+  };
+
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+
   if (isDeleting) {
     return (
       <div className='flex p-1'>
@@ -57,35 +79,63 @@ const ActionCell: React.FC<ActionCellProps> = ({
   }
 
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          className='h-8 w-8 rounded-full border-0 p-1 hover:bg-gray-200 data-[state=open]:bg-gray-200'
-          variant={'outline'}
+    <>
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            className='h-8 w-8 rounded-full border-0 p-1 hover:bg-gray-200 data-[state=open]:bg-gray-200'
+            variant={'outline'}
+          >
+            <EllipsisVertical />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align='start'
+          side='right'
+          onCloseAutoFocus={(e) => e.preventDefault()}
         >
-          <EllipsisVertical />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align='start'
-        side='right'
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        {!disabledActions.edit && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
-          </>
-        )}
-        {!disabledActions.delete && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onDelete}>Delete</DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          {!disabledActions.edit && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
+            </>
+          )}
+          {!disabledActions.delete && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleDeleteClick}>
+                Delete
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              record.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowDeleteDialog(false);
+                onDelete?.();
+              }}
+              className='bg-red-600 hover:bg-red-700'
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

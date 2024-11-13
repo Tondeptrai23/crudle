@@ -9,9 +9,10 @@ export interface Column<T> {
   editable?: boolean;
   isDefaultSort?: boolean;
   sortable?: boolean;
-  validate?: (value: any) => string | null;
+  validate?: (value: T[keyof T]) => string | null;
 }
 
+// Must use "any" here because the type of the data is not known
 export interface TableActions {
   onSave: (id: string, updatedData: any) => void | Promise<void>;
   onDelete: (id: string) => void | Promise<void>;
@@ -28,6 +29,7 @@ export interface TablePaginationProps {
 }
 
 export interface ActionCellProps {
+  requireDeleteConfirmation?: boolean;
   isEditing?: boolean;
   isDeleting?: boolean;
   isSaving?: boolean;
@@ -60,6 +62,7 @@ export interface GenericTableProps<T extends { id: string }> {
   formComponent: React.ComponentType<{
     onSubmit: (data: any) => void;
   }>;
+  requireDeleteConfirmation?: boolean;
   disabledActions: ActionCellProps['disabledActions'];
   queryHook: QueryHook<T>;
   filterOptions: FilterOption[];

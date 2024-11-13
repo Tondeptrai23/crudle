@@ -22,6 +22,7 @@ export const useStudents = (data: {
     queryFn: () => studentService.getStudents(page, pageSize, search),
     staleTime: 5 * 60 * 1000,
     keepPreviousData: true,
+    retry: false,
   });
 };
 
@@ -43,6 +44,7 @@ export const useStudentsWithFilters = (data: QueryHookParams) => {
       ),
     staleTime: 5 * 60 * 1000,
     keepPreviousData: true,
+    retry: false,
   });
 };
 

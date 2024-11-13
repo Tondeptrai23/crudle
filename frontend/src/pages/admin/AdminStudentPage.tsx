@@ -73,7 +73,7 @@ const AdminStudentPage: React.FC = () => {
     items: [
       { id: 'outlook', label: 'Outlook', icon: Settings },
       { id: 'gmail', label: 'Gmail', icon: Bell },
-      { id: 'facebok', label: 'Facebok', icon: Heart },
+      { id: 'facebook', label: 'Facebook', icon: Heart },
     ],
     label: 'Filter',
     labelIcon: Filter,
@@ -99,7 +99,7 @@ const AdminStudentPage: React.FC = () => {
         formComponent={AddStudentForm}
         disabledActions={{
           edit: false,
-          delete: true,
+          delete: false,
         }}
         filterOptions={[filterOption, rangeFilterOption]}
       />

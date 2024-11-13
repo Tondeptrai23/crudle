@@ -24,6 +24,7 @@ import {
   useTableSearch,
 } from '@/hooks/table/useTableDataOperation';
 import { GenericTableProps } from '@/types/table';
+import { useMemo } from 'react';
 import EnumFilter from '../common/filter/EnumFilter';
 import RangeFilter from '../common/filter/RangeFilter';
 import { Separator } from '../common/ui/separator';
@@ -37,6 +38,7 @@ const GenericTable = <T extends { id: string }>({
   disabledActions = {},
   queryHook,
   filterOptions,
+  requireDeleteConfirmation,
 }: GenericTableProps<T>) => {
   const defaultSortColumn = columns.find(
     (column) => column.isDefaultSort,
@@ -63,78 +65,139 @@ const GenericTable = <T extends { id: string }>({
     useTableAdd(actions);
   const { handleInputChange } = useTableSearch(search.onChange);
 
-  if (state.isError) {
-    return <div className='text-center text-red-500'>No data found</div>;
-  }
+  const tableBody = useMemo(() => {
+    if (state.isFetching) {
+      return <SkeletonTable rows={pagination.pageSize} variant='body' />;
+    }
+
+    if (data.length === 0 || state.isError) {
+      return (
+        <TableBody>
+          <TableRow>
+            <TableCell
+              className='text-center text-red-500'
+              colSpan={columns.length + 1}
+            >
+              {state.isError ? 'An error occurred' : 'No data found'}
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      );
+    }
+
+    return (
+      <TableBody>
+        {data.map((cell) => (
+          <TableRow className='p-0' key={cell.id}>
+            {columns.map((column) => (
+              <TableCell key={column.key.toString()} className='py-1'>
+                {editingRow === cell.id && column.editable ? (
+                  <Input
+                    value={String(
+                      editedValues?.[column.key] ?? cell[column.key],
+                    )}
+                    onChange={(e) =>
+                      handleCellValueChange(column.key, e.target.value)
+                    }
+                    className={cn(
+                      'h-full w-full border-2 p-1 focus:border-slate-800 focus-visible:ring-transparent',
+                      fieldErrors[String(column.key)] ? 'border-red-500' : '',
+                    )}
+                  />
+                ) : (
+                  String(cell[column.key])
+                )}
+              </TableCell>
+            ))}
+            <TableCell className='min-w-40 py-1'>
+              <ActionCell
+                requireDeleteConfirmation={requireDeleteConfirmation}
+                isEditing={editingRow === cell.id}
+                isDeleting={deletingRow === cell.id && isDeleting}
+                isSaving={isSaving}
+                onEdit={() => handleEdit(cell.id)}
+                onDelete={() => handleDelete(cell.id)}
+                onSave={() => handleSave(cell.id)}
+                onCancel={handleCancel}
+                disabledActions={disabledActions}
+              />
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    );
+  }, [
+    data,
+    state.isFetching,
+    state.isError,
+    columns,
+    editingRow,
+    editedValues,
+    fieldErrors,
+    deletingRow,
+    isDeleting,
+    isSaving,
+    pagination.pageSize,
+    handleCellValueChange,
+    handleEdit,
+    handleDelete,
+    handleSave,
+    handleCancel,
+    disabledActions,
+  ]);
+
+  const tableHeader = useMemo(
+    () => (
+      <TableHeader>
+        <TableRow>
+          {columns.map((column) => (
+            <TableHead key={column.header} className='text-blue-500'>
+              <TableSort
+                columnKey={String(column.key)}
+                columnHeader={column.header}
+                sortConfig={sort.sortConfig}
+                onSort={sort.onSort}
+                sortable={column.sortable}
+              />
+            </TableHead>
+          ))}
+          <TableHead className='w-4 text-blue-500'>Action</TableHead>
+        </TableRow>
+      </TableHeader>
+    ),
+    [columns, sort.sortConfig, sort.onSort],
+  );
+
+  const renderFilters = useMemo(
+    () =>
+      filterOptions.map((filterOption) => {
+        switch (filterOption.type) {
+          case 'enum':
+            return (
+              <EnumFilter
+                key={filterOption.id}
+                onChange={(value) => filters.onChange(filterOption.id, value)}
+                {...filterOption}
+              />
+            );
+          case 'range':
+            return (
+              <RangeFilter
+                key={filterOption.id}
+                value={filters.value[filterOption.id] as [number, number]}
+                onChange={(value) => filters.onChange(filterOption.id, value)}
+                {...filterOption}
+              />
+            );
+          default:
+            return null;
+        }
+      }),
+    [filterOptions, filters.onChange, filters.value],
+  );
 
   if (state.isLoading) {
     return <SkeletonTable rows={10} />;
-  }
-
-  let tableBody: React.ReactNode = null;
-
-  if (state.isFetching) {
-    tableBody = <SkeletonTable rows={pagination.pageSize} variant='body' />;
-  } else if (data.length === 0 || state.isError) {
-    tableBody = (
-      <TableBody>
-        <TableRow>
-          <TableCell
-            className='text-center text-red-500'
-            colSpan={columns.length + 1}
-          >
-            {state.isError ? 'An error occurred' : 'No data found'}
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    );
-  } else {
-    tableBody = (
-      <TableBody>
-        {data.map((cell) => {
-          return (
-            <TableRow className='p-0' key={cell.id}>
-              {columns.map((column) => {
-                return (
-                  <TableCell className='py-1'>
-                    {editingRow === cell.id && column.editable ? (
-                      <Input
-                        value={String(
-                          editedValues?.[column.key] ?? cell[column.key],
-                        )}
-                        onChange={(e) =>
-                          handleCellValueChange(column.key, e.target.value)
-                        }
-                        className={cn(
-                          'h-full w-full border-2 p-1 focus:border-slate-800 focus-visible:ring-transparent',
-                          fieldErrors[String(column.key)]
-                            ? 'border-red-500'
-                            : '',
-                        )}
-                      />
-                    ) : (
-                      String(cell[column.key])
-                    )}
-                  </TableCell>
-                );
-              })}
-              <TableCell className='min-w-40 py-1'>
-                <ActionCell
-                  isEditing={editingRow === cell.id}
-                  isDeleting={deletingRow === cell.id && isDeleting}
-                  isSaving={isSaving}
-                  onEdit={() => handleEdit(cell.id)}
-                  onDelete={() => handleDelete(cell.id)}
-                  onSave={() => handleSave(cell.id)}
-                  onCancel={handleCancel}
-                  disabledActions={disabledActions}
-                />
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    );
   }
 
   return (
@@ -156,57 +219,14 @@ const GenericTable = <T extends { id: string }>({
           onChange={handleInputChange}
         />
 
-        {filterOptions.map((filterOption) => {
-          switch (filterOption.type) {
-            case 'enum':
-              return (
-                <EnumFilter
-                  key={filterOption.id}
-                  onChange={(value) => {
-                    filters.onChange(filterOption.id, value);
-                  }}
-                  {...filterOption}
-                />
-              );
-            case 'range':
-              return (
-                <RangeFilter
-                  key={filterOption.id}
-                  value={filters.value[filterOption.id] as [number, number]}
-                  onChange={(value) => {
-                    filters.onChange(filterOption.id, value);
-                  }}
-                  {...filterOption}
-                />
-              );
-            default:
-              return null;
-          }
-        })}
+        {renderFilters}
 
         <div className='flex-grow' />
         <div />
       </div>
 
       <Table>
-        <TableHeader>
-          <TableRow>
-            {columns.map((column) => {
-              return (
-                <TableHead key={column.header} className='text-blue-500'>
-                  <TableSort
-                    columnKey={String(column.key)}
-                    columnHeader={column.header}
-                    sortConfig={sort.sortConfig}
-                    onSort={sort.onSort}
-                    sortable={column.sortable}
-                  />
-                </TableHead>
-              );
-            })}
-            <TableHead className='w-4 text-blue-500'>Action</TableHead>
-          </TableRow>
-        </TableHeader>
+        {tableHeader}
 
         {tableBody}
       </Table>
