@@ -36,14 +36,11 @@ export default class MockStudentService implements IStudentService {
     searchByName = '',
     filterByEmailDomain: string[] = [],
     rangeFilterByYear = [0, 0],
+    sort: [string, 'asc' | 'desc'] = ['fullname', 'asc'],
   ): Promise<ApiResponse<Student>> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedData = data.slice(startIndex, endIndex);
-
-    let filteredData = paginatedData;
+    let filteredData = data;
 
     if (searchByName) {
       filteredData = filteredData.filter((student) =>
@@ -67,8 +64,24 @@ export default class MockStudentService implements IStudentService {
       );
     }
 
+    if (sort[0] !== '' && sort[1]) {
+      filteredData = filteredData.sort((a, b) => {
+        const key = sort[0] as keyof Student;
+
+        if (sort[1] === 'asc') {
+          return a[key] > b[key] ? 1 : -1;
+        } else {
+          return a[key] < b[key] ? 1 : -1;
+        }
+      });
+    }
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedData = filteredData.slice(startIndex, endIndex);
+
     return {
-      data: filteredData,
+      data: paginatedData,
       totalItems: filteredData.length,
       totalPages: Math.ceil(filteredData.length / pageSize),
       currentPage: page,

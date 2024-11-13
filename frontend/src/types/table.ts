@@ -1,3 +1,4 @@
+import { SortConfig } from '@/components/admin/TableSort';
 import { UseQueryResult } from 'react-query';
 import { FilterOption, FilterParams } from './filter';
 import { ApiResponse } from './paginationApiResponse';
@@ -41,11 +42,16 @@ export interface ActionCellProps {
 }
 
 export type QueryHook<T> = (
-  page: number,
-  pageSize: number,
-  search: string,
-  filters: Record<string, FilterParams>,
+  data: QueryHookParams,
 ) => UseQueryResult<ApiResponse<T>>;
+
+export type QueryHookParams = {
+  page: number;
+  pageSize: number;
+  search: string;
+  filters: Record<string, FilterParams>;
+  sort: SortConfig;
+};
 
 export interface GenericTableProps<T extends { id: string }> {
   data?: T[];

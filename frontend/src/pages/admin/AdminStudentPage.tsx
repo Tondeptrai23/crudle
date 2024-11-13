@@ -86,7 +86,7 @@ const AdminStudentPage: React.FC = () => {
     type: 'range',
     step: 1,
     min: 1990,
-    max: 2000,
+    max: 2005,
   };
 
   return (

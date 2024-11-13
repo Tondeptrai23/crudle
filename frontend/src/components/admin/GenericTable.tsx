@@ -195,7 +195,8 @@ const GenericTable = <T extends { id: string }>({
               return (
                 <TableHead key={column.header} className='text-blue-500'>
                   <TableSort
-                    columnKey={column.header}
+                    columnKey={String(column.key)}
+                    columnHeader={column.header}
                     sortConfig={sort.sortConfig}
                     onSort={sort.onSort}
                     sortable={column.sortable}

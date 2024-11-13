@@ -198,7 +198,7 @@ export function useGenericTableData<T>({
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    key: defaultSortColumn,
+    key: defaultSortColumn ?? null,
     direction: 'asc',
   });
   const [searchQuery, setSearchQuery] = useState('');
@@ -232,7 +232,13 @@ export function useGenericTableData<T>({
     [],
   );
 
-  const query = useQueryHook(page, pageSize, searchQuery, filters);
+  const query = useQueryHook({
+    page,
+    pageSize,
+    search: searchQuery,
+    filters: filters,
+    sort: sortConfig,
+  });
 
   return {
     data: query.data?.data ?? [], // adjust based on your API response structure

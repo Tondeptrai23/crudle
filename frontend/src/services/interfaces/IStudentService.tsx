@@ -14,5 +14,6 @@ export default interface IStudentService {
     searchByName: string,
     filterByEmailDomain: string[],
     rangeFilterByYear: [number, number],
+    sort: [string, 'asc' | 'desc'],
   ) => Promise<ApiResponse<Student>>;
 }

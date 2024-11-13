@@ -1,4 +1,3 @@
-// types.ts
 export type SortConfig = {
   key: string | null;
   direction: 'asc' | 'desc' | null;
@@ -6,12 +5,12 @@ export type SortConfig = {
 
 export type SortProps = {
   columnKey: string;
+  columnHeader: string;
   sortConfig: SortConfig;
   onSort: (key: string, direction: 'asc' | 'desc') => void;
   sortable?: boolean;
 };
 
-// TableSort.tsx
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,9 +19,15 @@ import {
 } from '@/components/common/ui/dropdown-menu';
 import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
 
-const TableSort = ({ columnKey, sortConfig, onSort, sortable }: SortProps) => {
+const TableSort = ({
+  columnKey,
+  columnHeader,
+  sortConfig,
+  onSort,
+  sortable,
+}: SortProps) => {
   if (!sortable) {
-    return <span>{columnKey}</span>;
+    return <span>{columnHeader}</span>;
   }
 
   const getSortIcon = () => {
@@ -37,7 +42,7 @@ const TableSort = ({ columnKey, sortConfig, onSort, sortable }: SortProps) => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className='flex items-center focus:outline-none'>
-        {columnKey}
+        {columnHeader}
         {getSortIcon()}
       </DropdownMenuTrigger>
       <DropdownMenuContent align='start'>
