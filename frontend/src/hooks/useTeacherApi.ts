@@ -9,7 +9,12 @@ const teacherKeys = {
 
 const teacherService = new MockTeacherService();
 
-export const useTeachers = (page: number, pageSize: number, search: string) => {
+export const useTeachers = (data: {
+  page: number;
+  pageSize: number;
+  search: string;
+}) => {
+  const { page, pageSize, search } = data;
   return useQuery({
     queryKey: ['teachers', page, pageSize, search],
     queryFn: () => teacherService.getTeachers(page, pageSize, search),

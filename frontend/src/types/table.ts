@@ -21,9 +21,9 @@ export interface Column<T> {
 
 // Must use "any" here because the type of the data is not known
 export interface TableActions {
-  onSave: (id: string, updatedData: any) => void | Promise<void>;
-  onDelete: (id: string) => void | Promise<void>;
-  onAdd: (data: any) => void | Promise<void>;
+  onSave?: (id: string, updatedData: any) => void | Promise<void>;
+  onDelete?: (id: string) => void | Promise<void>;
+  onAdd?: (data: any) => void | Promise<void>;
 }
 
 export interface TablePaginationProps {

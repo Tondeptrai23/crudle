@@ -30,7 +30,6 @@ import RangeFilter from '../common/filter/RangeFilter';
 import { Separator } from '../common/ui/separator';
 import TableSort from './TableSort';
 
-// T is a generic type that extends an object with an id property
 const GenericTable = <T extends { id: string }>({
   columns,
   actions,

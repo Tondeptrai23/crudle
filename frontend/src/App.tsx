@@ -5,6 +5,7 @@ import MainLayout from './components/MainLayout.tsx';
 import AdminCoursePage from './pages/admin/AdminCoursePage.tsx';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.tsx';
 import AdminStudentPage from './pages/admin/AdminStudentPage.tsx';
+import AdminStudentPageWithNoFilter from './pages/admin/AdminStudentPageWithNoFilter.tsx';
 import AdminTeacherPage from './pages/admin/AdminTeacherPage.tsx';
 import CoursePage from './pages/CoursePage.tsx';
 import { WeatherPage } from './pages/WeatherPage.tsx';
@@ -23,6 +24,11 @@ const App: React.FC = () => {
             <Route path='/admin/dashboard' element={<AdminDashboardPage />} />
             <Route path='/admin/course' element={<AdminCoursePage />} />
             <Route path='/admin/student' element={<AdminStudentPage />} />
+            <Route
+              path='/admin/test/student'
+              element={<AdminStudentPageWithNoFilter />}
+            />
+
             <Route path='/admin/teacher' element={<AdminTeacherPage />} />
 
             <Route path='*' element={<div>404</div>} />

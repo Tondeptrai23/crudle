@@ -11,6 +11,7 @@ export function getNavItems(role?: string): { label: string; path: string }[] {
       { label: 'Course', path: '/admin/course' },
       { label: 'Teacher', path: '/admin/teacher' },
       { label: 'Student', path: '/admin/student' },
+      { label: 'Student Test', path: '/admin/test/student' },
     ];
   } else {
     return [

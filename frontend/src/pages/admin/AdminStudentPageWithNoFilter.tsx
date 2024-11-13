@@ -5,30 +5,23 @@ import AddStudentForm, {
 
 import {
   useCreateStudent,
-  useStudentsWithFilters,
+  useDeleteStudent,
+  useStudents,
   useUpdateStudent,
 } from '@/hooks/useStudentApi';
-import { EnumFilterOption, RangeFilterOption } from '@/types/filter';
 import Student, { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 import { Column } from '@/types/table';
-import { Bell, Calendar, Heart, Mail, Settings } from 'lucide-react';
 import React from 'react';
 
-const AdminStudentPage: React.FC = () => {
+/// This component is used to show usage of GenericTable component
+/// TODO: Delete this component later
+const AdminStudentPageWithNoFilter: React.FC = () => {
   const createStudent = useCreateStudent();
   const updateStudent = useUpdateStudent();
+  const deleteStudent = useDeleteStudent();
 
   const columns: Column<Student>[] = React.useMemo(
     () => [
-      {
-        header: 'ID',
-        key: 'id',
-        editable: false,
-        sortable: true,
-        style: {
-          width: '100px',
-        },
-      },
       {
         header: 'Full Name',
         key: 'fullname',
@@ -73,40 +66,21 @@ const AdminStudentPage: React.FC = () => {
       onSave: async (id: string, value: UpdateStudentDTO) => {
         await updateStudent.mutateAsync({ id, data: value });
       },
+      onDelete: async (id: string) => {
+        await deleteStudent.mutateAsync(id);
+      },
       onAdd: async (value: CreateStudentDTO) => {
         await createStudent.mutateAsync(value);
       },
     }),
-    [updateStudent, createStudent],
+    [updateStudent, deleteStudent, createStudent],
   );
-
-  const filterOption: EnumFilterOption = {
-    id: 'email',
-    type: 'enum',
-    items: [
-      { id: 'outlook', label: 'Outlook', icon: Settings },
-      { id: 'gmail', label: 'Gmail', icon: Bell },
-      { id: 'facebook', label: 'Facebook', icon: Heart },
-    ],
-    label: 'Email',
-    labelIcon: Mail,
-  };
-
-  const rangeFilterOption: RangeFilterOption = {
-    id: 'dob',
-    label: 'Year of Birth',
-    labelIcon: Calendar,
-    type: 'range',
-    step: 1,
-    min: 1990,
-    max: 2005,
-  };
 
   return (
     <div className='min-h-3/4 m-auto w-3/4 rounded-md border-2'>
       <h2 className='px-4 py-4 text-2xl font-semibold'>Student List</h2>
       <GenericTable
-        queryHook={useStudentsWithFilters}
+        queryHook={useStudents}
         columns={columns}
         actions={actions}
         formComponent={AddStudentForm}
@@ -114,10 +88,10 @@ const AdminStudentPage: React.FC = () => {
           edit: false,
           delete: true,
         }}
-        filterOptions={[filterOption, rangeFilterOption]}
+        filterOptions={[]}
       />
     </div>
   );
 };
 
-export default AdminStudentPage;
+export default AdminStudentPageWithNoFilter;
