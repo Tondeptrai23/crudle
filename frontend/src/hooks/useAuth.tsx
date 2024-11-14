@@ -3,34 +3,27 @@ import { authenticate, isAuthenticated } from "@/utils/api";
 
 interface AuthContextType {
   authed: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
-  logout: () => Promise<boolean>;
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   authed: false,
-  login: async () => false,
-  logout: async () => false,
+  login: async () => {},
+  logout: async () => {},
 });
 
 function useAuth() {
-  const [authed, setAuthed] = useState<boolean>(!!isAuthenticated());
+  const [authed, setAuthed] = useState<boolean>(Boolean(isAuthenticated()));
 
   return {
-    authed: authed,
+    authed,
     login: async (username: string, password: string) => {
-      try {
-        await authenticate(username, password);
-        setAuthed(true);
-      } catch {
-        console.error('Login failed');
-        return false;
-      }
-      return true;
+      await authenticate(username, password);
+      setAuthed(true);
     },
     logout: async () => {
       setAuthed(false);
-      return true;
     },
   };
 }

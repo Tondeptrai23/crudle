@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage.tsx';
 import { AuthProvider } from './hooks/useAuth.tsx';
 import RequireAuth from './components/auth/RequireAuth.tsx';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from './components/common/ui/toaster.tsx';
 
 const queryClient = new QueryClient();  
 
@@ -38,6 +39,7 @@ const App: React.FC = () => {
           </Routes>
         </MainLayout>
       </Router>
+      <Toaster />
       
       {/* Debugging */}
       <ReactQueryDevtools initialIsOpen={false} />

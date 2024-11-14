@@ -21,6 +21,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import useAuth from "@/hooks/useAuth"
 import { useState } from "react"
+import { useToast } from "@/hooks/use-toast"
+import { AxiosError } from "axios"
 
 const LoginSchema = z.object({
   email: z.string(),
@@ -43,19 +45,42 @@ export function LoginForm() {
   })
 
   const [ isLoading, setIsLoading ] = useState(false);
+  const { toast } = useToast();
   const navigate = useNavigate();
   const { login } = useAuth();
   const { state } = useLocation();
 
   function onSubmit(data: z.infer<typeof LoginSchema>) {
     setIsLoading(true);
-    login(data.email, data.password).then(() => {
-      navigate(state?.path || '/');
-    }).catch(() => {
-      setIsLoading(false);
-      // TODO: ?
-      console.log('Login failed!');
-    });
+    login(data.email, data.password)
+      .then(() => {
+        setIsLoading(false);
+        navigate(state?.from ? state.from : '/');
+      })
+      .catch((error) => {
+        setIsLoading(false);
+
+        const axiosError = error as AxiosError;
+        let description = "";
+
+        if (axiosError.response) {
+          if (axiosError.response.status === 401) {
+            description = "Invalid email or password. Please try again.";
+          }
+        } else if (axiosError.request) {
+          if (axiosError.code === 'ERR_NETWORK') {
+            description = "There was a network error. Please try again later.";
+          }
+        } else {
+          // TODO: Handle other error cases
+          description = axiosError.message;
+        }
+
+        toast({
+          title: "Failed to login",
+          description: description,
+        });
+      });
   }
 
   return (
@@ -97,7 +122,7 @@ export function LoginForm() {
             </Button>
           </form>
         </Form>
-        <Link to='/' className="text-sm underline">Forget your password?</Link>
+        <Link to='/' className="text-sm underline">Forgot your password?</Link>
       </CardContent>
     </Card>
   )

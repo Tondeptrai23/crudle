@@ -44,7 +44,6 @@ export const isAuthenticated = () => {
         return true;
       })
       .catch(() => {
-        console.error('Failed to refresh token');
         return false;
       });
   }
@@ -88,8 +87,6 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        console.error('Failed to refresh token 2');
-
         return Promise.reject(refreshError);
       }
     }
