@@ -17,7 +17,9 @@ const App: React.FC = () => {
     <AuthProvider>
     <QueryClientProvider client={queryClient}>
       <Router>
-        <MainLayout>
+        <Routes>
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/*' element={<MainLayout>
           <Routes>
             <Route path='/login' element={<LoginPage />} />
 
@@ -37,7 +39,8 @@ const App: React.FC = () => {
             <Route path='/profile' element={<div>Profile</div>} />
             <Route path='/settings' element={<div>Settings</div>} />
           </Routes>
-        </MainLayout>
+        </MainLayout>} />
+        </Routes>
       </Router>
       <Toaster />
       
