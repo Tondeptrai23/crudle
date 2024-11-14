@@ -9,6 +9,7 @@ import { AuthProvider } from './hooks/useAuth.tsx';
 import RequireAuth from './components/auth/RequireAuth.tsx';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from './components/common/ui/toaster.tsx';
+import Logout from './components/auth/Logout.tsx';
 
 const queryClient = new QueryClient();  
 
@@ -35,7 +36,7 @@ const App: React.FC = () => {
             } />
 
             <Route path='*' element={<div>404</div>} />
-            <Route path='/logout' element={<div>Logout</div>} />
+            <Route path='/logout' element={<Logout />} />
             <Route path='/profile' element={<div>Profile</div>} />
             <Route path='/settings' element={<div>Settings</div>} />
           </Routes>

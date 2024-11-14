@@ -25,6 +25,21 @@ export const authenticate = async (username: string, password: string) => {
   sessionStorage.setItem('refresh-token', response.data.Data.RefreshToken);
 };
 
+export const invalidateSession = async () => {
+  const refreshToken = sessionStorage.getItem('refresh-token');
+  const userId = sessionStorage.getItem('user-id');
+  if (!refreshToken) {
+    return;
+  }
+  await publicApi.post('/api/Auth/logout', {
+    UserId: userId,
+    RefreshToken: refreshToken,
+  });
+  sessionStorage.removeItem('access-token');
+  sessionStorage.removeItem('user-id');
+  sessionStorage.removeItem('refresh-token');
+}
+
 export const isAuthenticated = () => {
   const token = sessionStorage.getItem('access-token');
 

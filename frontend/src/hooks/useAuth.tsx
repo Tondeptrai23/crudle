@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { authenticate, isAuthenticated } from "@/utils/api";
+import { authenticate, invalidateSession, isAuthenticated } from "@/utils/api";
 
 interface AuthContextType {
   authed: boolean;
@@ -23,6 +23,7 @@ function useAuth() {
       setAuthed(true);
     },
     logout: async () => {
+      await invalidateSession();
       setAuthed(false);
     },
   };

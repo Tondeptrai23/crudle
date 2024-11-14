@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using _3w1m.Data;
 using _3w1m.Models.Domain;
+using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
 using _3w1m.Settings;
 using Microsoft.AspNetCore.Identity;
