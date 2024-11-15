@@ -69,4 +69,18 @@ public class AuthController : ControllerBase
         var newAccessToken = await _tokenService.GenerateAccessToken(user);
         return Ok(new ResponseDto<Object>(new { AccessToken = newAccessToken }));
     }
+    
+    [HttpPost]
+    [Route("logout")]
+    public async Task<IActionResult> Logout([FromBody, Required] RefreshTokenDto refreshTokenDto)
+    {
+        var user = await _userManager.FindByIdAsync(refreshTokenDto.UserId);
+        if (user == null || !await _tokenService.ValidateRefreshToken(user.Id, refreshTokenDto.RefreshToken))
+        {
+            throw new UnauthorizedException("Invalid refresh token.");
+        }
+
+        await _tokenService.RevokeRefreshToken(user.Id, refreshTokenDto.RefreshToken);
+        return Ok(new ResponseDto<string>("Refresh token revoked." ));
+    }
 }

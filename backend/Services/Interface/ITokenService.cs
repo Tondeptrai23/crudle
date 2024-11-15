@@ -29,4 +29,12 @@ public interface ITokenService
     /// <param name="refreshToken">The refresh token to validate.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a boolean value indicating whether the refresh token is valid.</returns>
     Task<bool> ValidateRefreshToken(string userId, string refreshToken);
+
+    /// <summary>
+    /// Revokes the specified refresh token for the given user.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="refreshToken"></param>
+    /// <returns></returns>
+    Task RevokeRefreshToken(string userId, string refreshToken);
 }
