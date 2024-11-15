@@ -25,15 +25,15 @@ public static class AuthenticationConfigExtension
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = false, // TODO: https://stackoverflow.com/questions/54395859/c-sharp-asp-net-core-bearer-error-invalid-token
+                    ValidateIssuer = true, 
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true, 
                     ValidIssuer = issuer,
                     ValidAudience = audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-                    RoleClaimType = ClaimTypes.Role,  // Make sure this is set
-                    ClockSkew = TimeSpan.Zero  // Reduce clock skew to zero for testing
+                    RoleClaimType = ClaimTypes.Role,  
+                    ClockSkew = TimeSpan.Zero  
 
                 };
             });
