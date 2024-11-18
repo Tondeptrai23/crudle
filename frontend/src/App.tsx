@@ -52,6 +52,7 @@ const App: React.FC = () => {
                         <Route path='/course' element={<AdminCoursePage />} />
                         <Route path='/student' element={<AdminStudentPage />} />
                         <Route path='/teacher' element={<AdminTeacherPage />} />
+                        <Route path='*' element={<div>Not Found</div>} />
                       </Routes>
                     </MainLayout>
                   </RequireAuth>
@@ -68,6 +69,10 @@ const App: React.FC = () => {
                       <Routes>
                         <Route path='/' element={<WeatherPage />} />
                         <Route path='/course' element={<CoursePage />} />
+
+                        <Route path='/profile' element={<div>Profile</div>} />
+                        <Route path='/settings' element={<div>Settings</div>} />
+                        <Route path='*' element={<div>Not Found</div>} />
                       </Routes>
                     </MainLayout>
                   </RequireAuth>
@@ -75,9 +80,7 @@ const App: React.FC = () => {
               }
             />
             <Route path='/logout' element={<Logout />} />
-            <Route path='/profile' element={<div>Profile</div>} />
-            <Route path='/settings' element={<div>Settings</div>} />
-            <Route path='*' element={<div>404</div>} />
+            <Route path='*' element={<div>Not Found</div>} />
           </Routes>
         </Router>
         <Toaster />

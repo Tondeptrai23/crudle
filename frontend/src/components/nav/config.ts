@@ -22,3 +22,13 @@ export function getNavItems(): { label: string; path: string }[] {
     ];
   }
 }
+
+export function getDefaultPath(): string {
+  const role = getRole();
+
+  if (role === Role.Admin) {
+    return '/admin';
+  } else {
+    return '/';
+  }
+}

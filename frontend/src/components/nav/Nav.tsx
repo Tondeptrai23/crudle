@@ -26,9 +26,16 @@ const Nav: React.FC<NavProps> = (props) => {
     const baseClass = 'px-3 py-1 font-semibold cursor-pointer';
     const selectedClass = 'bg-blue-500 rounded-lg text-white';
 
+    const currentSegments = pathname.split('/').filter(Boolean);
+    const pathSegments = path.split('/').filter(Boolean);
+
     const isSelected =
-      (path === '/' && pathname === '/') ||
-      (path !== '/' && pathname.startsWith(path));
+      path === '/'
+        ? pathname === '/'
+        : pathSegments.length === currentSegments.length && // Must be same depth
+          pathSegments.every(
+            (segment, index) => segment === currentSegments[index],
+          );
 
     const classValue = `${baseClass} ${isSelected ? selectedClass : ''}`.trim();
 
