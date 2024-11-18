@@ -13,12 +13,20 @@ const fetchCourses = async () => {
 };
 
 const CoursePage: React.FC = () => {
-  const { data: courses, isPending } = useQuery({
+  const {
+    data: courses,
+    isPending,
+    error,
+  } = useQuery({
     queryKey: ['courses'],
     queryFn: fetchCourses,
   });
 
   if (isPending) return <div>Loading...</div>;
+
+  if (error) {
+    throw error;
+  }
 
   return (
     <div>
