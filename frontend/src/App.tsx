@@ -15,6 +15,7 @@ import AdminTeacherPage from './pages/admin/AdminTeacherPage.tsx';
 import CoursePage from './pages/CoursePage.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { WeatherPage } from './pages/WeatherPage.tsx';
+import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 
 const queryClient = new QueryClient({
@@ -44,80 +45,39 @@ const App: React.FC = () => {
               path='/admin/*'
               element={
                 <ErrorBoundary>
-                  <MainLayout>
-                    <Routes>
-                      <Route
-                        path='/'
-                        element={
-                          <RequireAuth>
-                            <AdminHomePage />
-                          </RequireAuth>
-                        }
-                      />
-
-                      <Route
-                        path='/course'
-                        element={
-                          <RequireAuth>
-                            <AdminCoursePage />
-                          </RequireAuth>
-                        }
-                      />
-
-                      <Route
-                        path='/student'
-                        element={
-                          <RequireAuth>
-                            <AdminStudentPage />
-                          </RequireAuth>
-                        }
-                      />
-
-                      <Route
-                        path='/teacher'
-                        element={
-                          <RequireAuth>
-                            <AdminTeacherPage />
-                          </RequireAuth>
-                        }
-                      />
-                    </Routes>
-                  </MainLayout>
+                  <RequireAuth allowedRoles={[Role.Admin]}>
+                    <MainLayout>
+                      <Routes>
+                        <Route path='/' element={<AdminHomePage />} />
+                        <Route path='/course' element={<AdminCoursePage />} />
+                        <Route path='/student' element={<AdminStudentPage />} />
+                        <Route path='/teacher' element={<AdminTeacherPage />} />
+                      </Routes>
+                    </MainLayout>
+                  </RequireAuth>
                 </ErrorBoundary>
               }
             />
+
             <Route
               path='/*'
               element={
                 <ErrorBoundary>
-                  <MainLayout>
-                    <Routes>
-                      <Route
-                        path='/'
-                        element={
-                          <RequireAuth>
-                            <WeatherPage />
-                          </RequireAuth>
-                        }
-                      />
-
-                      <Route
-                        path='/course'
-                        element={
-                          <RequireAuth>
-                            <CoursePage />
-                          </RequireAuth>
-                        }
-                      />
-                    </Routes>
-                  </MainLayout>
+                  <RequireAuth allowedRoles={[Role.User]}>
+                    <MainLayout>
+                      <Routes>
+                        <Route path='/' element={<WeatherPage />} />
+                        <Route path='/course' element={<CoursePage />} />
+                      </Routes>
+                    </MainLayout>
+                  </RequireAuth>
                 </ErrorBoundary>
               }
             />
-            <Route path='*' element={<div>404</div>} />
             <Route path='/logout' element={<Logout />} />
             <Route path='/profile' element={<div>Profile</div>} />
             <Route path='/settings' element={<div>Settings</div>} />
+            <Route path='*' element={<div>404</div>} />
           </Routes>
         </Router>
         <Toaster />

@@ -1,5 +1,4 @@
 import Nav from '@/components/nav/Nav.tsx';
-import { useRole } from '@/hooks/useAuth';
 import { LucideLogOut, Settings, User } from 'lucide-react';
 import React from 'react';
 import { Separator } from './common/ui/separator';
@@ -10,12 +9,11 @@ interface MainLayoutProps {
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-  const role = useRole();
   return (
     <>
       <Nav
         className='max-h-18 max-w-full'
-        items={getNavItems(role)}
+        items={getNavItems()}
         handleNotification={() => {
           console.log('Notification clicked');
         }}

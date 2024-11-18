@@ -74,6 +74,10 @@ export const isAuthenticated = () => {
   }
 };
 
+export const getRole = () => {
+  return sessionStorage.getItem('role') ?? '';
+};
+
 api.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem('access-token');
