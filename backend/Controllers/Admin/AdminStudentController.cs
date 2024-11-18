@@ -42,17 +42,17 @@ public class StudentController : ControllerBase
 
     [HttpGet]
     [Route("{StudentId:int}")]
-    public async Task<IActionResult> GetStudentByIdAsync([FromRoute] int StudentId)
+    public async Task<IActionResult> GetStudentByIdAsync([FromRoute] int studentId)
     {
-        var student = await _studentService.GetStudentByIdAsync(StudentId);
+        var student = await _studentService.GetStudentByIdAsync(studentId);
         return Ok(new ResponseDto<StudentDetailDto>(student));
     }
 
     [Route("{StudentId:int}")]
     [HttpPatch]
-    public async Task<IActionResult> UpdateStudentAsync([FromBody] UpdateStudentRequestDto request, [FromRoute] int StudentId)
+    public async Task<IActionResult> UpdateStudentAsync([FromBody] UpdateStudentRequestDto request, [FromRoute] int studentId)
     {
-        var updatedStudent = await _studentService.UpdateStudentAsync(StudentId, request);
+        var updatedStudent = await _studentService.UpdateStudentAsync(studentId, request);
         
         return Ok(new ResponseDto<StudentDto>(updatedStudent));
     }

@@ -33,8 +33,12 @@ public class CourseController : ControllerBase
     public async Task<IActionResult> GetEnrolledCourseAsync()
     {
         var user = await _userManager.GetUserAsync(User);
-        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
 
+        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
         var enrolledCourse = await _courseService.GetEnrolledCourseOfAStudentAsync(student.StudentId);
         return Ok(new ResponseDto<IEnumerable<CourseDto>>(enrolledCourse));
     }
@@ -51,7 +55,15 @@ public class CourseController : ControllerBase
     [Route("{courseId:int}/Article/{articleId:int}")]
     public async Task<IActionResult> GetArticleByIdAsync([FromRoute] int courseId, [FromRoute] int articleId)
     {
-        var article = await _articleService.GetArticleByIdAsync(articleId, courseId);
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
+
+        var article = await _articleService.GetArticleByIdAsync(articleId, courseId, student.StudentId);
         return Ok(new ResponseDto<ArticleDetailDto>(article));
     }
 
@@ -61,6 +73,7 @@ public class CourseController : ControllerBase
         [FromQuery] ArticleCollectionQueryDto queryDto)
     {
         var (articleCount, articles) = await _articleService.GetArticlesAsync(courseId, queryDto);
-        return Ok(new PaginationResponseDto<IEnumerable<ArticleDto>>(articles, articleCount, queryDto.Page, queryDto.Size));
+        return Ok(new PaginationResponseDto<IEnumerable<ArticleDto>>(articles, articleCount, queryDto.Page,
+            queryDto.Size));
     }
 }

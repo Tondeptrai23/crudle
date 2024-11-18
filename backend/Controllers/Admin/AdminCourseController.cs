@@ -24,7 +24,7 @@ public class CourseController(ICourseService courseService) : Controller
     [HttpGet]
     [Route("{courseId:int}/Students")]
     public async Task<IActionResult> GetStudentsInCourse([FromRoute] int courseId) {
-        var (count, students) = await courseService.GetStudentsInCourseAsync(courseId);
+        var (_, students) = await courseService.GetStudentsInCourseAsync(courseId);
         return Ok(new ResponseDto<IEnumerable<StudentDto>>(students));
     }
 

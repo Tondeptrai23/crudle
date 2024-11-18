@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using _3w1m.Constants;
+﻿using _3w1m.Constants;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Article;
 using _3w1m.Dtos.Course;
@@ -36,7 +35,8 @@ public class CourseController : ControllerBase
     public async Task<IActionResult> GetCoursesDetail([FromRoute] int courseId)
     {
         var user = await _userManager.GetUserAsync(this.User);
-        if (user == null) {
+        if (user == null)
+        {
             return Unauthorized();
         }
 
@@ -46,7 +46,7 @@ public class CourseController : ControllerBase
         throw new NotImplementedException();
     }
 
-    
+
     [HttpGet]
     [Route("{courseId:int}")]
     public async Task<IActionResult> GetCourseById(int courseId)
@@ -54,7 +54,7 @@ public class CourseController : ControllerBase
         var course = await _courseService.GetCourseByIdAsync(courseId);
         return Ok(new ResponseDto<CourseDto>(course));
     }
-    
+
     [HttpGet]
     [Route("{courseId:int}/Articles")]
     public async Task<IActionResult> GetArticles(int courseId, [FromQuery] ArticleCollectionQueryDto queryDto)
@@ -62,28 +62,50 @@ public class CourseController : ControllerBase
         var (count, articles) = await _articleService.GetArticlesAsync(courseId, queryDto);
         return Ok(new PaginationResponseDto<IEnumerable<ArticleDto>>(articles, count, queryDto.Page, queryDto.Size));
     }
-    
+
     [HttpPost]
     [Route("{courseId:int}/Article")]
     public async Task<IActionResult> CreateArticle([FromRoute] int courseId, CreateArticleRequestDto dto)
     {
-        var article = await _articleService.CreateArticleAsync(courseId, dto);
+        var user = await _userManager.GetUserAsync(this.User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
+        var article = await _articleService.CreateArticleAsync(courseId,  teacher.TeacherId, dto);
         return Ok(new ResponseDto<ArticleDetailDto>(article));
     }
-    
+
     [HttpPut]
     [Route("{courseId:int}/Article/{articleId:int}")]
-    public async Task<IActionResult> UpdateArticle([FromRoute] int courseId, [FromRoute] int articleId, UpdateArticleRequestDto dto)
+    public async Task<IActionResult> UpdateArticle([FromRoute] int courseId, [FromRoute] int articleId,
+        UpdateArticleRequestDto dto)
     {
-        var article = await _articleService.UpdateArticleAsync(courseId, articleId, dto);
+        var user = await _userManager.GetUserAsync(this.User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
+        var article = await _articleService.UpdateArticleAsync(courseId, articleId, teacher.TeacherId, dto);
         return Ok(new ResponseDto<ArticleDetailDto>(article));
     }
-    
-    [HttpDelete] 
+
+    [HttpDelete]
     [Route("{courseId:int}/Article/{articleId:int}")]
     public async Task<IActionResult> DeleteArticle([FromRoute] int courseId, [FromRoute] int articleId)
     {
-        var result = await _articleService.DeleteArticleAsync(courseId, articleId);
+        var user = await _userManager.GetUserAsync(this.User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
+        var result = await _articleService.DeleteArticleAsync(courseId, articleId, teacher.TeacherId);
         return Ok(result);
     }
 }

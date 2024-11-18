@@ -71,6 +71,7 @@ public interface ICourseService
     /// Get all courses that a teacher is teaching
     /// </summary>
     /// <param name="teacherId">The unique identifier of the teacher</param>
+    /// <param name="courseId">The unique identifier of the course</param>
     /// <returns>The task contains a collection of courses that a teacher is teaching</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the teacher or the course is not found</exception>
     /// <exception cref="ForbiddenException">Thrown when the teacher is not teaching the course</exception>
