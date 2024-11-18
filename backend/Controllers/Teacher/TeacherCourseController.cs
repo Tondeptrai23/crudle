@@ -13,7 +13,6 @@ namespace _3w1m.Controllers.Teacher;
 [Route("api/Teacher/[controller]")]
 [ApiController]
 [Authorize(Roles = CourseRoles.Teacher)]
-[AllowAnonymous]
 [Tags("Teacher Course")]
 public class CourseController : ControllerBase
 {
