@@ -2,13 +2,13 @@ import { Button } from '@/components/common/ui/button';
 import {
   NavigationMenu,
   NavigationMenuItem,
-  NavigationMenuLink,
+  // NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/common/ui/navigation-menu';
 import { cn } from '@/lib/utils';
 import { Bell } from 'lucide-react';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import Profile, { ProfileMenuItem } from './Profile';
 
@@ -34,9 +34,13 @@ const Nav: React.FC<NavProps> = (props) => {
 
     return (
       <NavigationMenuItem key={path}>
+        {/* This <NavigationMenuLink> component is actually a <a> tag with some styles.
+        When we work with React Router, we should use the <Link> component from the 'react-router-dom' library.
+
         <NavigationMenuLink href={path}>
           <div className={classValue}>{label}</div>
-        </NavigationMenuLink>
+        </NavigationMenuLink> */}
+        <Link to={path} replace><div className={classValue}>{label}</div></Link>
       </NavigationMenuItem>
     );
   };
