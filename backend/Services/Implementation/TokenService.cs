@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using _3w1m.Data;
 using _3w1m.Models.Domain;
+using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
 using _3w1m.Settings;
 using Microsoft.AspNetCore.Identity;
@@ -44,7 +45,7 @@ public class TokenService : ITokenService
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
             claims: authClaims,
-            expires: DateTime.Now.AddMinutes(jwtExpirationMinutes),
+            expires: DateTime.UtcNow.AddMinutes(jwtExpirationMinutes),
             signingCredentials: creds
         );
 
@@ -53,31 +54,64 @@ public class TokenService : ITokenService
 
     public async Task<string> GenerateRefreshToken(string userId)
     {
+
+        using var rng = RandomNumberGenerator.Create();
+        using var sha256 = SHA256.Create();
+
         var randomNumber = new byte[32];
-        using (var rng = RandomNumberGenerator.Create())
+
+        rng.GetBytes(randomNumber);
+        var refreshToken = Convert.ToBase64String(randomNumber);
+        var hashedToken = Convert.ToBase64String(
+            sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken))
+        );
+        
+        var refreshTokenEntity = new RefreshToken
         {
-            rng.GetBytes(randomNumber);
-            var refreshToken = Convert.ToBase64String(randomNumber);
+            Token = hashedToken,
+            UserId = userId,
+            ExpiryDate = DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiresInMinutes),
+            IsRevoked = false
+        };
 
-            var refreshTokenEntity = new RefreshToken
-            {
-                Token = refreshToken,
-                UserId = userId,
-                ExpiryDate = _jwtSettings.RefreshTokenExpiredTime,
-                IsRevoked = false
-            };
+        _context.RefreshTokens.Add(refreshTokenEntity);
+        await _context.SaveChangesAsync();
 
-            _context.RefreshTokens.Add(refreshTokenEntity);
-            await _context.SaveChangesAsync();
-
-            return refreshToken;
-        }
+        return refreshToken;
     }
 
     public async Task<bool> ValidateRefreshToken(string userId, string refreshToken)
     {
-        var storedToken = await _context.RefreshTokens
-            .FirstOrDefaultAsync(rt => rt.UserId == userId && rt.Token == refreshToken && !rt.IsRevoked);
-        return storedToken != null && storedToken.ExpiryDate > DateTime.Now;
+        var hashedToken = Convert.ToBase64String(
+            SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(refreshToken))
+        );
+
+        var refreshTokenEntity = await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Token == hashedToken && rt.UserId == userId && rt.IsRevoked == false);
+        
+        if (refreshTokenEntity != null && refreshTokenEntity.ExpiryDate < DateTime.UtcNow)
+        {
+            throw new TokenExpiredException("Refresh has expired");
+        }
+        
+        return refreshTokenEntity != null;
+    }
+    
+    public async Task RevokeRefreshToken(string userId, string refreshToken)
+    {
+        var hashedToken = Convert.ToBase64String(
+            SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(refreshToken))
+        );
+
+        var refreshTokenEntity = await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Token == hashedToken && rt.UserId == userId && rt.IsRevoked == false);
+
+        if (refreshTokenEntity == null)
+        {
+            throw new ResourceNotFoundException("Refresh token not found.");
+        }
+
+        refreshTokenEntity.IsRevoked = true;
+        await _context.SaveChangesAsync();
     }
 }

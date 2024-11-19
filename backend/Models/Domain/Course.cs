@@ -14,9 +14,9 @@ public class Course
     
     public DateOnly StartDate { get; set; }
     
-    public int TeacherId { get; set; }
+    public int? TeacherId { get; set; }
     
-    public Teacher Teacher { get; set; }
+    public Teacher? Teacher { get; set; }
     
     public ICollection<Enrollment> Enrollments { get; set; }
 }

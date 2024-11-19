@@ -24,6 +24,8 @@ public static class SwaggerConfigExtension
                 }
             };
 
+            option.MapType<DateOnly>(() => new OpenApiSchema { Type = "string", Format = "date" });
+
             option.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
 
             option.AddSecurityRequirement(new OpenApiSecurityRequirement

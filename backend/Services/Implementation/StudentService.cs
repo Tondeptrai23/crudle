@@ -37,7 +37,7 @@ public class StudentService : IStudentService
         return _mapper.Map<StudentDetailDto>(student);
     }
     
-    public async Task<(int count, IEnumerable<StudentDto> students)> GetStudentsAsync(StudentCollectionQueryDto request)
+    public async Task<(int count, IEnumerable<StudentDto> students)> GetStudentsAsync(StudentCollectionQueryDto? request)
     {
         request ??= new StudentCollectionQueryDto();
         
@@ -96,11 +96,11 @@ public class StudentService : IStudentService
         }
     }
 
-    public async Task<StudentDto> UpdateStudentAsync(int StudentId, UpdateStudentRequestDto studentData)
+    public async Task<StudentDto> UpdateStudentAsync(int studentId, UpdateStudentRequestDto studentData)
     {
         ArgumentNullException.ThrowIfNull(studentData);
 
-        var student = await _context.Students.FindAsync(StudentId);
+        var student = await _context.Students.FindAsync(studentId);
         if (student == null)
         {
             throw new ResourceNotFoundException("Student not found");
@@ -121,7 +121,19 @@ public class StudentService : IStudentService
         
         return _mapper.Map<StudentDto>(student);
     }
-    
+
+    public async Task<StudentDto> GetStudentByUserIdAsync(string userId)
+    {
+        var student = await _context.Students
+            .FirstOrDefaultAsync(s => s.UserId == userId);
+        if (student == null)
+        {
+            throw new ResourceNotFoundException("Student not found");
+        }
+        
+        return _mapper.Map<StudentDto>(student);
+    }
+
     private IQueryable<Student> ApplyFilter(IQueryable<Student> query, StudentCollectionQueryDto request)
     {
         if (request.StudentId != null)

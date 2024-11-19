@@ -59,8 +59,14 @@
 }
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    @apply box-border;
+  }
   html, body {
     @apply w-full min-h-full;
+    font-family: 'Inter', sans-serif;
   }
   body {
     @apply bg-background text-foreground overflow-x-hidden;
