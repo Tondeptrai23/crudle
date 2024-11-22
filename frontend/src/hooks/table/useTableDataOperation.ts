@@ -4,7 +4,6 @@ import { getErrorMessage } from '@/lib/utils';
 import { FilterOption, FilterParams } from '@/types/filter';
 import { Column, QueryHook, TableActions } from '@/types/table';
 import { useCallback, useEffect, useState } from 'react';
-import { useDebounce } from '../useDebounce';
 
 export const useTableAdd = <T extends { id: string }>(
   actions?: TableActions,
@@ -167,25 +166,6 @@ export const useTableDelete = (actions?: TableActions) => {
   };
 };
 
-export const useTableSearch = (hanldeSearch: (value: string) => void) => {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const debouncedQuery = useDebounce(searchQuery, 300);
-
-  useEffect(() => {
-    hanldeSearch(debouncedQuery);
-  }, [debouncedQuery]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  return {
-    debouncedQuery,
-    handleInputChange,
-  };
-};
-
 export function useGenericTableData<T>({
   useQueryHook,
   filterOptions,
@@ -201,11 +181,27 @@ export function useGenericTableData<T>({
     key: defaultSortColumn ?? null,
     direction: 'asc',
   });
-  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<Record<string, FilterParams>>(
     filterOptions.reduce(
       (acc, option) => {
-        acc[option.id] = option.type === 'enum' ? [] : [option.min, option.max];
+        switch (option.type) {
+          case 'enum':
+            acc[option.id] = [];
+            break;
+          case 'range':
+            acc[option.id] = [option.min, option.max];
+            break;
+          case 'date':
+            acc[option.id] = [option.minDate, option.maxDate];
+            break;
+          case 'search':
+            acc[option.id] = option.value ?? '';
+            break;
+
+          default:
+            break;
+        }
+
         return acc;
       },
       {} as Record<string, FilterParams>,
@@ -226,7 +222,6 @@ export function useGenericTableData<T>({
   const query = useQueryHook({
     page,
     pageSize,
-    search: searchQuery,
     filters: filters,
     sort: sortConfig,
   });
@@ -256,12 +251,6 @@ export function useGenericTableData<T>({
       sortConfig: sortConfig,
       onSort: (key: string, direction: 'asc' | 'desc' | null) => {
         handleSort(key, direction);
-        setPage(1);
-      },
-    },
-    search: {
-      onChange: (value: string) => {
-        setSearchQuery(value);
         setPage(1);
       },
     },

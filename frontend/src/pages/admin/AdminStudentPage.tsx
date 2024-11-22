@@ -7,8 +7,13 @@ import {
   useCreateStudent,
   useStudentsWithFilters,
   useUpdateStudent,
-} from '@/hooks/useStudentApi';
-import { EnumFilterOption, RangeFilterOption } from '@/types/filter';
+} from '@/hooks/api/useStudentApi';
+import {
+  DateRangeFilterOption,
+  EnumFilterOption,
+  RangeFilterOption,
+  SearchFilterOption,
+} from '@/types/filter';
 import Student, { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 import { Column } from '@/types/table';
 import { Bell, Calendar, Heart, Mail, Settings } from 'lucide-react';
@@ -102,6 +107,22 @@ const AdminStudentPage: React.FC = () => {
     max: 2005,
   };
 
+  const dateRangeFilterOption: DateRangeFilterOption = {
+    id: 'dob2',
+    label: 'Date of Birth',
+    labelIcon: Calendar,
+    minDate: new Date('1990-01-01'),
+    maxDate: new Date('2005-12-31'),
+    type: 'date',
+  };
+
+  const searchFilterOption: SearchFilterOption = {
+    id: 'fullname',
+    label: 'Full Name',
+    labelIcon: Mail,
+    type: 'search',
+  };
+
   return (
     <div className='min-h-3/4 w m-auto flex flex-row gap-4'>
       <GenericTable
@@ -114,7 +135,12 @@ const AdminStudentPage: React.FC = () => {
           edit: false,
           delete: true,
         }}
-        filterOptions={[filterOption, rangeFilterOption]}
+        filterOptions={[
+          filterOption,
+          rangeFilterOption,
+          dateRangeFilterOption,
+          searchFilterOption,
+        ]}
       />
     </div>
   );
