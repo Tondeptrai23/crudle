@@ -18,3 +18,16 @@ export default interface Course {
   teacherName: string;
   teacherId: string;
 }
+
+export interface CreateCourseDTO {
+  name: string;
+  description: string;
+  startDate: string;
+  code: string;
+}
+
+export interface UpdateCourseDTO {
+  name: string;
+  description: string;
+  teacherId: string | null;
+}

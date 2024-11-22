@@ -1,14 +1,29 @@
 import CourseService from '@/services/CourseService';
+import { CreateCourseDTO } from '@/types/course';
 import { QueryHookParams } from '@/types/table';
-import { useQuery } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 const courseService = new CourseService();
 
+const courseKeys = {
+  lists: () => ['courses'],
+  detail: (id: string) => ['courses', id],
+};
+
 export const useCourses = (data: QueryHookParams) => {
-  const { page, pageSize, filters, sort } = data;
+  let { page, pageSize, filters, sort } = data;
   const nameFilter = filters.name as string;
   const codeFilter = filters.code as string[];
   const startDateFilter = filters.startDate as Date[];
+
+  if (page < 1) {
+    page = 1;
+  }
 
   return useQuery({
     queryKey: ['courses', page, pageSize, codeFilter, startDateFilter, sort],
@@ -24,6 +39,34 @@ export const useCourses = (data: QueryHookParams) => {
         orderDirection: sort.direction || 'asc',
       }),
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
     retry: false,
+  });
+};
+
+export const useCreateCourse = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateCourseDTO) => {
+      await courseService.createCourse(data);
+
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
+    },
+  });
+};
+
+export const useUpdateCourse = () => {
+  const queryClient = useQueryClient();
+
+  type UpdateCourseParams = { id: string; data: any };
+
+  return useMutation({
+    mutationFn: async ({ id, data }: UpdateCourseParams) => {
+      await courseService.updateCourse(id, data);
+
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: courseKeys.detail(id) });
+    },
   });
 };

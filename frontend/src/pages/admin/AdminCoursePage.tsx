@@ -2,18 +2,25 @@ import GenericTable from '@/components/admin/GenericTable';
 import AddCourseForm, {
   CourseFormSchema,
 } from '@/components/common/forms/AddCourseForm';
-import { useCourses } from '@/hooks/api/useCourseApi';
-import Course from '@/types/course';
+import {
+  useCourses,
+  useCreateCourse,
+  useUpdateCourse,
+} from '@/hooks/api/useCourseApi';
+import Course, { CreateCourseDTO, UpdateCourseDTO } from '@/types/course';
 import { Column } from '@/types/table';
 import React from 'react';
 
 const AdminCoursePage: React.FC = () => {
+  const createCourse = useCreateCourse();
+  const updateCourse = useUpdateCourse();
+
   const columns: Column<Course>[] = React.useMemo(
     () => [
       {
         header: 'Code',
         key: 'code',
-        editable: true,
+        editable: false,
         sortable: true,
         isDefaultSort: true,
         style: {
@@ -30,7 +37,7 @@ const AdminCoursePage: React.FC = () => {
         editable: true,
         sortable: true,
         style: {
-          minWidth: '200px',
+          minWidth: '150px',
           maxWidth: '300px',
         },
         validate: (value: string) => {
@@ -44,7 +51,7 @@ const AdminCoursePage: React.FC = () => {
         editable: true,
         sortable: false,
         style: {
-          minWidth: '300px',
+          minWidth: '200px',
         },
         validate: (value: string) => {
           const result = CourseFormSchema.shape.description.safeParse(value);
@@ -55,7 +62,7 @@ const AdminCoursePage: React.FC = () => {
         header: 'Start Date',
         key: 'startDate',
         sortable: true,
-        editable: true,
+        editable: false,
         style: {
           width: '150px',
         },
@@ -77,7 +84,18 @@ const AdminCoursePage: React.FC = () => {
     [],
   );
 
-  const actions = React.useMemo(() => ({}), []);
+  const actions = React.useMemo(
+    () => ({
+      onSave: async (id: string, value: UpdateCourseDTO) => {
+        await updateCourse.mutateAsync({ id, data: value });
+      },
+
+      onAdd: async (value: CreateCourseDTO) => {
+        await createCourse.mutateAsync(value);
+      },
+    }),
+    [],
+  );
   return (
     <div className='min-h-3/4 w m-auto flex flex-row gap-4'>
       <GenericTable

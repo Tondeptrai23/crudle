@@ -1,4 +1,8 @@
-import Course, { CourseResponse } from '@/types/course';
+import Course, {
+  CourseResponse,
+  CreateCourseDTO,
+  UpdateCourseDTO,
+} from '@/types/course';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import api from '@/utils/api';
 
@@ -45,8 +49,8 @@ export default class CourseService {
         code: course.Code,
         description: course.Description,
         startDate: course.StartDate,
-        teacherName: course.Teacher.Fullname,
-        teacherId: course.Teacher.TeacherId,
+        teacherName: course.Teacher?.Fullname ?? '',
+        teacherId: course.Teacher?.TeacherId ?? '',
       };
     });
 
@@ -56,5 +60,26 @@ export default class CourseService {
       totalPages: response.data.TotalPages,
       currentPage: response.data.CurrentPage,
     };
+  };
+
+  createCourse = async (data: CreateCourseDTO) => {
+    const response = await api.post('/api/admin/course', data);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
+  };
+
+  updateCourse = async (id: string, data: UpdateCourseDTO) => {
+    data.teacherId = null;
+    const response = await api.patch(`/api/admin/course/${id}`, data);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
   };
 }

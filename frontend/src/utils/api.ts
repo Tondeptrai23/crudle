@@ -80,6 +80,8 @@ export const getRole = () => {
 
 api.interceptors.request.use(
   (config) => {
+    config.headers['Content-Type'] = 'application/json';
+
     const token = sessionStorage.getItem('access-token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -119,6 +121,7 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+    console.error(error.response?.data);
 
     switch (error.response?.status) {
       case 401:
@@ -133,7 +136,6 @@ api.interceptors.response.use(
         return Promise.reject(new ServerError(error.response.data.Message));
       default:
         return Promise.reject(error);
-        break;
     }
   },
 );
