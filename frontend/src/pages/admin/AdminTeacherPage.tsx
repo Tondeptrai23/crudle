@@ -8,7 +8,7 @@ import {
   useDeleteTeacher,
   useTeachers,
   useUpdateTeacher,
-} from '@/hooks/useTeacherApi';
+} from '@/hooks/api/useTeacherApi';
 import { Column } from '@/types/table';
 import Teacher, { CreateTeacherDTO, UpdateTeacherDTO } from '@/types/teacher';
 import React from 'react';

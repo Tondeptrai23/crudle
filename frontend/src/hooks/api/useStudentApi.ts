@@ -32,17 +32,17 @@ export const useStudents = (data: {
 };
 
 export const useStudentsWithFilters = (data: QueryHookParams) => {
-  const { page, pageSize, search, filters, sort } = data;
+  const { page, pageSize, filters, sort } = data;
   const emailDomainFilter = filters.email as string[];
   const dobRangeFilter = filters.dob as [number, number];
 
   return useQuery({
-    queryKey: ['students', page, pageSize, search, filters, sort],
+    queryKey: ['students', page, pageSize, '', filters, sort],
     queryFn: () =>
       studentService.getStudentsWithFilters(
         page,
         pageSize,
-        search,
+        '',
         emailDomainFilter,
         dobRangeFilter,
         [sort.key, sort.direction || 'asc'],

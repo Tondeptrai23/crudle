@@ -5,6 +5,13 @@ export default interface Teacher {
   contactPhone: string;
 }
 
+export interface TeacherResponse {
+  TeacherId: string;
+  Fullname: string;
+  ContactEmail: string;
+  ContactPhone: string;
+}
+
 export interface CreateTeacherDTO {
   fullname: string;
   password: string;

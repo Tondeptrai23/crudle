@@ -73,6 +73,7 @@ const AdminStudentPage: React.FC = () => {
     ],
     [],
   );
+
   const actions = React.useMemo(
     () => ({
       onSave: async (id: string, value: UpdateStudentDTO) => {
