@@ -11,5 +11,5 @@ public class CourseDto
 
     public string Description { get; set; }
 
-    public IEnumerable<TeacherMinimalDto>? Teachers { get; set; }
+    public TeacherMinimalDto Teachers { get; set; }
 }

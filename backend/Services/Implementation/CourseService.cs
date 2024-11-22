@@ -233,24 +233,24 @@ public class CourseService : ICourseService
             query = query.Where(s => s.CourseId == queryDto.CourseId);
         }
 
-        if (queryDto.Name != null)
+        if (!string.IsNullOrWhiteSpace(queryDto.Name))
         {
-            query = query.Where(s => s.Name.Contains(queryDto.Name));
+            query = query.Where(s => s.Name.ToLower().Contains(queryDto.Name.ToLower()));
         }
 
-        if (queryDto.Code != null)
+        if (!string.IsNullOrWhiteSpace(queryDto.Code))
         {
-            query = query.Where(s => s.Code == queryDto.Code);
+            query = query.Where(s => s.Code.ToLower().Contains(queryDto.Code.ToLower()));
         }
 
-        if (queryDto.StartDate != null)
+        if (queryDto.StartDateFrom.HasValue)
         {
-            query = query.Where(s => s.StartDate == queryDto.StartDate);
+            query = query.Where(s => s.StartDate >= queryDto.StartDateFrom.Value);
         }
 
-        if (queryDto.Code != null)
+        if (queryDto.StartDateTo.HasValue)
         {
-            query = query.Where(s => s.Code == queryDto.Code);
+            query = query.Where(s => s.StartDate <= queryDto.StartDateTo.Value);
         }
 
         return query;
