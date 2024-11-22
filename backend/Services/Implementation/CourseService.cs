@@ -62,20 +62,9 @@ public class CourseService : ICourseService
     {
         var courses = _context.Courses;
 
-        if (await _context.Courses.AnyAsync(c => c.CourseId == courseData.CourseId))
-        {
-            throw new ConflictException($"Course with id {courseData.CourseId} already exists.");
-        }
-
         if (await _context.Courses.AnyAsync(c => c.Code == courseData.Code))
         {
             throw new ConflictException($"Course with code {courseData.Code} already exists.");
-        }
-
-        var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == courseData.TeacherId);
-        if (teacher == null)
-        {
-            throw new ResourceNotFoundException($"Teacher with id {courseData.TeacherId} not found");
         }
 
         var course = _mapper.Map<Course>(courseData);
@@ -104,14 +93,17 @@ public class CourseService : ICourseService
             course.Description = courseData.Description;
         }
 
-        var newTeacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == courseData.TeacherId);
-        if (newTeacher == null)
+        if (courseData.TeacherId != null)
         {
-            throw new ResourceNotFoundException($"Teacher with id {courseData.TeacherId} not found");
-        }
+            var newTeacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == courseData.TeacherId);
+            if (newTeacher == null)
+            {
+                throw new ResourceNotFoundException($"Teacher with id {courseData.TeacherId} not found");
+            }
 
-        course.TeacherId = newTeacher.TeacherId;
-        course.Teacher = newTeacher;
+            course.TeacherId = newTeacher.TeacherId;
+            course.Teacher = newTeacher;
+        }
 
         await _context.SaveChangesAsync();
 
