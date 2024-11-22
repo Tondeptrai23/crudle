@@ -238,11 +238,14 @@ public class CourseService : ICourseService
             query = query.Where(s => s.Name.ToLower().Contains(queryDto.Name.ToLower()));
         }
 
-        if (!string.IsNullOrWhiteSpace(queryDto.Code))
+        if (queryDto.Code != null && queryDto.Code.Any())
         {
-            query = query.Where(s => s.Code.ToLower().Contains(queryDto.Code.ToLower()));
+            var normalizedCodes = queryDto.Code
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => c.ToUpper());
+        
+            query = query.Where(s => normalizedCodes.Contains(s.Code.ToUpper()));
         }
-
         if (queryDto.StartDateFrom.HasValue)
         {
             query = query.Where(s => s.StartDate >= queryDto.StartDateFrom.Value);
