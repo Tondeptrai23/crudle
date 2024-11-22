@@ -12,7 +12,7 @@ const fetchCourses = async () => {
   return response.data.Data;
 };
 
-const CoursePage: React.FC = () => {
+const AdminCoursePage: React.FC = () => {
   const {
     data: courses,
     isPending,
@@ -40,4 +40,4 @@ const CoursePage: React.FC = () => {
   );
 };
 
-export default CoursePage;
+export default AdminCoursePage;
