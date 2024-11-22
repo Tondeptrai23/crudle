@@ -15,7 +15,7 @@ interface Course {
 
 interface Teacher {
   TeacherId: number;
-  Name: string;
+  Fullname: string;
 }
 
 const fetchCourses = async () => {
@@ -71,7 +71,7 @@ const CoursePage: React.FC = () => {
           />
         ))}
         {!courses?.length && (
-          <p className='col-span-full text-center text-gray-500'>
+          <p className='col-span-full text-center text-red-500'>
             No courses available
           </p>
         )}
