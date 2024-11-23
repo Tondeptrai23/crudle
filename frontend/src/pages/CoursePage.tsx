@@ -1,10 +1,10 @@
 import api from '@/utils/api';
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { CourseCard } from '@/components/common/course/CourseCard';
 import { Breadcrumb } from '@/components/common/ui/breadcrumb';
+import React from 'react';
 
 interface Course {
   CourseId: number;

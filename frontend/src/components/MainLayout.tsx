@@ -1,6 +1,8 @@
 import Nav from '@/components/nav/Nav.tsx';
 import { LucideLogOut, Settings, User } from 'lucide-react';
 import React from 'react';
+import { Separator } from './common/ui/separator';
+import { getNavItems } from './nav/config';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -11,10 +13,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     <>
       <Nav
         className='max-h-18 max-w-full'
-        items={[
-          { label: 'Weather', path: '/' },
-          { label: 'Course', path: '/course' },
-        ]}
+        items={getNavItems()}
         handleNotification={() => {
           console.log('Notification clicked');
         }}
@@ -36,7 +35,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           },
         ]}
       />
-      <main className='flex-grow'>{children}</main>
+
+      <Separator />
+
+      <main className='m-4 flex-grow'>{children}</main>
     </>
   );
 };
