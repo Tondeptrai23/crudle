@@ -1,4 +1,5 @@
-import MockTeacherService from '@/services/mock/mockTeacherService';
+import TeacherService from '@/services/TeacherService';
+import { QueryHookParams } from '@/types/table';
 import { CreateTeacherDTO, UpdateTeacherDTO } from '@/types/teacher';
 import {
   keepPreviousData,
@@ -12,19 +13,44 @@ const teacherKeys = {
   detail: (id: string) => ['teacher', id],
 };
 
-const teacherService = new MockTeacherService();
+const teacherService = new TeacherService();
 
-export const useTeachers = (data: {
-  page: number;
-  pageSize: number;
-  search: string;
-}) => {
-  const { page, pageSize, search } = data;
+export const useTeachers = (data: QueryHookParams) => {
+  let { page, pageSize, filters, sort } = data;
+  const idFilter = filters.id as string;
+  const nameFilter = filters.fullname as string;
+  const emailDomainFilter = filters.contactEmail as string[];
+  const phoneFilter = filters.phone as string;
+
+  if (page < 1) {
+    page = 1;
+  }
   return useQuery({
-    queryKey: ['teachers', page, pageSize, search],
-    queryFn: () => teacherService.getTeachers(page, pageSize, search),
+    queryKey: [
+      'teachers',
+      page,
+      pageSize,
+      idFilter,
+      nameFilter,
+      emailDomainFilter,
+      phoneFilter,
+      sort,
+    ],
+    queryFn: () =>
+      teacherService.getTeachersByAdmin({
+        page,
+        size: pageSize,
+        teacherId: idFilter,
+        fullname: nameFilter,
+        contactEmailDomain: emailDomainFilter,
+        contactPhone: phoneFilter,
+        orderBy: sort.key ?? undefined,
+        orderDirection: sort.direction ? 'desc' : 'asc',
+      }),
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -53,14 +79,14 @@ export const useUpdateTeacher = () => {
   });
 };
 
-export const useDeleteTeacher = () => {
-  const queryClient = useQueryClient();
+// export const useDeleteTeacher = () => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: string) => {
-      await teacherService.deleteTeacher(id);
-      queryClient.invalidateQueries({ queryKey: teacherKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: teacherKeys.detail(id) });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: async (id: string) => {
+//       await teacherService.deleteTeacher(id);
+//       queryClient.invalidateQueries({ queryKey: teacherKeys.lists() });
+//       queryClient.invalidateQueries({ queryKey: teacherKeys.detail(id) });
+//     },
+//   });
+// };

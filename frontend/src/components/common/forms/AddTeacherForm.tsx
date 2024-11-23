@@ -15,7 +15,9 @@ import { Input } from '@/components/common/ui/input';
 import Teacher from '@/types/teacher';
 
 const formSchema = z.object({
+  teacherId: z.string().optional(),
   contactEmail: z.string().email('Invalid email address'),
+  email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   fullname: z.string().min(2, 'Name must be at least 2 characters'),
   contactPhone: z
@@ -54,7 +56,49 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSubmit }) => {
         </span>
         <FormField
           control={form.control}
+          name='teacherId'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Teacher ID</FormLabel>
+              <FormControl>
+                <Input placeholder='001' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='fullname'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Full Name</FormLabel>
+              <FormControl>
+                <Input placeholder='Dr. John Doe' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name='contactEmail'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Contact Email</FormLabel>
+              <FormControl>
+                <Input placeholder='example@gmail.com' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='email'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
@@ -74,20 +118,6 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({ onSubmit }) => {
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <Input type='password' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name='fullname'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Full Name</FormLabel>
-              <FormControl>
-                <Input placeholder='Dr. John Doe' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
