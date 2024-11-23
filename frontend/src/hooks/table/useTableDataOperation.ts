@@ -181,6 +181,7 @@ export function useGenericTableData<T>({
     key: defaultSortColumn ?? null,
     direction: 'asc',
   });
+
   const [filters, setFilters] = useState<Record<string, FilterParams>>(
     filterOptions.reduce(
       (acc, option) => {
@@ -213,7 +214,7 @@ export function useGenericTableData<T>({
       if (forcedDirection) {
         setSortConfig({ key, direction: forcedDirection });
       } else {
-        setSortConfig({ key: null, direction: null });
+        setSortConfig({ key: defaultSortColumn ?? null, direction: 'asc' });
       }
     },
     [],
@@ -227,7 +228,7 @@ export function useGenericTableData<T>({
   });
 
   useEffect(() => {
-    if (query.data?.data.length === 1 && page > 1) {
+    if (query.data?.data.length === 0 && page > 1) {
       setPage(1);
     }
   }, [query.data?.data.length, page]);

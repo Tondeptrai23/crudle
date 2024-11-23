@@ -26,15 +26,23 @@ export const useCourses = (data: QueryHookParams) => {
   }
 
   return useQuery({
-    queryKey: ['courses', page, pageSize, codeFilter, startDateFilter, sort],
+    queryKey: [
+      'courses',
+      page,
+      pageSize,
+      nameFilter,
+      codeFilter,
+      startDateFilter,
+      sort,
+    ],
     queryFn: () =>
       courseService.getCoursesByAdmin({
         page,
         size: pageSize,
         name: nameFilter,
         code: codeFilter,
-        startDateFrom: startDateFilter?.[0]?.toISOString(),
-        startDateTo: startDateFilter?.[1]?.toISOString(),
+        startDateFrom: startDateFilter?.[0]?.toDateString(),
+        startDateTo: startDateFilter?.[1]?.toDateString(),
         orderBy: sort.key ?? undefined,
         orderDirection: sort.direction || 'asc',
       }),

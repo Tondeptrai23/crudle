@@ -33,6 +33,10 @@ const SearchFilter: React.FC<SearchFilterOption> = ({
   }, [value]);
 
   useEffect(() => {
+    if (value == '') {
+      onChange?.('');
+    }
+
     if (debouncedValue !== value) {
       onChange?.(debouncedValue);
     }
@@ -40,7 +44,6 @@ const SearchFilter: React.FC<SearchFilterOption> = ({
 
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      console.log('event.target.value', event.target.value);
       setLocalValue(event.target.value);
     },
     [],

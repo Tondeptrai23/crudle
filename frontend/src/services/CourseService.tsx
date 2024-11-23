@@ -20,21 +20,30 @@ export default class CourseService {
     page = 1,
     size = 10,
     name,
-    code,
+    code = [],
     startDateFrom,
     startDateTo,
     orderBy = 'CourseId',
     orderDirection = 'asc',
   }) => {
+    await new Promise((resolve) => setTimeout(resolve, 200));
     if (page < 1) {
       page = 1;
     }
 
     let query = `page=${page}&size=${size}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
-    query += name ? `&name=${name}` : '';
-    query += code ? `&code=${code}` : '';
-    query += startDateFrom ? `&startDateFrom=${startDateFrom}` : '';
-    query += startDateTo ? `&startDateTo=${startDateTo}` : '';
+    query += name || name?.length == 0 ? `&name=${name}` : '';
+    for (let i = 0; i < code?.length; i++) {
+      query += code[i] || code[i].length == 0 ? `&code=${code[i]}` : '';
+    }
+    query +=
+      startDateFrom || startDateFrom?.length == 0
+        ? `&startDateFrom=${startDateFrom}`
+        : '';
+    query +=
+      startDateTo || startDateTo?.length == 0
+        ? `&startDateTo=${startDateTo}`
+        : '';
 
     const response = await api.get(`/api/admin/course?${query}`);
 
