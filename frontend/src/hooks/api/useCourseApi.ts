@@ -48,6 +48,7 @@ export const useCourses = (data: QueryHookParams) => {
       }),
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
     retry: false,
   });
 };

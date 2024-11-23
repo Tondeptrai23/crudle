@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-import MockStudentService from '@/services/mock/mockStudentService';
+import StudentService from '@/services/StudentService';
 import { QueryHookParams } from '@/types/table';
 
 const studentKeys = {
@@ -14,42 +14,43 @@ const studentKeys = {
   detail: (id: string) => ['student', id],
 };
 
-const studentService = new MockStudentService();
+const studentService = new StudentService();
 
-export const useStudents = (data: {
-  page: number;
-  pageSize: number;
-  search: string;
-}) => {
-  const { page, pageSize, search } = data;
-  return useQuery({
-    queryKey: ['students', page, pageSize, search],
-    queryFn: () => studentService.getStudents(page, pageSize, search),
-    staleTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
-    retry: false,
-  });
-};
+export const useStudents = (data: QueryHookParams) => {
+  let { page, pageSize, filters, sort } = data;
+  const idFilter = filters.id as string;
+  const nameFilter = filters.fullname as string;
+  const dobRangeFilter = filters.dob as Date[];
 
-export const useStudentsWithFilters = (data: QueryHookParams) => {
-  const { page, pageSize, filters, sort } = data;
-  const emailDomainFilter = filters.email as string[];
-  const dobRangeFilter = filters.dob as [number, number];
+  if (page < 1) {
+    page = 1;
+  }
 
   return useQuery({
-    queryKey: ['students', page, pageSize, '', filters, sort],
+    queryKey: [
+      'students',
+      page,
+      pageSize,
+      idFilter,
+      nameFilter,
+      dobRangeFilter,
+      sort,
+    ],
     queryFn: () =>
-      studentService.getStudentsWithFilters(
+      studentService.getStudentsByAdmin({
         page,
-        pageSize,
-        '',
-        emailDomainFilter,
-        dobRangeFilter,
-        [sort.key, sort.direction || 'asc'],
-      ),
+        size: pageSize,
+        studentId: idFilter,
+        fullname: nameFilter,
+        dobFrom: dobRangeFilter[0]?.toDateString(),
+        dobTo: dobRangeFilter[1]?.toDateString(),
+        orderBy: sort.key ?? undefined,
+        orderDirection: sort.direction ? 'desc' : 'asc',
+      }),
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
     retry: false,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -81,15 +82,15 @@ export const useUpdateStudent = () => {
   });
 };
 
-export const useDeleteStudent = () => {
-  const queryClient = useQueryClient();
+// export const useDeleteStudent = () => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (id: string) => {
-      await studentService.deleteStudent(id);
+//   return useMutation({
+//     mutationFn: async (id: string) => {
+//       await studentService.deleteStudent(id);
 
-      queryClient.invalidateQueries({ queryKey: studentKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: studentKeys.detail(id) });
-    },
-  });
-};
+//       queryClient.invalidateQueries({ queryKey: studentKeys.lists() });
+//       queryClient.invalidateQueries({ queryKey: studentKeys.detail(id) });
+//     },
+//   });
+// };
