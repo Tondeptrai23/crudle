@@ -138,7 +138,7 @@ public class StudentService : IStudentService
     {
         if (request.StudentId != null)
         {
-            query = query.Where(s => s.StudentId == request.StudentId);
+            query = query.Where(s => s.StudentId.ToString().Contains(request.StudentId));
         }
         
         if (request.Fullname != null)
@@ -146,9 +146,14 @@ public class StudentService : IStudentService
             query = query.Where(s => s.Fullname.Contains(request.Fullname));
         }
         
-        if(request.DateOfBirth != null)
+        if (request.DateOfBirthFrom != null)
         {
-            query = query.Where(s => s.DateOfBirth == request.DateOfBirth);
+            query = query.Where(s => s.DateOfBirth >= request.DateOfBirthFrom);
+        }
+    
+        if (request.DateOfBirthTo != null)
+        {
+            query = query.Where(s => s.DateOfBirth <= request.DateOfBirthTo);
         }
 
         return query;

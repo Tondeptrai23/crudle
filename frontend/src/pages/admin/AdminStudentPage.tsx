@@ -5,13 +5,13 @@ import AddStudentForm, {
 
 import {
   useCreateStudent,
-  useStudentsWithFilters,
+  useStudents,
   useUpdateStudent,
-} from '@/hooks/useStudentApi';
-import { EnumFilterOption, RangeFilterOption } from '@/types/filter';
+} from '@/hooks/api/useStudentApi';
+import { DateRangeFilterOption, SearchFilterOption } from '@/types/filter';
 import Student, { CreateStudentDTO, UpdateStudentDTO } from '@/types/student';
 import { Column } from '@/types/table';
-import { Bell, Calendar, Heart, Mail, Settings } from 'lucide-react';
+import { Calendar, IdCard, User } from 'lucide-react';
 import React from 'react';
 
 const AdminStudentPage: React.FC = () => {
@@ -44,15 +44,6 @@ const AdminStudentPage: React.FC = () => {
         },
       },
       {
-        header: 'Email',
-        key: 'email',
-        style: {
-          minWidth: '200px',
-        },
-        sortable: false,
-        editable: false,
-      },
-      {
         header: 'Date of Birth',
         key: 'dob',
         sortable: true,
@@ -68,6 +59,7 @@ const AdminStudentPage: React.FC = () => {
     ],
     [],
   );
+
   const actions = React.useMemo(
     () => ({
       onSave: async (id: string, value: UpdateStudentDTO) => {
@@ -80,33 +72,34 @@ const AdminStudentPage: React.FC = () => {
     [updateStudent, createStudent],
   );
 
-  const filterOption: EnumFilterOption = {
-    id: 'email',
-    type: 'enum',
-    items: [
-      { id: 'outlook', label: 'Outlook', icon: Settings },
-      { id: 'gmail', label: 'Gmail', icon: Bell },
-      { id: 'facebook', label: 'Facebook', icon: Heart },
-    ],
-    label: 'Email',
-    labelIcon: Mail,
+  const dobFilterOption: DateRangeFilterOption = {
+    id: 'dob',
+    label: 'Date of Birth',
+    labelIcon: Calendar,
+    minDate: new Date('1990-01-01'),
+    maxDate: new Date('2010-12-31'),
+    type: 'date',
   };
 
-  const rangeFilterOption: RangeFilterOption = {
-    id: 'dob',
-    label: 'Birth Year',
-    labelIcon: Calendar,
-    type: 'range',
-    step: 1,
-    min: 1990,
-    max: 2005,
+  const searchIdFilterOption: SearchFilterOption = {
+    id: 'id',
+    label: 'ID',
+    labelIcon: IdCard,
+    type: 'search',
+  };
+
+  const searchNameFilterOption: SearchFilterOption = {
+    id: 'fullname',
+    label: 'Full Name',
+    labelIcon: User,
+    type: 'search',
   };
 
   return (
     <div className='min-h-3/4 w m-auto flex flex-row gap-4'>
       <GenericTable
         tableTitle='Student'
-        queryHook={useStudentsWithFilters}
+        queryHook={useStudents}
         columns={columns}
         actions={actions}
         formComponent={AddStudentForm}
@@ -114,7 +107,11 @@ const AdminStudentPage: React.FC = () => {
           edit: false,
           delete: true,
         }}
-        filterOptions={[filterOption, rangeFilterOption]}
+        filterOptions={[
+          dobFilterOption,
+          searchIdFilterOption,
+          searchNameFilterOption,
+        ]}
       />
     </div>
   );

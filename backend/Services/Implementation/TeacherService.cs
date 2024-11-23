@@ -134,18 +134,27 @@ public class TeacherService : ITeacherService
     {
         if (queryDto.TeacherId != null)
         {
-            teachers = teachers.Where(t => t.TeacherId == queryDto.TeacherId);
+            teachers = teachers.Where(t => t.TeacherId.ToString().Contains(queryDto.TeacherId));
         }
 
         if (queryDto.Fullname != null)
         {
-            teachers = teachers.Where(t => t.Fullname == queryDto.Fullname);
+            teachers = teachers.Where(t => t.Fullname.ToLower().Contains(queryDto.Fullname.ToLower()));
         }
-
-        teachers = teachers.Where(t => t.ContactEmail == queryDto.ContactEmail);
-
-        teachers = teachers.Where(t => t.ContactPhone == queryDto.ContactPhone);
-
+        
+        if (queryDto.ContactEmail != null && queryDto.ContactEmail.Length > 0)
+        {
+            foreach (var email in queryDto.ContactEmail)
+            {
+                teachers = teachers.Where(t => t.ContactEmail.ToLower().Contains(email.ToLower()));
+            }
+        }
+        
+        if (queryDto.ContactPhone != null)
+        {
+            teachers = teachers.Where(t => t.ContactPhone.ToLower().Contains(queryDto.ContactPhone.ToLower()));
+        }
+        
         return teachers;
     }
 

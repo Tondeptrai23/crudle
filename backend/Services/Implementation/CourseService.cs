@@ -62,20 +62,9 @@ public class CourseService : ICourseService
     {
         var courses = _context.Courses;
 
-        if (await _context.Courses.AnyAsync(c => c.CourseId == courseData.CourseId))
-        {
-            throw new ConflictException($"Course with id {courseData.CourseId} already exists.");
-        }
-
         if (await _context.Courses.AnyAsync(c => c.Code == courseData.Code))
         {
             throw new ConflictException($"Course with code {courseData.Code} already exists.");
-        }
-
-        var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == courseData.TeacherId);
-        if (teacher == null)
-        {
-            throw new ResourceNotFoundException($"Teacher with id {courseData.TeacherId} not found");
         }
 
         var course = _mapper.Map<Course>(courseData);
@@ -104,14 +93,17 @@ public class CourseService : ICourseService
             course.Description = courseData.Description;
         }
 
-        var newTeacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == courseData.TeacherId);
-        if (newTeacher == null)
+        if (courseData.TeacherId != null)
         {
-            throw new ResourceNotFoundException($"Teacher with id {courseData.TeacherId} not found");
-        }
+            var newTeacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == courseData.TeacherId);
+            if (newTeacher == null)
+            {
+                throw new ResourceNotFoundException($"Teacher with id {courseData.TeacherId} not found");
+            }
 
-        course.TeacherId = newTeacher.TeacherId;
-        course.Teacher = newTeacher;
+            course.TeacherId = newTeacher.TeacherId;
+            course.Teacher = newTeacher;
+        }
 
         await _context.SaveChangesAsync();
 
@@ -233,24 +225,27 @@ public class CourseService : ICourseService
             query = query.Where(s => s.CourseId == queryDto.CourseId);
         }
 
-        if (queryDto.Name != null)
+        if (!string.IsNullOrWhiteSpace(queryDto.Name))
         {
-            query = query.Where(s => s.Name.Contains(queryDto.Name));
+            query = query.Where(s => s.Name.ToLower().Contains(queryDto.Name.ToLower()));
         }
 
-        if (queryDto.Code != null)
+        if (queryDto.Code != null && queryDto.Code.Any())
         {
-            query = query.Where(s => s.Code == queryDto.Code);
+            var normalizedCodes = queryDto.Code
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => c.ToUpper());
+        
+            query = query.Where(s => normalizedCodes.Contains(s.Code.ToUpper()));
+        }
+        if (queryDto.StartDateFrom.HasValue)
+        {
+            query = query.Where(s => s.StartDate >= queryDto.StartDateFrom.Value);
         }
 
-        if (queryDto.StartDate != null)
+        if (queryDto.StartDateTo.HasValue)
         {
-            query = query.Where(s => s.StartDate == queryDto.StartDate);
-        }
-
-        if (queryDto.Code != null)
-        {
-            query = query.Where(s => s.Code == queryDto.Code);
+            query = query.Where(s => s.StartDate <= queryDto.StartDateTo.Value);
         }
 
         return query;
