@@ -72,4 +72,16 @@ public interface IArticleService
     /// <exception cref="ResourceNotFoundException">Thrown if the course or article is not found</exception>
     /// <exception cref="ForbiddenException">Thrown if the student is not enrolled in the course</exception>
     Task<UpdateArticleProgressDto> MarkArticleAsReadAsync(int courseId, int articleId, int studentId);
+    
+    /// <summary>
+    /// Reorders articles within a specified course after validating teacher's permission.
+    /// </summary>
+    /// <param name="courseId">The unique identifier of the course containing the articles</param>
+    /// <param name="articleIds">An array of article IDs in their new desired order</param>
+    /// <param name="teacherId">The unique identifier of the teacher performing the reordering</param>
+    /// <returns>A collection of updated article DTOs in their new order</returns>
+    /// <exception cref="ForbiddenException">Thrown when the teacher doesn't have permission to modify this course</exception>
+    /// <exception cref="ConflictException">Thrown when the order's cannot be updated</exception>
+    /// <exception cref="ResourceNotFoundException">Thrown when the course or any of the articles cannot be found</exception>
+    Task<IEnumerable<ArticleDto>> UpdateArticleOrderAsync(int courseId, int[] articleIds, int teacherId);
 }

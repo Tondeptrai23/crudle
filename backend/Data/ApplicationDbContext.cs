@@ -236,6 +236,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Title = "Article 1",
                 Summary = "Summary 1",
                 Content = "Content 1",
+                Order = 1,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             },
@@ -246,6 +247,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Title = "Article 2",
                 Summary = "Summary 2",
                 Content = "Content 2",
+                Order = 2,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             }

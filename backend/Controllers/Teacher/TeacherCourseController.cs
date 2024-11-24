@@ -108,4 +108,19 @@ public class CourseController : ControllerBase
         var result = await _articleService.DeleteArticleAsync(courseId, articleId, teacher.TeacherId);
         return Ok(result);
     }
+    
+    [HttpPatch]
+    [Route("{courseId:int}/Article/Order")]
+    public async Task<IActionResult> UpdateArticleOrderAsync([FromRoute] int courseId, [FromBody] int[] articleIds)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
+        var article  = await _articleService.UpdateArticleOrderAsync(courseId, articleIds, teacher.TeacherId);
+        return Ok(new ResponseDto<IEnumerable<ArticleDto>>(article));
+    }
 }

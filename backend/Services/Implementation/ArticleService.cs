@@ -85,6 +85,7 @@ public class ArticleService : IArticleService
         newArticle.CourseId = courseId;
         newArticle.CreatedAt = DateTime.Now;
         newArticle.UpdatedAt = DateTime.Now;
+        newArticle.Order = await _dbContext.Articles.Where(a => a.CourseId == courseId).CountAsync() + 1;
 
         _dbContext.Add(newArticle);
         await _dbContext.SaveChangesAsync();
@@ -217,12 +218,58 @@ public class ArticleService : IArticleService
         }
 
         _dbContext.Remove(article);
+        
+        // Update order of articles, decrease order of articles after the deleted article
+        var articles = await _dbContext.Articles
+            .Where(a => a.CourseId == courseId && a.Order > article.Order)
+            .ToListAsync();
+        foreach (var a in articles)
+        {
+            a.Order--;
+        }
+        
         var response = new DeleteArticleResponseDto
         {
             Success = await _dbContext.SaveChangesAsync() > 0
         };
 
         return response;
+    }
+
+    public async Task<IEnumerable<ArticleDto>> UpdateArticleOrderAsync(int courseId, int[] articleIds, int teacherId)
+    {
+        var teacher = await _dbContext.Teachers.FirstOrDefaultAsync(t => t.TeacherId == teacherId);
+        if (teacher == null)
+        {
+            throw new ResourceNotFoundException("Teacher not found");
+        }
+
+        var course = await _dbContext.Courses.Include(course => course.Teacher).FirstOrDefaultAsync(c => c.CourseId == courseId);
+        if (course == null)
+        {
+            throw new ResourceNotFoundException("Course not found");
+        }
+
+        if (course.TeacherId != teacherId)
+        {
+            throw new ForbiddenException("Teacher not authorized to update article order of this course");
+        }
+        
+        var articles = await _dbContext.Articles.Where(a => a.CourseId == courseId).ToListAsync();
+        if (articles.Count != articleIds.Length)
+        {
+            throw new ConflictException("Article count does not match");
+        }
+        
+        var articleDict = articles.ToDictionary(a => a.ArticleId);
+        for (var i = 0; i < articleIds.Length; i++)
+        {
+            articleDict[articleIds[i]].Order = i + 1;
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        return _mapper.Map<IEnumerable<ArticleDto>>(articles);
     }
 
     private IQueryable<Article> ApplyFilter(IQueryable<Article> query, ArticleCollectionQueryDto queryDto)

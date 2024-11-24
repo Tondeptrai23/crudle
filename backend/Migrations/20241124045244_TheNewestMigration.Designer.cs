@@ -12,8 +12,8 @@ using _3w1m.Data;
 namespace _3w1m.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241124014719_ArticleProgress")]
-    partial class ArticleProgress
+    [Migration("20241124045244_TheNewestMigration")]
+    partial class TheNewestMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -217,6 +217,9 @@ namespace _3w1m.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
                     b.Property<string>("Summary")
                         .HasColumnType("longtext");
 
@@ -239,20 +242,22 @@ namespace _3w1m.Migrations
                             ArticleId = 1,
                             Content = "Content 1",
                             CourseId = 1,
-                            CreatedAt = new DateTime(2024, 11, 24, 8, 47, 16, 995, DateTimeKind.Local).AddTicks(7330),
+                            CreatedAt = new DateTime(2024, 11, 24, 11, 52, 43, 799, DateTimeKind.Local).AddTicks(6161),
+                            Order = 1,
                             Summary = "Summary 1",
                             Title = "Article 1",
-                            UpdatedAt = new DateTime(2024, 11, 24, 8, 47, 16, 995, DateTimeKind.Local).AddTicks(7348)
+                            UpdatedAt = new DateTime(2024, 11, 24, 11, 52, 43, 799, DateTimeKind.Local).AddTicks(6184)
                         },
                         new
                         {
                             ArticleId = 2,
                             Content = "Content 2",
                             CourseId = 1,
-                            CreatedAt = new DateTime(2024, 11, 24, 8, 47, 16, 995, DateTimeKind.Local).AddTicks(7350),
+                            CreatedAt = new DateTime(2024, 11, 24, 11, 52, 43, 799, DateTimeKind.Local).AddTicks(6191),
+                            Order = 2,
                             Summary = "Summary 2",
                             Title = "Article 2",
-                            UpdatedAt = new DateTime(2024, 11, 24, 8, 47, 16, 995, DateTimeKind.Local).AddTicks(7351)
+                            UpdatedAt = new DateTime(2024, 11, 24, 11, 52, 43, 799, DateTimeKind.Local).AddTicks(6192)
                         });
                 });
 
@@ -561,15 +566,15 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000001",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e5a2deed-e0d6-409b-b0f5-5cea65622a3f",
+                            ConcurrencyStamp = "4bdfd4a3-612b-4361-85b6-4b1c6bd0020a",
                             Email = "test1@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST1@EXAMPLE.COM",
                             NormalizedUserName = "USER1",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIH4nXOr/txslV1MmS4tUmPgxXlL3tv0vxC1ZNAqp6l89cexqs3OFR0KlsbwnSwsDA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEwWM7JI68oZTOw8CPvw6JIZqHm4PyDUlHAmgD0+E2BYZOjehHKiUMGMjUavqUFa7g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1685fd88-0a83-4061-8fa1-b37a7c1e30be",
+                            SecurityStamp = "d61555cf-680d-4d1b-8934-c44e6dd7848f",
                             TwoFactorEnabled = false,
                             UserName = "user1"
                         },
@@ -577,15 +582,15 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000002",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a88bb5d2-8136-4710-8193-1b7112b9c439",
+                            ConcurrencyStamp = "88989922-ce7e-4cec-b68e-c5839309726f",
                             Email = "test2@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST2@EXAMPLE.COM",
                             NormalizedUserName = "USER2",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAhJ1chpy2LfzwJocoEb6nKL6a9JMsMwji9tbzhv2kI0KAIE4nZK2V/ntqHCQbZj3Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHymvmqDhRdIDLo4CGsYclMncxdqmDvJ3x23bqzZEuyVzJSHyhATCwN/sLO18q7V1A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6b3f9b2b-e669-4ccc-9e88-95ef8533a803",
+                            SecurityStamp = "c71c1c0a-02e1-44e5-b8cd-9d5a7dd35a6f",
                             TwoFactorEnabled = false,
                             UserName = "user2"
                         },
@@ -593,15 +598,15 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000003",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "020b11db-b5e5-4c4b-bbfc-48766cae05eb",
+                            ConcurrencyStamp = "906beef3-7032-4e84-86b0-9ba9fe198fb9",
                             Email = "test3@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST3@EXAMPLE.COM",
                             NormalizedUserName = "USER3",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIifk6zmEycpYnwEWQ3dpZGGFJXMvqQSs3hSVcZhLuAcbIMfC5tNMK5eeT/11ZdRYw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECav03RBEgJLf59hpk1Ge/ZieUJWANW5ti2PBau+3+JadfCo+oxpA84NfvjIzA8QAg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fd50b787-20d6-4893-b44a-25982ab92567",
+                            SecurityStamp = "cf1f1b74-ac9f-46d7-8dad-72a29268e531",
                             TwoFactorEnabled = false,
                             UserName = "user3"
                         },
@@ -609,15 +614,15 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000004",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "6bf807c2-bfb6-44f2-874e-238c4e913307",
+                            ConcurrencyStamp = "6e9f8106-8fb7-4062-b70a-4203d3e0e4fb",
                             Email = "test4@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST4@EXAMPLE.COM",
                             NormalizedUserName = "USER4",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIu2zhL6za/HwIf8MaydI7n/E7lp/pe+e9mAx5owQGiu88aSvb5uplAmhEgd50PY1w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEC5wrgq6w6jSSRTcV3FfIpSnHLfzLL4iPWjhiILnQNWNN2yvDdg3F+X2Baa7hdJrLA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "40ef33a3-804e-44b8-b241-a90125d207b6",
+                            SecurityStamp = "a460eb59-b568-4ccb-99e4-8c1d2a549d31",
                             TwoFactorEnabled = false,
                             UserName = "user4"
                         },
@@ -625,15 +630,15 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000005",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "170c2ff8-fd04-4d5f-aab3-db0b42d640c3",
+                            ConcurrencyStamp = "2b4d861d-96f8-45fc-845e-03d7b51ef1e5",
                             Email = "admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAENBHf5H3xxpLoNyfkP/mCLiTgXAFyN6x6CEf9sd0xpoidsl6GWMsbVtzlS/VvyUMaQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGRpLiCTdUp9hPVRp0PaRpDKbl8TFTEexIKFF0LC1s22WfP4RCPstnusg0WlbIIArw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7867f499-1560-4c29-9bd4-22e371c2fe20",
+                            SecurityStamp = "16d4b2cc-cf4e-46f0-805b-36c437cbab03",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });
