@@ -35,7 +35,7 @@ public interface IArticleService
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
     /// <exception cref="ResourceNotFoundException">Thrown if the course or article is not found</exception>
     /// <exception cref="ForbiddenException">Thrown if the teacher is not the one teaching the course</exception>
-    Task<ArticleDetailDto> CreateArticleAsync(int courseId, int teacherId,CreateArticleRequestDto createArticleDto);
+    Task<ArticleDetailDto> CreateArticleAsync(int courseId, int teacherId, CreateArticleRequestDto createArticleDto);
 
     /// <summary>
     /// Update an article
@@ -62,5 +62,14 @@ public interface IArticleService
     /// <exception cref="ForbiddenException">Thrown if the teacher is not the owner of the article</exception>
     Task<DeleteArticleResponseDto> DeleteArticleAsync(int courseId, int articleId, int teacherId);
 
-    Task<UpdateArticleProgressDto> UpdateArticleProgressAsync(int courseId, int articleId, int studentId, UpdateArticleProgressDto updateArticleProgressDto);
+    /// <summary>
+    /// Mark an article as read
+    /// </summary>
+    /// <param name="courseId">The unique identifier of the course</param>
+    /// <param name="articleId">The unique identifier of the article</param>
+    /// <param name="studentId">The unique identifier of the student</param>
+    /// <returns>The task result contains the response when article marked as read</returns>
+    /// <exception cref="ResourceNotFoundException">Thrown if the course or article is not found</exception>
+    /// <exception cref="ForbiddenException">Thrown if the student is not enrolled in the course</exception>
+    Task<UpdateArticleProgressDto> MarkArticleAsReadAsync(int courseId, int articleId, int studentId);
 }

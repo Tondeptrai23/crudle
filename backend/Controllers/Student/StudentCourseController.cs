@@ -76,4 +76,19 @@ public class CourseController : ControllerBase
         return Ok(new PaginationResponseDto<IEnumerable<ArticleDto>>(articles, articleCount, queryDto.Page,
             queryDto.Size));
     }
+
+    [HttpPost]
+    [Route("{courseId:int}/Article/{articleId:int}/Read")]
+    public async Task<IActionResult> MarkArticleAsReadAsync([FromRoute] int courseId, [FromRoute] int articleId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
+        await _articleService.MarkArticleAsReadAsync(courseId, articleId, student.StudentId);
+        return Ok();
+    }
 }

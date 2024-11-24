@@ -29,11 +29,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
         CreateMap<Teacher, TeacherMinimalDto>();
 
-        CreateMap<CreateRequestCourseDto, Course>();
+        CreateMap<CreateCourseRequestDto, Course>();
         CreateMap<Course, CourseDto>();
         CreateMap<CourseDto, Course>();
         CreateMap<Course, CourseDetailDto>();
         CreateMap<CourseDetailDto, Course>();
+        CreateMap<UpdateRequestCourseDto, Course>();
 
         CreateMap<ArticleDto, Article>();
         CreateMap<Article, ArticleDto>();
@@ -41,5 +42,8 @@ public class MappingProfile : Profile
         CreateMap<CreateArticleRequestDto, Article>();
         CreateMap<Article, ArticleDetailDto>();
         CreateMap<ArticleDetailDto, Article>();
+
+        CreateMap<ArticleProgress, UpdateArticleProgressDto>();
+        CreateMap<UpdateArticleProgressDto, ArticleProgress>();
     }
 }

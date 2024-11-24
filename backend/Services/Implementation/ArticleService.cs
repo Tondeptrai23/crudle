@@ -92,7 +92,7 @@ public class ArticleService : IArticleService
         newArticle.CreatedAt = DateTime.Now;
         newArticle.UpdatedAt = DateTime.Now;
 
-        _dbContext.Add((object)newArticle);
+        _dbContext.Add(newArticle);
         await _dbContext.SaveChangesAsync();
 
         return _mapper.Map<ArticleDetailDto>(newArticle);
@@ -148,7 +148,7 @@ public class ArticleService : IArticleService
     }
 
 
-    public async Task<UpdateArticleProgressDto> UpdateArticleProgressAsync(int courseId, int articleId, int studentId, UpdateArticleProgressDto updateArticleProgressDto)
+    public async Task<UpdateArticleProgressDto> MarkArticleAsReadAsync(int courseId, int articleId, int studentId)
     {
         var course = await _dbContext.Courses.Include(c => c.Enrollments).FirstOrDefaultAsync(c => c.CourseId == courseId);
         if (course == null)
@@ -173,24 +173,23 @@ public class ArticleService : IArticleService
             throw new ForbiddenException("Student not enrolled in this course");
         }
 
-        updateArticleProgressDto ??= new UpdateArticleProgressDto
-        {
-
-            ArticleId = articleId,
-            StudentId = studentId,
-        };
-
         var articleProgress = await _dbContext.ArticleProgresses.FirstOrDefaultAsync(ap =>
             ap.ArticleId == articleId && ap.StudentId == studentId);
 
-        if (articleProgress == null)    
+        if (articleProgress != null)
         {
-            articleProgress = _mapper.Map<ArticleProgress>(updateArticleProgressDto);
-            _dbContext.Add(articleProgress);
+            _dbContext.ArticleProgresses.Remove(articleProgress);
         }
-        else
+
+        if (articleProgress == null)
         {
-            articleProgress.IsDone = updateArticleProgressDto.IsDone;
+            articleProgress = new ArticleProgress
+            {
+                ArticleId = articleId,
+                StudentId = studentId,
+                IsDone = true
+            };
+            _dbContext.ArticleProgresses.Add(articleProgress);
         }
 
         await _dbContext.SaveChangesAsync();
