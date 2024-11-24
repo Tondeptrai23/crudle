@@ -43,12 +43,6 @@ public class ArticleService : IArticleService
 
     public async Task<ArticleDetailDto> GetArticleByIdAsync(int articleId, int courseId, int studentId)
     {
-        var student = await _dbContext.Students.FirstOrDefaultAsync(ar => ar.StudentId == studentId);
-        if (student == null)
-        {
-            throw new ResourceNotFoundException("Student not found");
-        }
-
         var course = await _dbContext.Courses.FirstOrDefaultAsync(ar => ar.CourseId == courseId);
         if (course == null)
         {
