@@ -113,7 +113,7 @@ public class ArticleService : IArticleService
             throw new ResourceNotFoundException("Course not found");
         }
 
-        if (course.TeacherId == teacherId)
+        if (course.TeacherId != teacherId)
         {
             throw new ForbiddenException("Teacher not authorized to update article of this course");
         }
@@ -210,7 +210,7 @@ public class ArticleService : IArticleService
             throw new ResourceNotFoundException("Course not found");
         }
 
-        if (course.TeacherId == teacherId)
+        if (course.TeacherId != teacherId)
         {
             throw new ForbiddenException("Teacher not authorized to delete this course");
         }
