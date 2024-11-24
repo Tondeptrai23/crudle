@@ -187,7 +187,7 @@ public class ArticleService : IArticleService
             {
                 ArticleId = articleId,
                 StudentId = studentId,
-                IsDone = true
+                IsRead = true
             };
             _dbContext.ArticleProgresses.Add(articleProgress);
         }

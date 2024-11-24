@@ -258,7 +258,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                     ArticleProgressId = 1,
                     ArticleId = 1,
                     StudentId = 1,
-                    IsDone = true
+                    IsRead = true
                 }
             }
         );

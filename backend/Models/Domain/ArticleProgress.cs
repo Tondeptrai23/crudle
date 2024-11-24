@@ -11,7 +11,7 @@ public class  ArticleProgress
     public int ArticleId { get; set; }
     public int StudentId { get; set; }
 
-    public bool IsDone { get; set; }
+    public bool IsRead { get; set; }
 
     public Article Article { get; set; }
     public Student Student { get; set; }
