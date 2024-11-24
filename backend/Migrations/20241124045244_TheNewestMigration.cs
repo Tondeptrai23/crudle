@@ -9,48 +9,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace _3w1m.Migrations
 {
     /// <inheritdoc />
-    public partial class DatabaseInitialization : Migration
+    public partial class TheNewestMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
-                name: "CourseId",
-                table: "Courses",
-                type: "int",
-                nullable: false,
-                oldClrType: typeof(Guid),
-                oldType: "char(36)")
-                .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
-                .OldAnnotation("Relational:Collation", "ascii_general_ci");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Code",
-                table: "Courses",
-                type: "longtext",
-                nullable: false)
+            migrationBuilder.AlterDatabase()
                 .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Description",
-                table: "Courses",
-                type: "longtext",
-                nullable: false)
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.AddColumn<DateOnly>(
-                name: "StartDate",
-                table: "Courses",
-                type: "date",
-                nullable: false,
-                defaultValue: new DateOnly(1, 1, 1));
-
-            migrationBuilder.AddColumn<int>(
-                name: "TeacherId",
-                table: "Courses",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
 
             migrationBuilder.CreateTable(
                 name: "Roles",
@@ -132,6 +97,31 @@ namespace _3w1m.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Token = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ExpiryDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Students",
                 columns: table => new
                 {
@@ -150,7 +140,8 @@ namespace _3w1m.Migrations
                         name: "FK_Students_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -176,7 +167,8 @@ namespace _3w1m.Migrations
                         name: "FK_Teachers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -283,6 +275,61 @@ namespace _3w1m.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Courses",
+                columns: table => new
+                {
+                    CourseId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Code = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    TeacherId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Courses", x => x.CourseId);
+                    table.ForeignKey(
+                        name: "FK_Courses_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "Teachers",
+                        principalColumn: "TeacherId");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Articles",
+                columns: table => new
+                {
+                    ArticleId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Summary = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Content = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Order = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Articles", x => x.ArticleId);
+                    table.ForeignKey(
+                        name: "FK_Articles_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "CourseId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Enrollments",
                 columns: table => new
                 {
@@ -309,19 +356,80 @@ namespace _3w1m.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "ArticleProgresses",
+                columns: table => new
+                {
+                    ArticleProgressId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ArticleId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    IsDone = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArticleProgresses", x => x.ArticleProgressId);
+                    table.ForeignKey(
+                        name: "FK_ArticleProgresses_Articles_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Articles",
+                        principalColumn: "ArticleId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ArticleProgresses_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "StudentId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "1", null, "Admin", "ADMIN" },
+                    { "2", null, "Teacher", "TEACHER" },
+                    { "3", null, "Student", "STUDENT" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { "00000000-0000-0000-0000-000000000001", 0, "4bdfd4a3-612b-4361-85b6-4b1c6bd0020a", "test1@example.com", false, false, null, "TEST1@EXAMPLE.COM", "USER1", "AQAAAAIAAYagAAAAEEwWM7JI68oZTOw8CPvw6JIZqHm4PyDUlHAmgD0+E2BYZOjehHKiUMGMjUavqUFa7g==", null, false, "d61555cf-680d-4d1b-8934-c44e6dd7848f", false, "user1" },
+                    { "00000000-0000-0000-0000-000000000002", 0, "88989922-ce7e-4cec-b68e-c5839309726f", "test2@example.com", false, false, null, "TEST2@EXAMPLE.COM", "USER2", "AQAAAAIAAYagAAAAEHymvmqDhRdIDLo4CGsYclMncxdqmDvJ3x23bqzZEuyVzJSHyhATCwN/sLO18q7V1A==", null, false, "c71c1c0a-02e1-44e5-b8cd-9d5a7dd35a6f", false, "user2" },
+                    { "00000000-0000-0000-0000-000000000003", 0, "906beef3-7032-4e84-86b0-9ba9fe198fb9", "test3@example.com", false, false, null, "TEST3@EXAMPLE.COM", "USER3", "AQAAAAIAAYagAAAAECav03RBEgJLf59hpk1Ge/ZieUJWANW5ti2PBau+3+JadfCo+oxpA84NfvjIzA8QAg==", null, false, "cf1f1b74-ac9f-46d7-8dad-72a29268e531", false, "user3" },
+                    { "00000000-0000-0000-0000-000000000004", 0, "6e9f8106-8fb7-4062-b70a-4203d3e0e4fb", "test4@example.com", false, false, null, "TEST4@EXAMPLE.COM", "USER4", "AQAAAAIAAYagAAAAEC5wrgq6w6jSSRTcV3FfIpSnHLfzLL4iPWjhiILnQNWNN2yvDdg3F+X2Baa7hdJrLA==", null, false, "a460eb59-b568-4ccb-99e4-8c1d2a549d31", false, "user4" },
+                    { "00000000-0000-0000-0000-000000000005", 0, "2b4d861d-96f8-45fc-845e-03d7b51ef1e5", "admin@gmail.com", false, false, null, "ADMIN@EXAMPLE.COM", "ADMIN", "AQAAAAIAAYagAAAAEGRpLiCTdUp9hPVRp0PaRpDKbl8TFTEexIKFF0LC1s22WfP4RCPstnusg0WlbIIArw==", null, false, "16d4b2cc-cf4e-46f0-805b-36c437cbab03", false, "admin" }
+                });
+
             migrationBuilder.InsertData(
                 table: "Students",
                 columns: new[] { "StudentId", "DateOfBirth", "Fullname", "UserId" },
                 values: new object[,]
                 {
-                    { 1, new DateOnly(2000, 1, 1), "Student 1", null },
-                    { 2, new DateOnly(2000, 1, 1), "Student 2", null }
+                    { 1, new DateOnly(2000, 1, 1), "Student 1", "00000000-0000-0000-0000-000000000002" },
+                    { 2, new DateOnly(2000, 1, 1), "Student 2", "00000000-0000-0000-0000-000000000003" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Teachers",
                 columns: new[] { "TeacherId", "ContactEmail", "ContactPhone", "Fullname", "UserId" },
-                values: new object[] { 1, "example@gmail.com", "0987654321", "Teacher 1", null });
+                values: new object[] { 1, "example@gmail.com", "0987654321", "Teacher 1", "00000000-0000-0000-0000-000000000001" });
+
+            migrationBuilder.InsertData(
+                table: "UserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { "2", "00000000-0000-0000-0000-000000000001" },
+                    { "3", "00000000-0000-0000-0000-000000000002" },
+                    { "3", "00000000-0000-0000-0000-000000000003" },
+                    { "1", "00000000-0000-0000-0000-000000000005" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Courses",
@@ -333,6 +441,15 @@ namespace _3w1m.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Articles",
+                columns: new[] { "ArticleId", "Content", "CourseId", "CreatedAt", "Order", "Summary", "Title", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, "Content 1", 1, new DateTime(2024, 11, 24, 11, 52, 43, 799, DateTimeKind.Local).AddTicks(6161), 1, "Summary 1", "Article 1", new DateTime(2024, 11, 24, 11, 52, 43, 799, DateTimeKind.Local).AddTicks(6184) },
+                    { 2, "Content 2", 1, new DateTime(2024, 11, 24, 11, 52, 43, 799, DateTimeKind.Local).AddTicks(6191), 2, "Summary 2", "Article 2", new DateTime(2024, 11, 24, 11, 52, 43, 799, DateTimeKind.Local).AddTicks(6192) }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Enrollments",
                 columns: new[] { "CourseId", "StudentId", "EnrolledAt", "EnrollmentId" },
                 values: new object[,]
@@ -340,6 +457,26 @@ namespace _3w1m.Migrations
                     { 1, 1, new DateOnly(2022, 1, 1), 0 },
                     { 2, 2, new DateOnly(2022, 2, 1), 0 }
                 });
+
+            migrationBuilder.InsertData(
+                table: "ArticleProgresses",
+                columns: new[] { "ArticleProgressId", "ArticleId", "IsDone", "StudentId" },
+                values: new object[] { 1, 1, true, 1 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleProgresses_ArticleId",
+                table: "ArticleProgresses",
+                column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ArticleProgresses_StudentId",
+                table: "ArticleProgresses",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Articles_CourseId",
+                table: "Articles",
+                column: "CourseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_TeacherId",
@@ -350,6 +487,11 @@ namespace _3w1m.Migrations
                 name: "IX_Enrollments_StudentId",
                 table: "Enrollments",
                 column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
@@ -399,31 +541,22 @@ namespace _3w1m.Migrations
                 table: "Users",
                 column: "NormalizedUserName",
                 unique: true);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Courses_Teachers_TeacherId",
-                table: "Courses",
-                column: "TeacherId",
-                principalTable: "Teachers",
-                principalColumn: "TeacherId",
-                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Courses_Teachers_TeacherId",
-                table: "Courses");
+            migrationBuilder.DropTable(
+                name: "ArticleProgresses");
 
             migrationBuilder.DropTable(
                 name: "Enrollments");
 
             migrationBuilder.DropTable(
-                name: "RoleClaims");
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "Teachers");
+                name: "RoleClaims");
 
             migrationBuilder.DropTable(
                 name: "UserClaims");
@@ -438,53 +571,22 @@ namespace _3w1m.Migrations
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
+                name: "Articles");
+
+            migrationBuilder.DropTable(
                 name: "Students");
 
             migrationBuilder.DropTable(
                 name: "Roles");
 
             migrationBuilder.DropTable(
+                name: "Courses");
+
+            migrationBuilder.DropTable(
+                name: "Teachers");
+
+            migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Courses_TeacherId",
-                table: "Courses");
-
-            migrationBuilder.DeleteData(
-                table: "Courses",
-                keyColumn: "CourseId",
-                keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "Courses",
-                keyColumn: "CourseId",
-                keyValue: 2);
-
-            migrationBuilder.DropColumn(
-                name: "Code",
-                table: "Courses");
-
-            migrationBuilder.DropColumn(
-                name: "Description",
-                table: "Courses");
-
-            migrationBuilder.DropColumn(
-                name: "StartDate",
-                table: "Courses");
-
-            migrationBuilder.DropColumn(
-                name: "TeacherId",
-                table: "Courses");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "CourseId",
-                table: "Courses",
-                type: "char(36)",
-                nullable: false,
-                collation: "ascii_general_ci",
-                oldClrType: typeof(int),
-                oldType: "int")
-                .OldAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
         }
     }
 }
