@@ -61,4 +61,6 @@ public interface IArticleService
     /// <exception cref="ResourceNotFoundException">Thrown if the course or article is not found</exception>
     /// <exception cref="ForbiddenException">Thrown if the teacher is not the owner of the article</exception>
     Task<DeleteArticleResponseDto> DeleteArticleAsync(int courseId, int articleId, int teacherId);
+
+    Task<UpdateArticleProgressDto> UpdateArticleProgressAsync(int courseId, int articleId, int studentId, UpdateArticleProgressDto updateArticleProgressDto);
 }

@@ -29,12 +29,10 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
         CreateMap<Teacher, TeacherMinimalDto>();
 
-        CreateMap<CreateCourseRequestDto, Course>();
-        CreateMap<Course, CourseDto>()
-            .ForMember(dest => dest.Teachers, opt => opt.MapFrom(src => new List<Teacher> { src.Teacher }));
+        CreateMap<CreateRequestCourseDto, Course>();
+        CreateMap<Course, CourseDto>();
         CreateMap<CourseDto, Course>();
-        CreateMap<Course, CourseDetailDto>()
-            .ForMember(dest => dest.Teachers, opt => opt.MapFrom(src => new List<Teacher> { src.Teacher }));
+        CreateMap<Course, CourseDetailDto>();
         CreateMap<CourseDetailDto, Course>();
 
         CreateMap<ArticleDto, Article>();

@@ -24,11 +24,18 @@ const Nav: React.FC<NavProps> = (props) => {
 
   const generateNavigationItem = (path: string, label: string) => {
     const baseClass = 'px-3 py-1 font-semibold cursor-pointer';
-    const selectedClass = 'bg-zinc-200 rounded-lg';
+    const selectedClass = 'bg-blue-500 rounded-lg text-white';
+
+    const currentSegments = pathname.split('/').filter(Boolean);
+    const pathSegments = path.split('/').filter(Boolean);
 
     const isSelected =
-      (path === '/' && pathname === '/') ||
-      (path !== '/' && pathname.startsWith(path));
+      path === '/'
+        ? pathname === '/'
+        : pathSegments.length === currentSegments.length && // Must be same depth
+          pathSegments.every(
+            (segment, index) => segment === currentSegments[index],
+          );
 
     const classValue = `${baseClass} ${isSelected ? selectedClass : ''}`.trim();
 
@@ -40,7 +47,9 @@ const Nav: React.FC<NavProps> = (props) => {
         <NavigationMenuLink href={path}>
           <div className={classValue}>{label}</div>
         </NavigationMenuLink> */}
-        <Link to={path} replace><div className={classValue}>{label}</div></Link>
+        <Link to={path} replace>
+          <div className={classValue}>{label}</div>
+        </Link>
       </NavigationMenuItem>
     );
   };

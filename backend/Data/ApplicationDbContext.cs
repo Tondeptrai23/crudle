@@ -1,5 +1,4 @@
 using _3w1m.Constants;
-using _3w1m.Dtos.Article;
 using _3w1m.Models.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -65,9 +64,19 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Article>()
-            .HasOne<Course>(a => a.Course)
+            .HasOne(a => a.Course)
             .WithMany(c => c.Articles);
 
+        modelBuilder.Entity<ArticleProgress>().HasKey(ag => ag.ArticleProgressId);
+        modelBuilder.Entity<ArticleProgress>()
+            .HasOne(ag => ag.Article)
+            .WithMany(ar => ar.ArticleProgresses)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ArticleProgress>()
+            .HasOne(ag => ag.Student)
+            .WithMany(st => st.ArticleProgresses)
+            .OnDelete(DeleteBehavior.Cascade);
+            
         // Seed data 
         var hasher = new PasswordHasher<User>();
 
@@ -242,6 +251,17 @@ public class ApplicationDbContext : IdentityDbContext<User>
             }
         };
         modelBuilder.Entity<Article>().HasData(listArticle);
+
+        modelBuilder.Entity<ArticleProgress>().HasData(
+            new List<ArticleProgress>() {
+                new() {
+                    ArticleProgressId = 1,
+                    ArticleId = 1,
+                    StudentId = 1,
+                    IsDone = true
+                }
+            }
+        );
     }
 
     public DbSet<Student> Students { get; set; }
@@ -252,6 +272,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Article> Articles { get; set; }
+    public DbSet<ArticleProgress> ArticleProgresses { get; set; }
 
     private static class UserSeeding
     {

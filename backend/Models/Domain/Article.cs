@@ -11,4 +11,5 @@ public class Article
     public DateTime UpdatedAt { get; set; }
     
     public Course Course { get; set; }
+    public ICollection<ArticleProgress> ArticleProgresses { get; set; }
 }

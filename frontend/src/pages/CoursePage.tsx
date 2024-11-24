@@ -1,8 +1,6 @@
 import api from '@/utils/api';
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Navigate } from 'react-router-dom';
-import { AxiosError } from 'axios';
+import React from 'react';
 
 interface Course {
   CourseId: number;
@@ -15,18 +13,20 @@ const fetchCourses = async () => {
 };
 
 const CoursePage: React.FC = () => {
-  const { data: courses, isPending, error } = useQuery({ 
-    queryKey: ['courses'], 
-    queryFn: fetchCourses 
+  const {
+    data: courses,
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: ['courses'],
+    queryFn: fetchCourses,
   });
 
   if (isPending) return <div>Loading...</div>;
 
   if (error) {
-    if ((error as AxiosError).response?.status === 401) {
-      return <Navigate to="/login" />;
-    }
-  } 
+    throw error;
+  }
 
   return (
     <div>
