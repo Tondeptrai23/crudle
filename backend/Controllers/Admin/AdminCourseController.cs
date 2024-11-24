@@ -2,6 +2,7 @@
 using _3w1m.Dtos;
 using _3w1m.Dtos.Course;
 using _3w1m.Dtos.Student;
+using _3w1m.Dtos.Teacher;
 using _3w1m.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,10 +45,18 @@ public class CourseController(ICourseService courseService) : Controller
     } 
 
     [HttpPost]
-    [Route("{courseId:int}/Enroll")]
-    public async Task<IActionResult> EnrollStudentIntoCourse([FromRoute] int courseId, [FromBody] List<int> studentIds)
+    [Route("{courseId:int}/EnrollStudent")]
+    public async Task<IActionResult> EnrollStudentIntoCourse([FromRoute] int courseId, [FromBody] EnrollStudentToCourseRequestDto enrollRequest)
     {
-        var students = await courseService.EnrollStudentIntoCourseAsync(courseId, studentIds);
+        var students = await courseService.EnrollStudentIntoCourseAsync(courseId, enrollRequest);
         return Ok(new ResponseDto<IEnumerable<StudentDto>>(students));
+    }
+
+    [HttpPost]
+    [Route("{courseId:int}/EnrollTeacher")]
+    public async Task<IActionResult> EnrollTeacherIntoCourse([FromRoute] int courseId, [FromBody] EnrollTeacherToCourseRequestDto enrollRequest)
+    {
+        var teacher = await courseService.EnrollTeacherIntoCourseAsync(courseId, enrollRequest);
+        return Ok(new ResponseDto<TeacherDto>(teacher));
     }
 }
