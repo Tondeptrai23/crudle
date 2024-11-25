@@ -1,6 +1,6 @@
 ﻿using _3w1m.Dtos.Article;
-using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
+using _3w1m.Specifications.Interface;
 
 namespace _3w1m.Services.Interface;
 
@@ -13,7 +13,9 @@ public interface IArticleService
     /// <param name="queryDto">The query parameters for filtering, ordering, and pagination</param>
     /// <returns>The task result contains the quantity and a collection of article Dto</returns>
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
-    Task<(int, IEnumerable<ArticleDto>)> GetArticlesAsync(int courseId, ArticleCollectionQueryDto? queryDto);
+    Task<(int, IEnumerable<ArticleDto>)> GetArticlesAsync(int courseId, IArticleSpecification serviceSpecification,
+        ArticleCollectionQueryDto? queryDto);
+
 
     /// <summary>
     /// Get article by articleId and courseId
@@ -23,7 +25,7 @@ public interface IArticleService
     /// <param name="studentId">The unique identifier of the student</param>
     /// <returns>The task result contains the article detail Dto</returns>
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
-    Task<ArticleDetailDto> GetArticleByIdAsync(int articleId, int courseId, int studentId);
+    Task<ArticleDto> GetArticleByIdAsync(int articleId, int courseId, int studentId);
 
     /// <summary>
     /// Create an article
@@ -35,7 +37,7 @@ public interface IArticleService
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
     /// <exception cref="ResourceNotFoundException">Thrown if the course or article is not found</exception>
     /// <exception cref="ForbiddenException">Thrown if the teacher is not the one teaching the course</exception>
-    Task<ArticleDetailDto> CreateArticleAsync(int courseId, int teacherId, CreateArticleRequestDto createArticleDto);
+    Task<ArticleDto> CreateArticleAsync(int courseId, int teacherId, CreateArticleRequestDto createArticleDto);
 
     /// <summary>
     /// Update an article
@@ -48,7 +50,8 @@ public interface IArticleService
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
     /// <exception cref="ResourceNotFoundException">Thrown if the article is not found</exception>
     /// <exception cref="ForbiddenException">Thrown if the teacher is not the owner of the article</exception>
-    Task<ArticleDetailDto> UpdateArticleAsync(int courseId, int articleId, int teacherId, UpdateArticleRequestDto updateArticleDto);
+    Task<ArticleDto> UpdateArticleAsync(int courseId, int articleId, int teacherId,
+        UpdateArticleRequestDto updateArticleDto);
 
     /// <summary>
     /// Update an article
@@ -72,7 +75,7 @@ public interface IArticleService
     /// <exception cref="ResourceNotFoundException">Thrown if the course or article is not found</exception>
     /// <exception cref="ForbiddenException">Thrown if the student is not enrolled in the course</exception>
     Task<UpdateArticleProgressDto> MarkArticleAsReadAsync(int courseId, int articleId, int studentId);
-    
+
     /// <summary>
     /// Reorders articles within a specified course after validating teacher's permission.
     /// </summary>

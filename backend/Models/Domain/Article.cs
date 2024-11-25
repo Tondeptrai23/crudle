@@ -1,4 +1,7 @@
-﻿namespace _3w1m.Models.Domain;
+﻿using System;
+using System.Collections.Generic;
+
+namespace _3w1m.Models.Domain;
 
 public class Article
 {

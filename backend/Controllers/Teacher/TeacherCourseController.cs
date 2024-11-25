@@ -4,6 +4,8 @@ using _3w1m.Dtos.Article;
 using _3w1m.Dtos.Course;
 using _3w1m.Models.Domain;
 using _3w1m.Services.Interface;
+using _3w1m.Specifications;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +22,12 @@ public class CourseController : ControllerBase
     private readonly ICourseService _courseService;
     private readonly ITeacherService _teacherService;
     private readonly IArticleService _articleService;
+    private readonly IMapper _mapper;
 
     public CourseController(UserManager<User> userManager, ICourseService courseService,
-        ITeacherService teacherService, IArticleService articleService)
+        ITeacherService teacherService, IArticleService articleService, IMapper mapper)
     {
+        _mapper = mapper;
         _userManager = userManager;
         _courseService = courseService;
         _teacherService = teacherService;
@@ -59,8 +63,15 @@ public class CourseController : ControllerBase
     [Route("{courseId:int}/Articles")]
     public async Task<IActionResult> GetArticles(int courseId, [FromQuery] ArticleCollectionQueryDto queryDto)
     {
-        var (count, articles) = await _articleService.GetArticlesAsync(courseId, queryDto);
-        return Ok(new PaginationResponseDto<IEnumerable<ArticleDto>>(articles, count, queryDto.Page, queryDto.Size));
+        var specification = new TeacherArticleSpecification();
+        var (count, articles) =
+            await _articleService.GetArticlesAsync(courseId, specification, queryDto);
+
+        return Ok(new PaginationResponseDto<IEnumerable<TeacherMinimalArticleDto>>(
+            _mapper.Map<IEnumerable<TeacherMinimalArticleDto>>(articles),
+            count,
+            queryDto.Page,
+            queryDto.Size));
     }
 
     [HttpPost]
@@ -75,7 +86,7 @@ public class CourseController : ControllerBase
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
         var article = await _articleService.CreateArticleAsync(courseId, teacher.TeacherId, dto);
-        return Ok(new ResponseDto<ArticleDetailDto>(article));
+        return Ok(new ResponseDto<TeacherArticleResponseDto>(_mapper.Map<TeacherArticleResponseDto>(article)));
     }
 
     [HttpPut]
@@ -91,7 +102,7 @@ public class CourseController : ControllerBase
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
         var article = await _articleService.UpdateArticleAsync(courseId, articleId, teacher.TeacherId, dto);
-        return Ok(new ResponseDto<ArticleDetailDto>(article));
+        return Ok(new ResponseDto<TeacherArticleResponseDto>(_mapper.Map<TeacherArticleResponseDto>(article)));
     }
 
     [HttpDelete]
@@ -121,6 +132,7 @@ public class CourseController : ControllerBase
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
         var article = await _articleService.UpdateArticleOrderAsync(courseId, articleIds, teacher.TeacherId);
-        return Ok(new ResponseDto<IEnumerable<ArticleDto>>(article));
+        return Ok(new ResponseDto<IEnumerable<TeacherMinimalArticleDto>>(
+            _mapper.Map<IEnumerable<TeacherMinimalArticleDto>>(article)));
     }
 }

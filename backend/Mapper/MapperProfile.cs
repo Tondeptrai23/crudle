@@ -5,6 +5,7 @@ using _3w1m.Dtos.Student;
 using _3w1m.Dtos.Teacher;
 using _3w1m.Models.Domain;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore.Migrations.Operations.Builders;
 
 namespace _3w1m.Mapper;
 
@@ -37,11 +38,23 @@ public class MappingProfile : Profile
         CreateMap<UpdateRequestCourseDto, Course>();
 
         CreateMap<ArticleDto, Article>();
-        CreateMap<Article, ArticleDto>();
-        
+        CreateMap<Article, ArticleDto>()
+            .ForMember(dest => dest.ReadAt,
+                opt => 
+                        opt.MapFrom(scr => scr.ArticleProgresses.Any() ? scr.ArticleProgresses.First().ReadAt : null));
+        CreateMap<ArticleDto, StudentArticleResponseDto>()
+            .ForMember(dest => dest.IsRead,
+                opt => opt.MapFrom(src => src.ReadAt != null));
+        CreateMap<ArticleDto, TeacherArticleResponseDto>();
+
         CreateMap<CreateArticleRequestDto, Article>();
-        CreateMap<Article, ArticleDetailDto>();
-        CreateMap<ArticleDetailDto, Article>();
+        
+        CreateMap<ArticleDto, TeacherMinimalArticleDto>();
+        CreateMap<ArticleDto, StudentMinimalArticleDto>()
+            .ForMember(dest => dest.IsRead, opt =>
+                opt.MapFrom(src => src.ReadAt != null))
+            .ForMember(dest => dest.ReadAt, opt =>
+                opt.MapFrom(src => src.ReadAt));
 
         CreateMap<ArticleProgress, UpdateArticleProgressDto>();
         CreateMap<UpdateArticleProgressDto, ArticleProgress>();
