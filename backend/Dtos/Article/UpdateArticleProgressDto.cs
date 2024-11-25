@@ -10,5 +10,5 @@ public class UpdateArticleProgressDto
     public int ArticleId { get; set; }
     public int StudentId { get; set; }
 
-    public bool IsDone { get; set; } = false;
+    public DateTime? ReadAt { get; set; }
 }

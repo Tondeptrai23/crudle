@@ -88,7 +88,7 @@ public class CourseController : ControllerBase
         }
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-        await _articleService.MarkArticleAsReadAsync(courseId, articleId, student.StudentId);
-        return Ok();
+        var updateArticleProgressDto = await _articleService.MarkArticleAsReadAsync(courseId, articleId, student.StudentId);
+        return Ok(new ResponseDto<UpdateArticleProgressDto>(updateArticleProgressDto));
     }
 }

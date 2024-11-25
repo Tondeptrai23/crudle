@@ -74,7 +74,7 @@ public class CourseController : ControllerBase
         }
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
-        var article = await _articleService.CreateArticleAsync(courseId,  teacher.TeacherId, dto);
+        var article = await _articleService.CreateArticleAsync(courseId, teacher.TeacherId, dto);
         return Ok(new ResponseDto<ArticleDetailDto>(article));
     }
 
@@ -106,9 +106,9 @@ public class CourseController : ControllerBase
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
         var result = await _articleService.DeleteArticleAsync(courseId, articleId, teacher.TeacherId);
-        return Ok(result);
+        return Ok(new GeneralDeleteResponseDto { Success = result });
     }
-    
+
     [HttpPatch]
     [Route("{courseId:int}/Article/Order")]
     public async Task<IActionResult> UpdateArticleOrderAsync([FromRoute] int courseId, [FromBody] int[] articleIds)
@@ -120,7 +120,7 @@ public class CourseController : ControllerBase
         }
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
-        var article  = await _articleService.UpdateArticleOrderAsync(courseId, articleIds, teacher.TeacherId);
+        var article = await _articleService.UpdateArticleOrderAsync(courseId, articleIds, teacher.TeacherId);
         return Ok(new ResponseDto<IEnumerable<ArticleDto>>(article));
     }
 }
