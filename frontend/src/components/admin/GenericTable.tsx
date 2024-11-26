@@ -72,6 +72,10 @@ const GenericTable = <T extends { id: string }>({
     }
 
     if (data.length === 0 || state.isError) {
+      if (state.isError) {
+        throw state.error;
+      }
+
       return (
         <TableBody>
           <TableRow>
@@ -79,7 +83,7 @@ const GenericTable = <T extends { id: string }>({
               className='text-center text-red-500'
               colSpan={columns.length + 1}
             >
-              {state.isError ? 'An error occurred' : 'No data found'}
+              No data found
             </TableCell>
           </TableRow>
         </TableBody>
