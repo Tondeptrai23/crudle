@@ -10,6 +10,12 @@ public class CourseDto
     public string Name { get; set; }
 
     public string Description { get; set; }
+    
+    public string Code { get; set; }
+    
+    public DateOnly StartDate { get; set; }
+    
+    public int TeacherId { get; set; }
 
-    public IEnumerable<TeacherMinimalDto>? Teachers { get; set; }
+    public TeacherMinimalDto Teacher { get; set; }
 }
