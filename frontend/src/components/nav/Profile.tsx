@@ -46,7 +46,7 @@ const Profile: React.FC<ProfileProps> = (props) => {
               {props.avatar ? props.avatar : <User />}
             </AvatarFallback>
           </Avatar>
-          <div className='hidden md:block'>
+          <div className='hidden md:block text-left'>
             <h2 className='text-md font-semibold'>{props.name}</h2>
             <p className='text-gray-500'>{props.role}</p>
           </div>
