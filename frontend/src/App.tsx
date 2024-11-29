@@ -70,7 +70,10 @@ const App: React.FC = () => {
                       <Routes>
                         <Route path='/' element={<WeatherPage />} />
                         <Route path='/course' element={<CoursePage />} />
-
+                        <Route
+                          path='/course/:courseId'
+                          element={<CourseDetailPage />}
+                        />
                         <Route path='/profile' element={<div>Profile</div>} />
                         <Route path='/settings' element={<div>Settings</div>} />
                         <Route path='*' element={<div>Not Found</div>} />

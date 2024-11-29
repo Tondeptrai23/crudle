@@ -19,7 +19,7 @@ interface Teacher {
 }
 
 const fetchCourses = async () => {
-  const response = await api.get('/api/Admin/Course');
+  const response = await api.get('/api/Student/Course');
   return response.data.Data;
 };
 

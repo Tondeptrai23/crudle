@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Accordion } from '@radix-ui/react-accordion';
 import api from '@/utils/api';
 
 interface CourseDetails {
@@ -26,7 +27,7 @@ const CourseDetailPage: React.FC = () => {
   } = useQuery({
     queryKey: ['course', courseId],
     queryFn: async () => {
-      const response = await api.get(`/api/Admin/Course/${courseId}`);
+      const response = await api.get(`/api/Student/Course/${courseId}`);
       return response.data.Data;
     },
   });
@@ -36,21 +37,20 @@ const CourseDetailPage: React.FC = () => {
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      test
-      {/* <h1 className='mb-8 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl'>
+      <h1 className='lg:text-54l mb-8 scroll-m-20 text-4xl font-bold tracking-tight'>
         {course.Name}
       </h1>
       <div className='prose max-w-none'>
-        <h2 className='text-2xl font-bold'>Description</h2>
+        <h2 className='text-2xl font-semibold'>Description</h2>
         <p>{course.Description}</p>
 
-        <h2 className='mt-8 text-2xl font-bold'>Instructors</h2>
-        <ul>
+        <h2 className='mt-8 text-2xl font-semibold'>Instructors</h2>
+        {/* <ul>
           {course.Teachers?.map((teacher) => (
             <li key={teacher.TeacherId}>{teacher.Name}</li>
           ))}
-        </ul>
-      </div> */}
+        </ul> */}
+      </div>
     </div>
   );
 };

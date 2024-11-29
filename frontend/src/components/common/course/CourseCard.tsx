@@ -22,23 +22,23 @@ interface CourseCardProps {
 }
 
 const TeachersList: React.FC<{ teachers: Teacher[] }> = ({ teachers }) => (
-  <div className='mt-4'>
-    <h4 className='mb-2 text-lg font-medium'>Instructors</h4>
-    <ul className='list-none space-y-1'>
-      {teachers?.map((teacher) => (
+  <div className='mt-4 flex items-center gap-2'>
+    <div className='text-lg font-medium'>Instructor:</div>
+    <div className='flex flex-wrap gap-4'>
+      {teachers?.map((teacher, index) => (
         <Link
           key={teacher.TeacherId}
           to={`/teacher/${teacher.TeacherId}`}
-          className='block'
+          className='inline-flex items-center'
           onClick={(e) => e.stopPropagation()}
         >
-          <li className='flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:underline'>
-            <span className='h-2 w-2 rounded-full bg-primary' />
+          <div className='flex items-center gap-2 text-lg text-gray-600 hover:text-gray-900 hover:underline'>
             {teacher.Fullname}
-          </li>
+            {index < teachers.length - 1 && <span className='ml-2'>,</span>}
+          </div>
         </Link>
       ))}
-    </ul>
+    </div>
   </div>
 );
 
