@@ -6,6 +6,7 @@ import {
   NavigationMenuList,
 } from '@/components/common/ui/navigation-menu';
 import { cn } from '@/lib/utils';
+import useAuth from '@/hooks/useAuth';
 import { Bell } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -21,6 +22,7 @@ export interface NavProps {
 
 const Nav: React.FC<NavProps> = (props) => {
   const { pathname } = useLocation();
+  const { role } = useAuth();
 
   const generateNavigationItem = (path: string, label: string) => {
     const baseClass = 'px-3 py-1 font-semibold cursor-pointer';
@@ -76,7 +78,7 @@ const Nav: React.FC<NavProps> = (props) => {
         >
           <Bell />
         </Button>
-        <Profile name='John Doe' role='Hoc Sinh' items={props.profileItems} />
+        <Profile name='John Doe' role={role} items={props.profileItems} />
       </div>
     </NavigationMenu>
   );
