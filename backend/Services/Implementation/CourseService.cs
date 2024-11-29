@@ -2,6 +2,7 @@ using _3w1m.Data;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Course;
 using _3w1m.Dtos.Student;
+using _3w1m.Dtos.Teacher;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
@@ -58,47 +59,47 @@ public class CourseService : ICourseService
         return (countAsync, _mapper.Map<IEnumerable<CourseDto>>(await query.ToListAsync()));
     }
 
-    public async Task<CourseDto> CreateCourseAsync(CreateRequestCourseDto courseData)
+    public async Task<CourseDto> CreateCourseAsync(CreateCourseRequestDto data)
     {
         var courses = _context.Courses;
 
-        if (await courses.AnyAsync(c => c.Code == courseData.Code))
+        if (await courses.AnyAsync(c => c.Code == data.Code))
         {
-            throw new ConflictException($"Course with code {courseData.Code} already exists.");
+            throw new ConflictException($"Course with code {data.Code} already exists.");
         }
 
-        var course = _mapper.Map<Course>(courseData);
+        var course = _mapper.Map<Course>(data);
         courses.Add(course);
         await _context.SaveChangesAsync();
 
         return _mapper.Map<CourseDto>(course);
     }
 
-    public async Task<CourseDto> UpdateCourseAsync(int entityId, UpdateCourseRequestDto courseData)
+    public async Task<CourseDto> UpdateCourseAsync(int entityId, UpdateRequestCourseDto requestCourseData)
     {
-        ArgumentNullException.ThrowIfNull(courseData);
+        ArgumentNullException.ThrowIfNull(requestCourseData);
         var course = await _context.Courses.Include(c => c.Teacher).FirstOrDefaultAsync(c => c.CourseId == entityId);
         if (course == null)
         {
             throw new ResourceNotFoundException("Course not found");
         }
 
-        if (courseData.Name != null)
+        if (requestCourseData.Name != null)
         {
-            course.Name = courseData.Name;
+            course.Name = requestCourseData.Name;
         }
 
-        if (courseData.Description != null)
+        if (requestCourseData.Description != null)
         {
-            course.Description = courseData.Description;
+            course.Description = requestCourseData.Description;
         }
 
-        if (courseData.TeacherId != null)
+        if (requestCourseData.TeacherId != null)
         {
-            var newTeacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == courseData.TeacherId);
+            var newTeacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == requestCourseData.TeacherId);
             if (newTeacher == null)
             {
-                throw new ResourceNotFoundException($"Teacher with id {courseData.TeacherId} not found");
+                throw new ResourceNotFoundException($"Teacher with id {requestCourseData.TeacherId} not found");
             }
 
             course.TeacherId = newTeacher.TeacherId;
@@ -127,15 +128,17 @@ public class CourseService : ICourseService
         return (students.Count, _mapper.Map<IEnumerable<StudentDto>>(students));
     }
 
-    public async Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId, List<int> studentIds)
+    public async Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId, EnrollStudentToCourseRequestDto enrollRequest)
     {
+        var studentIds = enrollRequest.StudentIds;
+
         var course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseId == courseId);
         if (course == null)
         {
             throw new ResourceNotFoundException($"Course with id {courseId} not found.");
         }
 
-        var (isExist, nonExistedStudent) = IsStudentExist(studentIds);
+        var (isExist, nonExistedStudent) = IsStudentExist(studentIds.ToList());
         if (isExist == false)
         {
             throw new ResourceNotFoundException($"Student with id {nonExistedStudent} not found");
@@ -158,7 +161,7 @@ public class CourseService : ICourseService
             await enrollments.AddAsync(new Enrollment
             {
                 CourseId = courseId,
-                StudentId = studentIds[i],
+                StudentId = studentIds.ElementAt(i),
                 EnrolledAt = new DateOnly(now.Year, now.Month, now.Day)
             });
         }
@@ -167,6 +170,35 @@ public class CourseService : ICourseService
         var (_, students) = await GetStudentsInCourseAsync(courseId);
 
         return students;
+    }
+
+
+    public Task<TeacherDto> EnrollTeacherIntoCourseAsync(int courseId, EnrollTeacherToCourseRequestDto enrollRequest)
+    {
+        var teacherId = enrollRequest.TeacherId;
+        var course = _context.Courses.FirstOrDefault(c => c.CourseId == courseId);
+        if (course == null)
+        {
+            throw new ResourceNotFoundException($"Course with id {courseId} not found.");
+        }
+
+        var teacher = _context.Teachers.FirstOrDefault(t => t.TeacherId == teacherId);
+        if (teacher == null)
+        {
+            throw new ResourceNotFoundException($"Teacher with id {teacherId} not found.");
+        }
+
+        if (course.TeacherId == teacherId)
+        {
+            throw new ConflictException($"Teacher with id {teacherId} is already teaching the course.");
+        }
+
+        course.TeacherId = teacherId;
+        course.Teacher = teacher;
+
+        _context.SaveChanges();
+
+        return Task.FromResult(_mapper.Map<TeacherDto>(teacher));
     }
 
     public async Task<IEnumerable<CourseDto>> GetEnrolledCourseOfAStudentAsync(int studentId)
@@ -297,4 +329,5 @@ public class CourseService : ICourseService
 
         return (true, null);
     }
+
 }

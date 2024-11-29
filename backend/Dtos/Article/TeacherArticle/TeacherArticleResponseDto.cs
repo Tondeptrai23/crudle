@@ -1,8 +1,6 @@
-using System;
+﻿namespace _3w1m.Dtos.Article;
 
-namespace _3w1m.Dtos.Article;
-
-public class ArticleDto
+public class TeacherArticleResponseDto
 {
     public int ArticleId { get; set; }
     public int CourseId { get; set; }
@@ -12,5 +10,4 @@ public class ArticleDto
     public int Order { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public DateTime? ReadAt { get; set; }
 }

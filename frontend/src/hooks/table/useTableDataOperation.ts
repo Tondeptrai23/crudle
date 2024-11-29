@@ -247,6 +247,7 @@ export function useGenericTableData<T>({
       isLoading: query.isLoading,
       isError: query.isError,
       isFetching: query.isFetching,
+      error: query.error,
     },
     sort: {
       sortConfig: sortConfig,

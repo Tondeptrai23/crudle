@@ -1,8 +1,13 @@
-﻿using _3w1m.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using _3w1m.Data;
 using _3w1m.Dtos.Article;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
+using _3w1m.Specifications.Interface;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +25,7 @@ public class ArticleService : IArticleService
     }
 
     public async Task<(int, IEnumerable<ArticleDto>)> GetArticlesAsync(int courseId,
+        IArticleSpecification serviceSpecification,
         ArticleCollectionQueryDto? queryDto)
     {
         queryDto ??= new ArticleCollectionQueryDto();
@@ -30,18 +36,22 @@ public class ArticleService : IArticleService
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var query = _dbContext.Articles.Where(x => x.CourseId == courseId).AsQueryable();
+        IQueryable<Article> query = _dbContext.Articles
+            .Where(x => x.CourseId == courseId)
+            .AsQueryable();
 
+        query = serviceSpecification.Apply(query);
         query = ApplyFilter(query, queryDto);
         query = ApplyOrder(query, queryDto);
 
         var articleCount = await query.CountAsync();
         query = ApplyPagination(query, queryDto);
 
-        return (articleCount, _mapper.Map<IEnumerable<ArticleDto>>(await query.ToListAsync()));
+        var articleDtos = _mapper.Map<IEnumerable<ArticleDto>>(await query.ToListAsync());
+        return (articleCount, articleDtos);
     }
 
-    public async Task<ArticleDetailDto> GetArticleByIdAsync(int articleId, int courseId)
+    public async Task<ArticleDto> GetArticleByIdAsync(int articleId, int courseId, int studentId)
     {
         var course = await _dbContext.Courses.FirstOrDefaultAsync(ar => ar.CourseId == courseId);
         if (course == null)
@@ -49,80 +59,178 @@ public class ArticleService : IArticleService
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var article = await _dbContext.Articles.Where(ar => ar.CourseId == courseId && ar.ArticleId == articleId)
+        if (await _dbContext.Enrollments.AnyAsync(er => er.CourseId == courseId && er.StudentId == studentId) == false)
+        {
+            throw new ForbiddenException("Student not enrolled in this course");
+        }
+
+        var article = await _dbContext.Articles
+            .Include(ar => ar.ArticleProgresses.Where(ap => ap.StudentId == studentId))
+            .Where(ar => ar.CourseId == courseId && ar.ArticleId == articleId)
             .FirstOrDefaultAsync();
         if (article == null)
         {
             throw new ResourceNotFoundException("Article not found");
         }
 
-        return _mapper.Map<ArticleDetailDto>(article);
+        return _mapper.Map<ArticleDto>(article);
     }
 
-    public async Task<ArticleDetailDto> CreateArticleAsync(int courseId, CreateRequestArticleDto article)
+    public async Task<ArticleDto> CreateArticleAsync(int courseId, int teacherId, CreateArticleRequestDto article)
     {
-        var course = await _dbContext.Set<Course>().FirstOrDefaultAsync(x => x.CourseId == courseId);
+        var teacher = await _dbContext.Teachers.FirstOrDefaultAsync(t => t.TeacherId == teacherId);
+        if (teacher == null)
+        {
+            throw new ResourceNotFoundException("Teacher not found");
+        }
+
+        var course = await _dbContext.Courses.FirstOrDefaultAsync(x => x.CourseId == courseId);
         if (course == null)
         {
             throw new ResourceNotFoundException("Course not found");
+        }
+
+        if (course.TeacherId != teacherId)
+        {
+            throw new ForbiddenException("Teacher not authorized to create article for this course");
         }
 
         var newArticle = _mapper.Map<Article>(article);
         newArticle.CourseId = courseId;
         newArticle.CreatedAt = DateTime.Now;
         newArticle.UpdatedAt = DateTime.Now;
+        newArticle.Order = await _dbContext.Articles.Where(a => a.CourseId == courseId).CountAsync() + 1;
 
         _dbContext.Add((object)newArticle);
         await _dbContext.SaveChangesAsync();
 
-        return _mapper.Map<ArticleDetailDto>(newArticle);
+        return _mapper.Map<ArticleDto>(newArticle);
     }
 
-    public async Task<ArticleDetailDto> UpdateArticleAsync(int courseId, int articleId,
-        UpdateRequestArticleDto updateDto)
+    public async Task<ArticleDto> UpdateArticleAsync(int courseId, int articleId, int teacherId,
+        UpdateArticleRequestDto updateArticleDto)
     {
-        var course = await _dbContext.Set<Course>().FirstOrDefaultAsync(c => c.CourseId == courseId);
+        var teacher = await _dbContext.Teachers.FirstOrDefaultAsync(t => t.TeacherId == teacherId);
+        if (teacher == null)
+        {
+            throw new ResourceNotFoundException("Teacher not found");
+        }
+
+        var course = await _dbContext.Courses.Include(course => course.Teacher)
+            .FirstOrDefaultAsync(c => c.CourseId == courseId);
         if (course == null)
         {
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var article = await _dbContext.Set<Article>()
+        if (course.TeacherId != teacherId)
+        {
+            throw new ForbiddenException("Teacher not authorized to update article of this course");
+        }
+
+        var article = await _dbContext.Articles
             .FirstOrDefaultAsync(a => a.CourseId == courseId && a.ArticleId == articleId);
         if (article == null)
         {
             throw new ResourceNotFoundException("Article not found");
         }
 
-        if (updateDto.Title != null)
+        if (updateArticleDto.Title != null)
         {
-            article.Title = updateDto.Title;
+            article.Title = updateArticleDto.Title;
         }
 
-        if (updateDto.Content != null)
+        if (updateArticleDto.Content != null)
         {
-            article.Content = updateDto.Content;
+            article.Content = updateArticleDto.Content;
         }
 
-        if (updateDto.Summary != null)
+        if (updateArticleDto.Summary != null)
         {
-            article.Summary = updateDto.Summary;
+            article.Summary = updateArticleDto.Summary;
         }
 
         article.UpdatedAt = DateTime.Now;
-            
-        return _mapper.Map<ArticleDetailDto>(article);
+
+        await _dbContext.SaveChangesAsync();
+
+        return _mapper.Map<ArticleDto>(article);
     }
 
-    public async Task<DeleteResponseArticleDto> DeleteArticleAsync(int courseId, int articleId)
+
+    public async Task<UpdateArticleProgressDto> MarkArticleAsReadAsync(int courseId, int articleId, int studentId)
     {
-        var course = await _dbContext.Set<Course>().FirstOrDefaultAsync(c => c.CourseId == courseId);
+        var course = await _dbContext.Courses.Include(c => c.Enrollments)
+            .FirstOrDefaultAsync(c => c.CourseId == courseId);
         if (course == null)
         {
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var article = await _dbContext.Set<Article>()
+        var student = await _dbContext.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
+        if (student == null)
+        {
+            throw new ResourceNotFoundException("Student not found");
+        }
+
+        var article = await _dbContext.Articles
+            .Include(ar => ar.ArticleProgresses.Where(ap => ap.StudentId == studentId))
+            .FirstOrDefaultAsync(a => a.ArticleId == articleId && a.CourseId == courseId);
+        if (article == null)
+        {
+            throw new ResourceNotFoundException("Article not found");
+        }
+
+        if (course.Enrollments.Any(e => e.StudentId == studentId) == false)
+        {
+            throw new ForbiddenException("Student not enrolled in this course");
+        }
+
+        var articleProgress = article.ArticleProgresses.FirstOrDefault(ap => ap.StudentId == studentId);
+
+        if (articleProgress != null)
+        {
+            _dbContext.ArticleProgresses.Remove(articleProgress);
+            articleProgress.ReadAt = null;
+        }
+
+        if (articleProgress == null)
+        {
+            articleProgress = new ArticleProgress
+            {
+                ArticleId = articleId,
+                StudentId = studentId,
+                ReadAt = DateTime.Now
+            };
+            _dbContext.ArticleProgresses.Add(articleProgress);
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        return _mapper.Map<UpdateArticleProgressDto>(articleProgress);
+    }
+
+    public async Task<bool> DeleteArticleAsync(int courseId, int articleId, int teacherId)
+    {
+        var teacher = await _dbContext.Teachers.FirstOrDefaultAsync(t => t.TeacherId == teacherId);
+        if (teacher == null)
+        {
+            throw new ResourceNotFoundException("Teacher not found");
+        }
+
+        var course = await _dbContext.Courses.Include(course => course.Teacher)
+            .FirstOrDefaultAsync(c => c.CourseId == courseId);
+        if (course == null)
+        {
+            throw new ResourceNotFoundException("Course not found");
+        }
+
+        if (course.TeacherId != teacherId)
+        {
+            throw new ForbiddenException("Teacher not authorized to delete this course");
+        }
+
+        var article = await _dbContext.Articles
             .FirstOrDefaultAsync(a => a.CourseId == courseId && a.ArticleId == articleId);
         if (article == null)
         {
@@ -130,12 +238,54 @@ public class ArticleService : IArticleService
         }
 
         _dbContext.Remove(article);
-        var response = new DeleteResponseArticleDto
-        {
-            Success = await _dbContext.SaveChangesAsync() > 0
-        };
 
-        return response;
+        // Update order of articles, decrease order of articles after the deleted article
+        var articles = await _dbContext.Articles
+            .Where(a => a.CourseId == courseId && a.Order > article.Order)
+            .ToListAsync();
+        foreach (var a in articles)
+        {
+            a.Order--;
+        }
+
+        return await _dbContext.SaveChangesAsync() > 0;
+    }
+
+    public async Task<IEnumerable<ArticleDto>> UpdateArticleOrderAsync(int courseId, int[] articleIds, int teacherId)
+    {
+        var teacher = await _dbContext.Teachers.FirstOrDefaultAsync(t => t.TeacherId == teacherId);
+        if (teacher == null)
+        {
+            throw new ResourceNotFoundException("Teacher not found");
+        }
+
+        var course = await _dbContext.Courses.Include(course => course.Teacher)
+            .FirstOrDefaultAsync(c => c.CourseId == courseId);
+        if (course == null)
+        {
+            throw new ResourceNotFoundException("Course not found");
+        }
+
+        if (course.TeacherId != teacherId)
+        {
+            throw new ForbiddenException("Teacher not authorized to update article order of this course");
+        }
+
+        var articles = await _dbContext.Articles.Where(a => a.CourseId == courseId).ToListAsync();
+        if (articles.Count != articleIds.Length)
+        {
+            throw new ConflictException("Article count does not match");
+        }
+
+        var articleDict = articles.ToDictionary(a => a.ArticleId);
+        for (var i = 0; i < articleIds.Length; i++)
+        {
+            articleDict[articleIds[i]].Order = i + 1;
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        return _mapper.Map<IEnumerable<ArticleDto>>(articles);
     }
 
     private IQueryable<Article> ApplyFilter(IQueryable<Article> query, ArticleCollectionQueryDto queryDto)
