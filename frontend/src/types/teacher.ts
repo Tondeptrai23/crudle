@@ -25,3 +25,8 @@ export interface UpdateTeacherDTO {
   contactEmail?: string;
   contactPhone?: string;
 }
+
+export interface TeacherResponse {
+  TeacherId: string;
+  Fullname: string;
+}
