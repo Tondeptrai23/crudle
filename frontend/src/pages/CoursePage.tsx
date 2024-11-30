@@ -1,11 +1,12 @@
 import api from '@/utils/api';
 import { useQuery } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
-import { CourseCard } from '@/components/common/course/CourseCard';
+import { CourseCard } from '@/components/course/CourseCard';
 import { Breadcrumb } from '@/components/common/ui/breadcrumb';
 import React from 'react';
 import { CourseResponse } from '@/types/course';
 import Course from '@/types/course';
+import CourseSkeleton from '@/components/course/CourseSkeleton';
 
 const mapToCourse = (response: CourseResponse): Course => ({
   id: response.CourseId.toString(),
@@ -32,7 +33,12 @@ const CoursePage: React.FC = () => {
     queryFn: fetchCourses,
   });
 
-  if (isPending) return <div>Loading...</div>;
+  if (isPending)
+    return (
+      <div className='container mx-auto px-4 py-8'>
+        <CourseSkeleton />
+      </div>
+    );
 
   if (error) {
     throw error;

@@ -7,7 +7,7 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from '../ui/card';
+} from '../common/ui/card';
 import Course from '@/types/course';
 
 interface TeacherInfoProps {
