@@ -57,7 +57,6 @@ export type QueryHook<T> = (
 export type QueryHookParams = {
   page: number;
   pageSize: number;
-  search: string;
   filters: Record<string, FilterParams>;
   sort: SortConfig;
 };

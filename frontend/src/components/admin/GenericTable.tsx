@@ -19,13 +19,14 @@ import {
   useTableAdd,
   useTableDelete,
   useTableEdit,
-  useTableSearch,
 } from '@/hooks/table/useTableDataOperation';
 import { GenericTableProps } from '@/types/table';
 import { PlusCircle } from 'lucide-react';
 import { useMemo } from 'react';
+import DateRangeFilter from '../common/filter/DateRangeFilter';
 import EnumFilter from '../common/filter/EnumFilter';
 import RangeFilter from '../common/filter/RangeFilter';
+import SearchFilter from '../common/filter/SearchFilter';
 import { Accordion } from '../common/ui/accordion';
 import LoadingButton from '../common/ui/LoadingButton';
 import { Separator } from '../common/ui/separator';
@@ -45,7 +46,7 @@ const GenericTable = <T extends { id: string }>({
     (column) => column.isDefaultSort,
   )?.header;
 
-  let { data, pagination, state, sort, search, filters } = useGenericTableData({
+  let { data, pagination, state, sort, filters } = useGenericTableData({
     useQueryHook: queryHook,
     filterOptions,
     defaultSortColumn,
@@ -64,7 +65,6 @@ const GenericTable = <T extends { id: string }>({
   const { isDeleting, deletingRow, handleDelete } = useTableDelete(actions);
   const { isAdding, dialogOpen, setDialogOpen, handleAdd, handleShowDialog } =
     useTableAdd(actions);
-  const { handleInputChange } = useTableSearch(search.onChange);
 
   const tableBody = useMemo(() => {
     if (state.isFetching) {
@@ -72,6 +72,10 @@ const GenericTable = <T extends { id: string }>({
     }
 
     if (data.length === 0 || state.isError) {
+      if (state.isError) {
+        throw state.error;
+      }
+
       return (
         <TableBody>
           <TableRow>
@@ -79,7 +83,7 @@ const GenericTable = <T extends { id: string }>({
               className='text-center text-red-500'
               colSpan={columns.length + 1}
             >
-              {state.isError ? 'An error occurred' : 'No data found'}
+              No data found
             </TableCell>
           </TableRow>
         </TableBody>
@@ -190,6 +194,7 @@ const GenericTable = <T extends { id: string }>({
                 componentType='accordion'
               />
             );
+
           case 'range':
             return (
               <RangeFilter
@@ -200,6 +205,28 @@ const GenericTable = <T extends { id: string }>({
                 componentType='accordion'
               />
             );
+
+          case 'date':
+            return (
+              <DateRangeFilter
+                key={filterOption.id}
+                value={filters.value[filterOption.id] as [Date, Date]}
+                onChange={(value) => filters.onChange(filterOption.id, value)}
+                {...filterOption}
+                componentType='accordion'
+              />
+            );
+
+          case 'search':
+            return (
+              <SearchFilter
+                key={filterOption.id}
+                onChange={(value) => filters.onChange(filterOption.id, value)}
+                {...filterOption}
+                componentType='accordion'
+              />
+            );
+
           default:
             return null;
         }
@@ -213,17 +240,11 @@ const GenericTable = <T extends { id: string }>({
 
   return (
     <>
-      <div className='flex min-w-64 flex-col gap-4 rounded-md border-2 px-4'>
+      <div className='flex h-full min-w-64 flex-col gap-4 rounded-md border-2 px-4'>
         <h2 className='pt-4 text-center text-2xl font-semibold'>
           {tableTitle} List
         </h2>
-        <div className='flex items-center justify-center gap-2'>
-          <Input
-            placeholder={`Search ${tableTitle.toLowerCase()}...`}
-            className='w-full'
-            onChange={handleInputChange}
-          />
-        </div>
+
         <LoadingButton
           variant='outline'
           className='w-full items-center gap-2'
@@ -245,7 +266,7 @@ const GenericTable = <T extends { id: string }>({
         )}
       </div>
 
-      <div className='flex-grow rounded-md border-2'>
+      <div className='flex-grow'>
         <Table>
           {tableHeader}
 

@@ -1,8 +1,15 @@
 export default interface Student {
   id: string;
   fullname: string;
-  email: string;
+  userId: string;
   dob: string;
+}
+
+export interface StudentCollectionResponse {
+  StudentId: string;
+  Fullname: string;
+  DateOfBirth: string;
+  UserId: string;
 }
 
 export interface CreateStudentDTO {

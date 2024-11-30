@@ -63,9 +63,23 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasForeignKey(rt => rt.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Article>()
+            .HasOne(a => a.Course)
+            .WithMany(c => c.Articles);
+
+        modelBuilder.Entity<ArticleProgress>().HasKey(ag => ag.ArticleProgressId);
+        modelBuilder.Entity<ArticleProgress>()
+            .HasOne(ag => ag.Article)
+            .WithMany(ar => ar.ArticleProgresses)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ArticleProgress>()
+            .HasOne(ag => ag.Student)
+            .WithMany(st => st.ArticleProgresses)
+            .OnDelete(DeleteBehavior.Cascade);
+            
         // Seed data 
         var hasher = new PasswordHasher<User>();
-        
+
         var listUser = new List<User>()
         {
             new User
@@ -114,7 +128,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Id = UserSeeding.AdminId
             }
         };
-        
+
         // Seed role
         var listRoles = new List<IdentityRole>()
         {
@@ -142,12 +156,12 @@ public class ApplicationDbContext : IdentityDbContext<User>
            }
         };
         modelBuilder.Entity<Teacher>().HasData(listTeacher);
-        
+
         modelBuilder.Entity<IdentityUserRole<string>>().HasData(
             new IdentityUserRole<string> { RoleId = "2", UserId = listUser[0].Id }
         );
-        
-        
+
+
         var listStudent = new List<Student>()
         {
             new Student
@@ -166,12 +180,12 @@ public class ApplicationDbContext : IdentityDbContext<User>
             }
         };
         modelBuilder.Entity<Student>().HasData(listStudent);
-        
+
         modelBuilder.Entity<IdentityUserRole<string>>().HasData(
             new IdentityUserRole<string> { RoleId = "3", UserId = listUser[1].Id },
             new IdentityUserRole<string> { RoleId = "3", UserId = listUser[2].Id }
         );
-        
+
         var listCourse = new List<Course>()
         {
             new Course
@@ -194,8 +208,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
             }
         };
 
-
-
         var listEnrollment = new List<Enrollment>()
         {
             new Enrollment
@@ -214,6 +226,44 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
         modelBuilder.Entity<Course>().HasData(listCourse);
         modelBuilder.Entity<Enrollment>().HasData(listEnrollment);
+
+        var listArticle = new List<Article>()
+        {
+            new()
+            {
+                ArticleId = 1,
+                CourseId = 1,
+                Title = "Article 1",
+                Summary = "Summary 1",
+                Content = "Content 1",
+                Order = 1,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            },
+            new()
+            {
+                ArticleId = 2,
+                CourseId = 1,
+                Title = "Article 2",
+                Summary = "Summary 2",
+                Content = "Content 2",
+                Order = 2,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            }
+        };
+        modelBuilder.Entity<Article>().HasData(listArticle);
+
+        modelBuilder.Entity<ArticleProgress>().HasData(
+            new List<ArticleProgress>() {
+                new() {
+                    ArticleProgressId = 1,
+                    ArticleId = 1,
+                    StudentId = 1,
+                    ReadAt = DateTime.Now
+                }
+            }
+        );
     }
 
     public DbSet<Student> Students { get; set; }
@@ -223,6 +273,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Article> Articles { get; set; }
+    public DbSet<ArticleProgress> ArticleProgresses { get; set; }
 
     private static class UserSeeding
     {

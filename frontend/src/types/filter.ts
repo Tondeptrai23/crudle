@@ -8,7 +8,7 @@ export interface BaseFilterOption {
   id: string;
   label?: string;
   labelIcon?: React.FC<React.SVGProps<SVGSVGElement>>;
-  type: 'enum' | 'range';
+  type: 'enum' | 'range' | 'date' | 'search';
   componentType?: 'popover' | 'accordion';
 }
 
@@ -27,6 +27,24 @@ export interface EnumFilterOption extends BaseFilterOption {
   type: 'enum';
 }
 
-export type FilterParams = string[] | [number, number];
+export interface DateRangeFilterOption extends BaseFilterOption {
+  minDate: Date;
+  maxDate: Date;
+  onChange?: (range: [Date, Date]) => void;
+  value?: [Date, Date];
+  type: 'date';
+}
 
-export type FilterOption = RangeFilterOption | EnumFilterOption;
+export interface SearchFilterOption extends BaseFilterOption {
+  value?: string;
+  onChange?: (value: string) => void;
+  type: 'search';
+}
+
+export type FilterParams = string[] | [number, number] | string | [Date, Date];
+
+export type FilterOption =
+  | RangeFilterOption
+  | EnumFilterOption
+  | DateRangeFilterOption
+  | SearchFilterOption;

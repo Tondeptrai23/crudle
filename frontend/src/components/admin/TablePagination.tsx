@@ -25,7 +25,6 @@ const TablePagination = ({
   onPageChange,
   onPageSizeChange,
 }: TablePaginationProps) => {
-  // Validate current page is within bounds
   React.useEffect(() => {
     if (currentPage > totalPages) {
       onPageChange(totalPages);
