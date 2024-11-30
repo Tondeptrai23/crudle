@@ -1,8 +1,10 @@
 ﻿using _3w1m.Constants;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Article;
+using _3w1m.Dtos.Assignment;
 using _3w1m.Dtos.Course;
 using _3w1m.Models.Domain;
+using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
 using _3w1m.Specifications;
 using AutoMapper;
@@ -23,22 +25,25 @@ public class CourseController : ControllerBase
     private readonly ITeacherService _teacherService;
     private readonly IArticleService _articleService;
     private readonly IMapper _mapper;
+    private readonly IAssignmentService _assignmentService;
 
     public CourseController(UserManager<User> userManager, ICourseService courseService,
-        ITeacherService teacherService, IArticleService articleService, IMapper mapper)
+        ITeacherService teacherService, IArticleService articleService, IMapper mapper,
+        IAssignmentService assignmentService)
     {
         _mapper = mapper;
         _userManager = userManager;
         _courseService = courseService;
         _teacherService = teacherService;
         _articleService = articleService;
+        _assignmentService = assignmentService;
     }
 
     [HttpGet]
     [Route("Detail/{courseId:int}")]
     public async Task<IActionResult> GetCoursesDetail([FromRoute] int courseId)
     {
-        var user = await _userManager.GetUserAsync(this.User);
+        var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             return Unauthorized();
@@ -49,7 +54,6 @@ public class CourseController : ControllerBase
         return Ok(new ResponseDto<CourseDetailDto>(course));
         throw new NotImplementedException();
     }
-
 
     [HttpGet]
     [Route("{courseId:int}")]
@@ -78,7 +82,7 @@ public class CourseController : ControllerBase
     [Route("{courseId:int}/Article")]
     public async Task<IActionResult> CreateArticle([FromRoute] int courseId, CreateArticleRequestDto dto)
     {
-        var user = await _userManager.GetUserAsync(this.User);
+        var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             return Unauthorized();
@@ -94,10 +98,15 @@ public class CourseController : ControllerBase
     public async Task<IActionResult> UpdateArticle([FromRoute] int courseId, [FromRoute] int articleId,
         UpdateArticleRequestDto dto)
     {
-        var user = await _userManager.GetUserAsync(this.User);
+        var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             return Unauthorized();
+        }
+
+        if (await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This teacher is not allowed to create assignment for this course");
         }
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
@@ -109,7 +118,7 @@ public class CourseController : ControllerBase
     [Route("{courseId:int}/Article/{articleId:int}")]
     public async Task<IActionResult> DeleteArticle([FromRoute] int courseId, [FromRoute] int articleId)
     {
-        var user = await _userManager.GetUserAsync(this.User);
+        var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
             return Unauthorized();
@@ -134,5 +143,47 @@ public class CourseController : ControllerBase
         var article = await _articleService.UpdateArticleOrderAsync(courseId, articleIds, teacher.TeacherId);
         return Ok(new ResponseDto<IEnumerable<TeacherMinimalArticleDto>>(
             _mapper.Map<IEnumerable<TeacherMinimalArticleDto>>(article)));
+    }
+
+    [HttpPost]
+    [Route("{courseId:int}/Assignment")]
+    public async Task<IActionResult> CreateAssignment([FromRoute] int courseId,
+        [FromBody] CreateAssignmentRequestDto createAssignmentRequestDto)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This teacher is not allowed to create assignment for this course");
+        }
+
+        var assignment = await _assignmentService.CreateAssignmentAsync(courseId, createAssignmentRequestDto);
+        return Ok(new ResponseDto<AssignmentDto>(assignment));
+    }
+
+
+    [HttpGet]
+    [Route("{courseId:int}/Assignments")]
+    public async Task<IActionResult> GetAssignments([FromRoute] int courseId,
+        [FromQuery] AssignmentCollectionQueryDto queryDto)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This teacher is not allowed to create assignment for this course");
+        }
+
+        var (count, assignments) = await _assignmentService.GetAssignmentsAsync(courseId, queryDto);
+        return Ok(new PaginationResponseDto<IEnumerable<AssignmentDto>>(assignments, count, queryDto.Page,
+            queryDto.Size));
     }
 }
