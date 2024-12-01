@@ -373,6 +373,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 AssignmentId = 1,
                 CourseId = 3,
                 Name = "Assignment 1",
+                Content = "Content 1",
                 DueDate = new DateTime(2025, 1, 1),
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
