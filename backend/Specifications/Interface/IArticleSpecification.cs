@@ -2,7 +2,7 @@
 
 namespace _3w1m.Specifications.Interface;
 
-public interface IArticleSpecification
+public interface IArticleSpecification : IBaseSpecification<Article>
 {
     IQueryable<Article> Apply(IQueryable<Article> query);
 }

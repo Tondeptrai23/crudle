@@ -58,7 +58,8 @@ public interface ICourseService
     /// <returns>The task contain a collection of Student</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the course or the student is not found</exception>
     /// <exception cref="ConflictException">Thrown when the student is already enrolled in the course</exception>
-    Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId, EnrollStudentToCourseRequestDto enrollRequest);
+    Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId,
+        EnrollStudentToCourseRequestDto enrollRequest);
 
     /// <summary>
     /// Get all courses that a student is enrolled in
@@ -71,12 +72,11 @@ public interface ICourseService
     /// <summary>
     /// Get all courses that a teacher is teaching
     /// </summary>
-    /// <param name="teacherId">The unique identifier of the teacher</param>
     /// <param name="courseId">The unique identifier of the course</param>
     /// <returns>The task contains a collection of courses that a teacher is teaching</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the teacher or the course is not found</exception>
     /// <exception cref="ForbiddenException">Thrown when the teacher is not teaching the course</exception>
-    Task<CourseDetailDto> GetCourseDetailAsync(int teacherId, int courseId);
+    Task<CourseDetailDto> GetCourseDetailAsync(int courseId);
 
     /// <summary>
     /// Enroll teacher into the course
@@ -88,4 +88,6 @@ public interface ICourseService
     /// <exception cref="ConflictException">Thrown when the teacher is already enrolled in the course</exception>
     /// <exception cref="ForbiddenException">Thrown when the teacher is not teaching the course</exception>
     Task<TeacherDto> EnrollTeacherIntoCourseAsync(int courseId, EnrollTeacherToCourseRequestDto enrollRequest);
+
+    Task<bool> CourseEnrolledUserValidationAsync(int courseId, String userId);
 }
