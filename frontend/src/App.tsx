@@ -1,46 +1,94 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import Nav from './components/common/Nav.tsx';
-import { Separator } from './components/common/ui/separator.tsx';
+import ErrorBoundary from './components/auth/ErrorBoundary.tsx';
+import Logout from './components/auth/Logout.tsx';
+import RequireAuth from './components/auth/RequireAuth.tsx';
+import { Toaster } from './components/common/ui/toaster.tsx';
+import MainLayout from './components/MainLayout.tsx';
+import { AuthProvider } from './hooks/useAuth.tsx';
+import AdminCoursePage from './pages/admin/AdminCoursePage.tsx';
+import AdminHomePage from './pages/admin/AdminHomePage.tsx';
+import AdminStudentPage from './pages/admin/AdminStudentPage.tsx';
+import AdminTeacherPage from './pages/admin/AdminTeacherPage.tsx';
 import CoursePage from './pages/CoursePage.tsx';
+import { LoginPage } from './pages/LoginPage.tsx';
 import { WeatherPage } from './pages/WeatherPage.tsx';
+import { Role } from './types/enums.ts';
+import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        if (error instanceof RefreshTokenExpiredError) {
+          return false;
+        }
+        if (error instanceof ForbiddenError) {
+          return false;
+        }
+        return failureCount < 3;
+      },
+    },
+  },
+});
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Nav
-        className='max-h-18 max-w-full'
-        items={[
-          { label: 'Weather', path: '/' },
-          { label: 'Course', path: '/course' },
-        ]}
-        handleNotification={() => {
-          console.log('Notification clicked');
-        }}
-        profileActions={{
-          handleLogout: () => {
-            console.log('Logout clicked');
-          },
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <Routes>
+            <Route path='/login' element={<LoginPage />} />
+            <Route
+              path='/admin/*'
+              element={
+                <ErrorBoundary>
+                  <RequireAuth allowedRoles={[Role.Admin]}>
+                    <MainLayout>
+                      <Routes>
+                        <Route path='/' element={<AdminHomePage />} />
+                        <Route path='/course' element={<AdminCoursePage />} />
+                        <Route path='/student' element={<AdminStudentPage />} />
+                        <Route path='/teacher' element={<AdminTeacherPage />} />
+                        <Route path='*' element={<div>Not Found</div>} />
+                      </Routes>
+                    </MainLayout>
+                  </RequireAuth>
+                </ErrorBoundary>
+              }
+            />
 
-          handleProfile: () => {
-            console.log('Profile clicked');
-          },
+            <Route
+              path='/*'
+              element={
+                <ErrorBoundary>
+                  <RequireAuth allowedRoles={[Role.User]}>
+                    <MainLayout>
+                      <Routes>
+                        <Route path='/' element={<WeatherPage />} />
+                        <Route path='/course' element={<CoursePage />} />
 
-          handleSettings: () => {
-            console.log('Settings clicked');
-          },
-        }}
-      />
+                        <Route path='/profile' element={<div>Profile</div>} />
+                        <Route path='/settings' element={<div>Settings</div>} />
+                        <Route path='*' element={<div>Not Found</div>} />
+                      </Routes>
+                    </MainLayout>
+                  </RequireAuth>
+                </ErrorBoundary>
+              }
+            />
+            <Route path='/logout' element={<Logout />} />
+            <Route path='*' element={<div>Not Found</div>} />
+          </Routes>
+        </Router>
+        <Toaster />
 
-      <Separator />
-
-      <main className='flex-grow'>
-        <Routes>
-          <Route path='/' element={<WeatherPage />} />
-          <Route path='/course' element={<CoursePage />} />
-        </Routes>
-      </main>
-    </Router>
+        {/* Debugging */}
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </AuthProvider>
   );
 };
 

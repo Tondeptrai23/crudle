@@ -2,41 +2,56 @@ import { Button } from '@/components/common/ui/button';
 import {
   NavigationMenu,
   NavigationMenuItem,
-  NavigationMenuLink,
+  // NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/common/ui/navigation-menu';
 import { cn } from '@/lib/utils';
+import useAuth from '@/hooks/useAuth';
 import { Bell } from 'lucide-react';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
-import Profile, { ProfileActions } from './Profile';
+import Profile, { ProfileMenuItem } from './Profile';
 
 export interface NavProps {
   className?: string;
   items: { path: string; label: string }[];
   handleNotification: () => void;
-  profileActions: ProfileActions;
+  profileItems: ProfileMenuItem[];
 }
 
 const Nav: React.FC<NavProps> = (props) => {
   const { pathname } = useLocation();
+  const { role } = useAuth();
 
   const generateNavigationItem = (path: string, label: string) => {
     const baseClass = 'px-3 py-1 font-semibold cursor-pointer';
-    const selectedClass = 'bg-zinc-200 rounded-lg';
+    const selectedClass = 'bg-blue-500 rounded-lg text-white';
+
+    const currentSegments = pathname.split('/').filter(Boolean);
+    const pathSegments = path.split('/').filter(Boolean);
 
     const isSelected =
-      (path === '/' && pathname === '/') ||
-      (path !== '/' && pathname.startsWith(path));
+      path === '/'
+        ? pathname === '/'
+        : pathSegments.length === currentSegments.length && // Must be same depth
+          pathSegments.every(
+            (segment, index) => segment === currentSegments[index],
+          );
 
     const classValue = `${baseClass} ${isSelected ? selectedClass : ''}`.trim();
 
     return (
       <NavigationMenuItem key={path}>
+        {/* This <NavigationMenuLink> component is actually a <a> tag with some styles.
+        When we work with React Router, we should use the <Link> component from the 'react-router-dom' library.
+
         <NavigationMenuLink href={path}>
           <div className={classValue}>{label}</div>
-        </NavigationMenuLink>
+        </NavigationMenuLink> */}
+        <Link to={path} replace>
+          <div className={classValue}>{label}</div>
+        </Link>
       </NavigationMenuItem>
     );
   };
@@ -50,7 +65,7 @@ const Nav: React.FC<NavProps> = (props) => {
         <Logo />
         <NavigationMenuList className='gap-4'>
           {props.items.map(({ path, label }) =>
-            generateNavigationItem(path, label)
+            generateNavigationItem(path, label),
           )}
         </NavigationMenuList>
       </div>
@@ -63,11 +78,7 @@ const Nav: React.FC<NavProps> = (props) => {
         >
           <Bell />
         </Button>
-        <Profile
-          name='John Doe'
-          role='Hoc Sinh'
-          actions={props.profileActions}
-        />
+        <Profile name='John Doe' role={role} items={props.profileItems} />
       </div>
     </NavigationMenu>
   );
