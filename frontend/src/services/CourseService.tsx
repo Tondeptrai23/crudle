@@ -2,6 +2,8 @@ import Course, {
   CourseResponse,
   CreateCourseDTO,
   UpdateCourseDTO,
+  Article,
+  ArticleResponse,
 } from '@/types/course';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import api from '@/utils/api';
@@ -90,5 +92,53 @@ export default class CourseService {
     }
 
     return response.data.Data;
+  };
+
+  getArticlesByStudent: (id: string, data: {
+    title?: string;
+    summary?: string;
+    content?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    page?: number;
+    size?: number;
+    orderBy?: string;
+    orderDirection?: 'asc' | 'desc';
+  }) => Promise<ApiResponse<Article>> = async (id, data) => {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    if (data.page && data.page < 1) {
+      data.page = 1;
+    }
+
+    let query = `page=${data.page || 1}&size=${data.size || 10}&orderBy=${data.orderBy || 'createdAt'}&orderDirection=${data.orderDirection || 'asc'}`;
+    query += data.title ? `&title=${data.title}` : '';
+    query += data.summary ? `&summary=${data.summary}` : '';
+    query += data.content ? `&content=${data.content}` : '';
+    query += data.createdAt ? `&createdAt=${data.createdAt}` : '';
+    query += data.updatedAt ? `&updatedAt=${data.updatedAt}` : '';
+
+    const response = await api.get(`/api/student/course/${id}/articles?${query}`);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    const articles: Article[] = response.data.Data.map((article: ArticleResponse) => {
+      return {
+        id: article.ArticleId,
+        title: article.Title, 
+        summary: article.Summary,
+        content: article.Content,
+        createdAt: article.CreatedAt,
+        updatedAt: article.UpdatedAt,
+      };
+    });
+
+    return {
+      data: articles,
+      totalItems: response.data.TotalItems,
+      totalPages: response.data.TotalPages,
+      currentPage: response.data.CurrentPage,
+    };
   };
 }

@@ -13,6 +13,7 @@ const courseService = new CourseService();
 const courseKeys = {
   lists: () => ['courses'],
   detail: (id: string) => ['courses', id],
+  articles: (courseId: string) => ['articles', courseId],
 };
 
 export const useCourses = (data: QueryHookParams) => {
@@ -46,6 +47,18 @@ export const useCourses = (data: QueryHookParams) => {
         orderBy: sort.key ?? undefined,
         orderDirection: sort.direction || 'asc',
       }),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+};
+
+export const useArticles = (courseId: string) => {
+  return useQuery({
+    queryKey: courseKeys.articles(courseId),
+    queryFn: () =>
+      courseService.getArticlesByStudent(courseId, {}),
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
