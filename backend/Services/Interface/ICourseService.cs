@@ -88,6 +88,12 @@ public interface ICourseService
     /// <exception cref="ConflictException">Thrown when the teacher is already enrolled in the course</exception>
     /// <exception cref="ForbiddenException">Thrown when the teacher is not teaching the course</exception>
     Task<TeacherDto> EnrollTeacherIntoCourseAsync(int courseId, EnrollTeacherToCourseRequestDto enrollRequest);
-
+    
+    /// <summary>
+    /// Validate if the user is enrolled in the course
+    /// </summary>
+    /// <param name="courseId">The unique identifier of the course</param>
+    /// <param name="userId">The unique identifier of the user</param>
+    /// <returns>The task contain a boolean value</returns>
     Task<bool> CourseEnrolledUserValidationAsync(int courseId, String userId);
 }
