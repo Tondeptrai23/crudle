@@ -33,6 +33,7 @@ public class MappingProfile : Profile
         CreateMap<CreateCourseRequestDto, Course>();
         CreateMap<Course, CourseDto>();
         CreateMap<CourseDto, Course>();
+        CreateMap<CourseDto, CourseMinimalDto>();
         CreateMap<Course, CourseDetailDto>();
         CreateMap<CourseDetailDto, Course>();
         CreateMap<UpdateRequestCourseDto, Course>();
