@@ -9,4 +9,6 @@ public class Question
     
     public Assignment Assignment { get; set; }
     public ICollection<Answer> Answers { get; set; }
+    
+    public ICollection<StudentAnswer> StudentAnswers { get; set; }
 }

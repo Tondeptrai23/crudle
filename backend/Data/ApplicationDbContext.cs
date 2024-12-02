@@ -95,7 +95,34 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .WithMany(c => c.Assignments)
             .HasForeignKey(asgmt => asgmt.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasKey(asgmtSub => asgmtSub.SubmissionId);
+        
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasOne<Assignment>(asgmtSub => asgmtSub.Assignment)
+            .WithMany(asgmt => asgmt.Submissions)
+            .HasForeignKey(asgmtSub => asgmtSub.AssignmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasOne<Student>(asgmtSub => asgmtSub.Student)
+            .WithMany(st => st.Submissions)
+            .HasForeignKey(asgmtSub => asgmtSub.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<StudentAnswer>()
+            .HasOne<Question>(stAns => stAns.Question)
+            .WithMany(ques => ques.StudentAnswers)
+            .HasForeignKey(stAns => stAns.QuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<StudentAnswer>()
+            .HasOne<AssignmentSubmission>(stAns => stAns.Submission)
+            .WithMany(asgmtSub => asgmtSub.Answers)
+            .HasForeignKey(stAns => stAns.SubmissionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         // Seed data 
         var hasher = new PasswordHasher<User>();
 
@@ -394,6 +421,34 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 }
             }
         );
+        
+        modelBuilder.Entity<AssignmentSubmission>().HasData(
+            new List<AssignmentSubmission>() {
+                new() {
+                    SubmissionId = 1,
+                    AssignmentId = 1,
+                    StudentId = 2,
+                    SubmittedAt = DateTime.Now
+                }
+            }
+        );
+        
+        modelBuilder.Entity<StudentAnswer>().HasData(
+            new List<StudentAnswer>() {
+                new() {
+                    StudentAnswerId = 1,
+                    QuestionId = 1,
+                    SubmissionId = 1,
+                    Value = "Answer 1"
+                },
+                new() {
+                    StudentAnswerId = 2,
+                    QuestionId = 2,
+                    SubmissionId = 1,
+                    Value = "Answer 3"
+                }
+            }
+        );
     }
 
     public DbSet<Student> Students { get; set; }
@@ -406,6 +461,10 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Answer> Answers { get; set; }
     public DbSet<Question> Questions { get; set; }
     public DbSet<Assignment> Assignments { get; set; }
+    
+    public DbSet<AssignmentSubmission> AssignmentSubmissions { get; set; }
+    
+    public DbSet<StudentAnswer> StudentAnswers { get; set; }
 
     private static class UserSeeding
     {

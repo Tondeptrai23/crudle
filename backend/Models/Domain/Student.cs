@@ -14,4 +14,6 @@ public class Student
     
     public ICollection<Enrollment> Enrollments { get; set; }
     public ICollection<ArticleProgress> ArticleProgresses { get; set; }
+    
+    public ICollection<AssignmentSubmission> Submissions { get; set; }
 }
