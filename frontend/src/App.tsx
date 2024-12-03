@@ -15,6 +15,7 @@ import AdminTeacherPage from './pages/admin/AdminTeacherPage.tsx';
 import CoursePage from './pages/CoursePage.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { WeatherPage } from './pages/WeatherPage.tsx';
+import CourseDetailPage from './pages/CourseDetailPage.tsx';
 import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 
@@ -69,7 +70,10 @@ const App: React.FC = () => {
                       <Routes>
                         <Route path='/' element={<WeatherPage />} />
                         <Route path='/course' element={<CoursePage />} />
-
+                        <Route
+                          path='/course/:courseId'
+                          element={<CourseDetailPage />}
+                        />
                         <Route path='/profile' element={<div>Profile</div>} />
                         <Route path='/settings' element={<div>Settings</div>} />
                         <Route path='*' element={<div>Not Found</div>} />

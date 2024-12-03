@@ -7,6 +7,11 @@ import { ApiResponse } from '@/types/paginationApiResponse';
 import api from '@/utils/api';
 
 export default class CourseService {
+  async getCoursesByStudent(): Promise<CourseResponse[]> {
+    const response = await api.get('/api/Student/Course');
+    return response.data.Data;
+  }
+
   getCoursesByAdmin: (data: {
     page?: number;
     size?: number;
@@ -92,3 +97,13 @@ export default class CourseService {
     return response.data.Data;
   };
 }
+
+export const mapToCourse = (response: CourseResponse) => ({
+  id: response.CourseId.toString(),
+  name: response.Name,
+  description: response.Description,
+  code: response.Code,
+  startDate: response.StartDate,
+  teacherId: response.Teacher.TeacherId.toString(),
+  teacherName: response.Teacher.Fullname,
+});

@@ -1,41 +1,44 @@
 import api from '@/utils/api';
 import { useQuery } from '@tanstack/react-query';
+import { useStudentCourses } from '@/hooks/api/useCourseApi';
+import { Navigate } from 'react-router-dom';
+import { CourseCard } from '@/components/course/CourseCard';
+import { Breadcrumb } from '@/components/common/ui/breadcrumb';
 import React from 'react';
-
-interface Course {
-  CourseId: number;
-  Name: string;
-}
-
-const fetchCourses = async () => {
-  const response = await api.get('/api/Admin/Course');
-  return response.data.Data;
-};
+import { CourseResponse } from '@/types/course';
+import Course from '@/types/course';
+import CourseSkeleton from '@/components/course/CourseSkeleton';
+import { mapToCourse } from '@/services/CourseService';
 
 const CoursePage: React.FC = () => {
-  const {
-    data: courses,
-    isPending,
-    error,
-  } = useQuery({
-    queryKey: ['courses'],
-    queryFn: fetchCourses,
-  });
+  const { data: courses, isPending, error } = useStudentCourses();
 
-  if (isPending) return <div>Loading...</div>;
+  if (isPending)
+    return (
+      <div className='container mx-auto px-4 py-8'>
+        <CourseSkeleton />
+      </div>
+    );
 
   if (error) {
     throw error;
   }
 
   return (
-    <div>
-      <h1>Courses</h1>
-      <ul>
-        {courses.map((course: Course) => (
-          <li key={course.CourseId}>{course.Name}</li>
+    <div className='container mx-auto px-4 py-8'>
+      <h1 className='mb-8 scroll-m-20 text-3xl font-bold tracking-tight lg:text-4xl'>
+        Courses
+      </h1>
+      <div className='grid w-full gap-6'>
+        {courses?.map((course) => (
+          <CourseCard key={course.CourseId} {...mapToCourse(course)} />
         ))}
-      </ul>
+        {!courses?.length && (
+          <p className='col-span-full text-center text-red-500'>
+            No courses available
+          </p>
+        )}
+      </div>
     </div>
   );
 };
