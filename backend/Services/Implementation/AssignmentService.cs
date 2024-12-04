@@ -99,7 +99,7 @@ public class AssignmentService : IAssignmentService
     {
         var assignment = await _dbContext.Assignments.Include(a => a.Questions)
             .ThenInclude(q => q.Answers)
-            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId    
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId
                                       && c.CourseId == courseId);
         if (assignment == null)
         {
@@ -109,60 +109,50 @@ public class AssignmentService : IAssignmentService
         var score = 0;
         var submittedAt = DateTime.Now;
 
-        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
-        try
+        var submission = new AssignmentSubmission
         {
-            var submission = (await _dbContext.AssignmentSubmissions.AddAsync(new AssignmentSubmission
+            AssignmentId = assignmentId,
+            StudentId = studentId,
+            SubmittedAt = submittedAt
+        };
+
+        var studentAnswers = new List<StudentAnswer>();
+        foreach (var answer in requestDto.Answers)
+        {
+            var questionEntity = assignment.Questions.FirstOrDefault(q => q.QuestionId == answer.QuestionId);
+            if (questionEntity == null)
             {
-                AssignmentId = assignmentId,
-                StudentId = studentId,
-                SubmittedAt = submittedAt
-            })).Entity;
-            
-            // Save changes to get the submission id
-            await _dbContext.SaveChangesAsync();
-            
-            foreach (var answer in requestDto.Answers)
+                throw new ResourceNotFoundException("Question not found");
+            }
+
+            if (questionEntity.Type == "Multiple Choice")
             {
-                var questionEntity = assignment.Questions.FirstOrDefault(q => q.QuestionId == answer.QuestionId);
-                if (questionEntity == null)
+                var answerInDb = questionEntity.Answers.FirstOrDefault(a =>
+                    a.Value == answer.Value && a.QuestionId == answer.QuestionId);
+                if (answerInDb == null)
                 {
-                    throw new ResourceNotFoundException("Question not found");
+                    throw new ResourceNotFoundException("Answer not found");
                 }
 
-                if (questionEntity.Type == "Multiple Choice")
+                studentAnswers.Add(new StudentAnswer
                 {
-                    var answerInDb = questionEntity.Answers.FirstOrDefault(a =>
-                        a.Value == answer.Value && a.QuestionId == answer.QuestionId);
-                    if (answerInDb == null)
-                    {
-                        throw new ResourceNotFoundException("Answer not found");
-                    }
+                    SubmissionId = submission.SubmissionId,
+                    QuestionId = answer.QuestionId,
+                    Value = answer.Value
+                });
 
-                    _dbContext.StudentAnswers.Add(new StudentAnswer
-                    {
-                        SubmissionId = submission.SubmissionId,
-                        QuestionId = answer.QuestionId,
-                        Value = answer.Value
-                    });
-
-                    if (answerInDb.IsCorrect)
-                    {
-                        score++;
-                    }
+                if (answerInDb.IsCorrect)
+                {
+                    score++;
                 }
             }
-            
-            submission.Score = score;
+        }
 
-            await _dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
-        }
-        catch (Exception e)
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        submission.Score = score;
+        submission.Answers = studentAnswers;
+
+        await _dbContext.AssignmentSubmissions.AddAsync(submission);
+        await _dbContext.SaveChangesAsync();
 
         var assignmentSubmission = new AssignmentSubmissionResponseDto
         {
