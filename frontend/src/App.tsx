@@ -18,6 +18,8 @@ import { WeatherPage } from './pages/WeatherPage.tsx';
 import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 import ArticlesTempPage from './pages/users/ArticlesTempPage.tsx';
+import { R } from 'node_modules/@tanstack/react-query-devtools/build/modern/ReactQueryDevtools-Cn7cKi7o';
+import ArticleDetailPage from './pages/users/ArticleDetailPage.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,8 +71,9 @@ const App: React.FC = () => {
                     <MainLayout>
                       <Routes>
                         <Route path='/' element={<WeatherPage />} />
-                        <Route path='/course' element={<ArticlesTempPage />} />
+                        {/* <Route path='/course' element={<ArticlesTempPage />} /> */}
                         {/* <Route path='/courses' element={<CoursePage />} /> */}
+                        <Route path='/course' element={<ArticleDetailPage />} />
 
                         <Route path='/profile' element={<div>Profile</div>} />
                         <Route path='/settings' element={<div>Settings</div>} />

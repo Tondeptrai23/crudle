@@ -7,15 +7,16 @@ import { ScrollArea } from "@/components/common/ui/scroll-area";
 import { BookOpen, BookX } from "lucide-react";
 
 const ArticlesTempPage: React.FC = () => {
+  // Seeding data for articles
   const { data: articles, isLoading, error } = useArticles("1");
 
   if (isLoading) {
     return (
       <div className="container mx-auto p-6 space-y-4">
-        <Skeleton className="h-12 w-[200px]" />
+        <Skeleton className="h-12 w-[300px]" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-[200px] w-full" />
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} className="h-[250px] w-full" />
           ))}
         </div>
       </div>
