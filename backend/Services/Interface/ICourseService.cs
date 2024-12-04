@@ -4,6 +4,7 @@ using _3w1m.Dtos.Student;
 using _3w1m.Dtos.Teacher;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
+using _3w1m.Specifications.Interface;
 
 namespace _3w1m.Services.Interface;
 
@@ -64,10 +65,11 @@ public interface ICourseService
     /// <summary>
     /// Get all courses that a student is enrolled in
     /// </summary>
-    /// <param name="studentId">The unique identifier of the student</param>
+    /// <params name="queryDto">The query parameters</params>s
+    /// <params name="spec">The specification for the query</params>
     /// <returns>The task contains a collection of courses that a student is enrolled</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the student is not found</exception>
-    Task<IEnumerable<CourseDto>> GetEnrolledCourseOfAStudentAsync(int studentId);
+    Task<(int, IEnumerable<CourseDto>)> GetEnrolledCoursesOfUserAsync(CourseCollectionQueryDto queryDto, ICourseSpecification spec);
 
     /// <summary>
     /// Get all courses that a teacher is teaching

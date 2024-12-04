@@ -37,7 +37,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetEnrolledCoursesAsync()
+    public async Task<IActionResult> GetEnrolledCoursesAsync([FromQuery] CourseCollectionQueryDto queryDto)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -46,9 +46,16 @@ public class CourseController : ControllerBase
         }
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-        var enrolledCourse = await _courseService.GetEnrolledCourseOfAStudentAsync(student.StudentId);
-        return Ok(new ResponseDto<IEnumerable<CourseMinimalDto>>(_mapper.Map<IEnumerable<CourseMinimalDto>>(enrolledCourse)));
+        var spec = new StudentCourseSpecification(student.StudentId);
+        var (courseCount, courses) = await _courseService.GetEnrolledCoursesOfUserAsync(queryDto, spec);
+
+        return Ok(new PaginationResponseDto<IEnumerable<CourseMinimalDto>>(
+            _mapper.Map<IEnumerable<CourseMinimalDto>>(courses),
+            courseCount,
+            queryDto.Page,
+            queryDto.Size));
     }
+
 
     [HttpGet]
     [Route("{courseId:int}")]
@@ -67,12 +74,12 @@ public class CourseController : ControllerBase
         {
             return Unauthorized();
         }
-        
+
         if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
         {
             throw new ForbiddenException("This student is not enrolled in the course");
         }
-        
+
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
         IArticleSpecification spec = new StudentArticleSpecification(student.StudentId);
         var article = await _articleService.GetArticleByIdAsync(courseId, articleId, spec);

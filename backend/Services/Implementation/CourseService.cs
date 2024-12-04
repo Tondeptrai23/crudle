@@ -6,6 +6,7 @@ using _3w1m.Dtos.Teacher;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
+using _3w1m.Specifications.Interface;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,16 +16,12 @@ public class CourseService : ICourseService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
-    private readonly IStudentService _studentService;
-    private readonly ITeacherService _teacherService;
 
     public CourseService(ApplicationDbContext context, IMapper mapper, IStudentService studentService,
         ITeacherService teacherService)
     {
         _context = context;
         _mapper = mapper;
-        _studentService = studentService;
-        _teacherService = teacherService;
     }
 
     public async Task<CourseDto> GetCourseByIdAsync(int courseId)
@@ -173,7 +170,7 @@ public class CourseService : ICourseService
 
         return students;
     }
-    
+
     public Task<TeacherDto> EnrollTeacherIntoCourseAsync(int courseId, EnrollTeacherToCourseRequestDto enrollRequest)
     {
         var teacherId = enrollRequest.TeacherId;
@@ -221,24 +218,18 @@ public class CourseService : ICourseService
         return isEnrolled;
     }
 
-    public async Task<IEnumerable<CourseDto>> GetEnrolledCourseOfAStudentAsync(int studentId)
+    public async Task<(int, IEnumerable<CourseDto>)> GetEnrolledCoursesOfUserAsync(CourseCollectionQueryDto queryDto,
+        ICourseSpecification spec)
     {
-        var student = await _context.Students
-            .Where(s => s.StudentId == studentId)
-            .FirstOrDefaultAsync();
-
-        if (student == null)
-        {
-            throw new ResourceNotFoundException("Student not found");
-        }
-
-        var enrollments = await _context.Enrollments.Where(e => e.StudentId == studentId)
-            .Select(enrollment => enrollment.CourseId).ToListAsync();
-
-        var courses = await _context.Courses.Include(course => course.Teacher)
-            .Where(course => enrollments.Contains(course.CourseId)).ToListAsync();
-
-        return _mapper.Map<IEnumerable<CourseDto>>(courses);
+        var coursesDbSet = _context.Courses;
+        var courses = spec.Apply(coursesDbSet);
+        
+        courses = ApplyFilter(courses, queryDto);
+        courses = ApplyOrder(courses, queryDto);
+        var count = await courses.CountAsync();
+        courses = ApplyPagination(courses, queryDto);
+        
+        return (count, _mapper.Map<IEnumerable<CourseDto>>(courses));
     }
 
     public async Task<CourseDetailDto> GetCourseDetailAsync(int courseId)

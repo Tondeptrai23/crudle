@@ -37,9 +37,17 @@ public class CourseController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCourses([FromQuery] CourseCollectionQueryDto queryDto)
+    public async Task<IActionResult> GetEnrolledCoursesAsync([FromQuery] CourseCollectionQueryDto queryDto)
     {
-        var (count, courses) = await _courseService.GetCoursesAsync(queryDto);
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+        var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
+        var spec = new TeacherCourseSpecification(teacher.TeacherId);        
+        
+        var (count, courses) = await _courseService.GetEnrolledCoursesOfUserAsync(queryDto, spec);
         return Ok(new PaginationResponseDto<IEnumerable<CourseDto>>(
             _mapper.Map<IEnumerable<CourseDto>>(courses),
             count,
