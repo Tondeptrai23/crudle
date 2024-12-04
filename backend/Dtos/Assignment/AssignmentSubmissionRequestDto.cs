@@ -5,5 +5,5 @@ namespace _3w1m.Dtos.Assignment;
 
 public class AssignmentSubmissionRequestDto
 {
-    public ICollection<AnswerDto> Answers { get; set; }
+    public ICollection<AnswerSubmitRequestDto> Answers { get; set; }
 }

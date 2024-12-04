@@ -12,7 +12,7 @@ public interface IAssignmentService
     public Task<AssignmentDto> CreateAssignmentAsync(int courseId,
         CreateAssignmentRequestDto createAssignmentRequestDto);
 
-    public Task<AssignmentSubmissionResponseDto> SubmitAssignmentAsync(int courseId, int assignmentId, AssignmentSubmissionRequestDto assignmentSubmissionRequestDto);
+    public Task<AssignmentSubmissionResponseDto> SubmitAssignmentAsync(int courseId, int assignmentId, int studentId, AssignmentSubmissionRequestDto assignmentSubmissionRequestDto);
 
     public Task<bool> DeleteAssignmentAsync(int courseId, int assignmentId);
 

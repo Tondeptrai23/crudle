@@ -2,7 +2,7 @@ namespace _3w1m.Models.Domain;
 
 public class AssignmentSubmission
 {
-    public int? SubmissionId { get; set; }
+    public int SubmissionId { get; set; }
     
     
     public DateTime SubmittedAt { get; set; }

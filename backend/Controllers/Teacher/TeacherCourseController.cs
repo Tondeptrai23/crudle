@@ -146,7 +146,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpPost]
-    [Route("{courseId:int}/Assignment")]
+    [Route("{courseId:int}/Assignments")]
     public async Task<IActionResult> CreateAssignment([FromRoute] int courseId,
         [FromBody] CreateAssignmentRequestDto createAssignmentRequestDto)
     {

@@ -94,42 +94,74 @@ public class AssignmentService : IAssignmentService
     }
 
     public async Task<AssignmentSubmissionResponseDto> SubmitAssignmentAsync(int courseId, int assignmentId,
-        AssignmentSubmissionRequestDto assignmentSubmissionRequestDto)
+        int studentId,
+        AssignmentSubmissionRequestDto requestDto)
     {
-        var course = await _dbContext.Courses.Include(c => c.Assignments)
-            .ThenInclude(assignment => assignment.Questions).ThenInclude(question => question.Answers)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId);
-        if (course == null)
-        {
-            throw new ResourceNotFoundException("Course not found");
-        }
-
-        var assignment = course.Assignments.FirstOrDefault(asgmt => asgmt.AssignmentId == assignmentId);
+        var assignment = await _dbContext.Assignments.Include(a => a.Questions)
+            .ThenInclude(q => q.Answers)
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId    
+                                      && c.CourseId == courseId);
         if (assignment == null)
         {
             throw new ResourceNotFoundException("Assignment not found");
         }
 
         var score = 0;
-        foreach (var question in assignment.Questions)
+        var submittedAt = DateTime.Now;
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
         {
-            var submittedQuestion =
-                assignmentSubmissionRequestDto.Answers.FirstOrDefault(ans => ans.QuestionId == question.QuestionId);
-            if (submittedQuestion == null)
+            var submission = (await _dbContext.AssignmentSubmissions.AddAsync(new AssignmentSubmission
             {
-                continue;
-            }
+                AssignmentId = assignmentId,
+                StudentId = studentId,
+                SubmittedAt = submittedAt
+            })).Entity;
+            
+            // Save changes to get the submission id
+            await _dbContext.SaveChangesAsync();
+            
+            foreach (var answer in requestDto.Answers)
+            {
+                var questionEntity = assignment.Questions.FirstOrDefault(q => q.QuestionId == answer.QuestionId);
+                if (questionEntity == null)
+                {
+                    throw new ResourceNotFoundException("Question not found");
+                }
 
-            var correctAnswer = question.Answers.FirstOrDefault(ans => ans.IsCorrect);
-            if (correctAnswer == null)
-            {
-                continue;
-            }
+                if (questionEntity.Type == "Multiple Choice")
+                {
+                    var answerInDb = questionEntity.Answers.FirstOrDefault(a =>
+                        a.Value == answer.Value && a.QuestionId == answer.QuestionId);
+                    if (answerInDb == null)
+                    {
+                        throw new ResourceNotFoundException("Answer not found");
+                    }
 
-            if (submittedQuestion.AnswerId == correctAnswer.AnswerId)
-            {
-                score++;
+                    _dbContext.StudentAnswers.Add(new StudentAnswer
+                    {
+                        SubmissionId = submission.SubmissionId,
+                        QuestionId = answer.QuestionId,
+                        Value = answer.Value
+                    });
+
+                    if (answerInDb.IsCorrect)
+                    {
+                        score++;
+                    }
+                }
             }
+            
+            submission.Score = score;
+
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            throw;
         }
 
         var assignmentSubmission = new AssignmentSubmissionResponseDto
