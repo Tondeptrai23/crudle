@@ -1,9 +1,12 @@
 using _3w1m.Constants;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Article;
+using _3w1m.Dtos.Course;
 using _3w1m.Models.Domain;
+using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
 using _3w1m.Specifications;
+using _3w1m.Specifications.Interface;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -34,7 +37,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetEnrolledCourseAsync()
+    public async Task<IActionResult> GetEnrolledCoursesAsync([FromQuery] CourseCollectionQueryDto queryDto)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -43,9 +46,16 @@ public class CourseController : ControllerBase
         }
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-        var enrolledCourse = await _courseService.GetEnrolledCourseOfAStudentAsync(student.StudentId);
-        return Ok(new ResponseDto<IEnumerable<CourseDto>>(enrolledCourse));
+        var spec = new StudentCourseSpecification(student.StudentId);
+        var (courseCount, courses) = await _courseService.GetEnrolledCoursesOfUserAsync(queryDto, spec);
+
+        return Ok(new PaginationResponseDto<IEnumerable<CourseMinimalDto>>(
+            _mapper.Map<IEnumerable<CourseMinimalDto>>(courses),
+            courseCount,
+            queryDto.Page,
+            queryDto.Size));
     }
+
 
     [HttpGet]
     [Route("{courseId:int}")]
@@ -65,9 +75,14 @@ public class CourseController : ControllerBase
             return Unauthorized();
         }
 
-        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This student is not enrolled in the course");
+        }
 
-        var article = await _articleService.GetArticleByIdAsync(articleId, courseId, student.StudentId);
+        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
+        IArticleSpecification spec = new StudentArticleSpecification(student.StudentId);
+        var article = await _articleService.GetArticleByIdAsync(courseId, articleId, spec);
         return Ok(new ResponseDto<StudentArticleResponseDto>(_mapper.Map<StudentArticleResponseDto>(article)));
     }
 
@@ -80,6 +95,11 @@ public class CourseController : ControllerBase
         if (user == null)
         {
             return Unauthorized();
+        }
+
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This student is not enrolled in the course");
         }
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
@@ -103,6 +123,11 @@ public class CourseController : ControllerBase
         if (user == null)
         {
             return Unauthorized();
+        }
+
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This student is not enrolled in the course");
         }
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);

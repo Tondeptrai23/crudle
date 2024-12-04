@@ -10,6 +10,7 @@ public interface IArticleService
     /// Get articles by courseId
     /// </summary>
     /// <param name="courseId">The unique identifier of the course </param>
+    /// <param name="serviceSpecification">The specification for filtering articles for student and teacher</param>
     /// <param name="queryDto">The query parameters for filtering, ordering, and pagination</param>
     /// <returns>The task result contains the quantity and a collection of article Dto</returns>
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
@@ -22,22 +23,21 @@ public interface IArticleService
     /// </summary>
     /// <param name="articleId">The unique identifier of the article</param>
     /// <param name="courseId">The unique identifier of the course</param>
-    /// <param name="studentId">The unique identifier of the student</param>
+    /// <param name="spec">The specification for filtering articles for student and teacher</param>
     /// <returns>The task result contains the article detail Dto</returns>
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
-    Task<ArticleDto> GetArticleByIdAsync(int articleId, int courseId, int studentId);
+    Task<ArticleDto> GetArticleByIdAsync(int courseId, int articleId, IArticleSpecification spec);
 
     /// <summary>
     /// Create an article
     /// </summary>
     /// <param name="courseId">The unique identifier of the course</param>
-    /// <param name="teacherId">The unique identifier of the teacher</param>
     /// <param name="createArticleDto">The Dto containing the information for create new article</param>
     /// <returns>The task result contains the article detail Dto</returns>
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
     /// <exception cref="ResourceNotFoundException">Thrown if the course or article is not found</exception>
     /// <exception cref="ForbiddenException">Thrown if the teacher is not the one teaching the course</exception>
-    Task<ArticleDto> CreateArticleAsync(int courseId, int teacherId, CreateArticleRequestDto createArticleDto);
+    Task<ArticleDto> CreateArticleAsync(int courseId, CreateArticleRequestDto createArticleDto);
 
     /// <summary>
     /// Update an article
@@ -45,12 +45,11 @@ public interface IArticleService
     /// <param name="courseId">The unique identifier of the course</param>
     /// <param name="articleId">The unique identifier of the article</param>
     /// <param name="updateArticleDto">The Dto containing the information for update article</param>
-    /// <param name="teacherId">The unique identifier of the teacher</param>
     /// <returns>The task result contains the article detail Dto</returns>
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
     /// <exception cref="ResourceNotFoundException">Thrown if the article is not found</exception>
     /// <exception cref="ForbiddenException">Thrown if the teacher is not the owner of the article</exception>
-    Task<ArticleDto> UpdateArticleAsync(int courseId, int articleId, int teacherId,
+    Task<ArticleDto> UpdateArticleAsync(int courseId, int articleId,
         UpdateArticleRequestDto updateArticleDto);
 
     /// <summary>
@@ -58,12 +57,11 @@ public interface IArticleService
     /// </summary>
     /// <param name="courseId">The unique identifier of the course</param>
     /// <param name="articleId">The unique identifier of the article</param>
-    /// <param name="teacherId">The unique identifier of the teacher</param>
     /// <returns>The task result contains the response when article deleted</returns>
     /// <exception cref="ResourceNotFoundException">Thrown if the course is not found</exception>
     /// <exception cref="ResourceNotFoundException">Thrown if the course or article is not found</exception>
     /// <exception cref="ForbiddenException">Thrown if the teacher is not the owner of the article</exception>
-    Task<bool> DeleteArticleAsync(int courseId, int articleId, int teacherId);
+    Task<bool> DeleteArticleAsync(int courseId, int articleId);
 
     /// <summary>
     /// Mark an article as read
@@ -81,10 +79,9 @@ public interface IArticleService
     /// </summary>
     /// <param name="courseId">The unique identifier of the course containing the articles</param>
     /// <param name="articleIds">An array of article IDs in their new desired order</param>
-    /// <param name="teacherId">The unique identifier of the teacher performing the reordering</param>
     /// <returns>A collection of updated article DTOs in their new order</returns>
     /// <exception cref="ForbiddenException">Thrown when the teacher doesn't have permission to modify this course</exception>
     /// <exception cref="ConflictException">Thrown when the order's cannot be updated</exception>
     /// <exception cref="ResourceNotFoundException">Thrown when the course or any of the articles cannot be found</exception>
-    Task<IEnumerable<ArticleDto>> UpdateArticleOrderAsync(int courseId, int[] articleIds, int teacherId);
+    Task<IEnumerable<ArticleDto>> UpdateArticleOrderAsync(int courseId, int[] articleIds);
 }

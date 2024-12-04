@@ -6,6 +6,7 @@ using _3w1m.Dtos.Teacher;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
+using _3w1m.Specifications.Interface;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,16 +16,12 @@ public class CourseService : ICourseService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
-    private readonly IStudentService _studentService;
-    private readonly ITeacherService _teacherService;
 
     public CourseService(ApplicationDbContext context, IMapper mapper, IStudentService studentService,
         ITeacherService teacherService)
     {
         _context = context;
         _mapper = mapper;
-        _studentService = studentService;
-        _teacherService = teacherService;
     }
 
     public async Task<CourseDto> GetCourseByIdAsync(int courseId)
@@ -96,7 +93,8 @@ public class CourseService : ICourseService
 
         if (requestCourseData.TeacherId != null)
         {
-            var newTeacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == requestCourseData.TeacherId);
+            var newTeacher =
+                await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == requestCourseData.TeacherId);
             if (newTeacher == null)
             {
                 throw new ResourceNotFoundException($"Teacher with id {requestCourseData.TeacherId} not found");
@@ -128,7 +126,8 @@ public class CourseService : ICourseService
         return (students.Count, _mapper.Map<IEnumerable<StudentDto>>(students));
     }
 
-    public async Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId, EnrollStudentToCourseRequestDto enrollRequest)
+    public async Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId,
+        EnrollStudentToCourseRequestDto enrollRequest)
     {
         var studentIds = enrollRequest.StudentIds;
 
@@ -172,7 +171,6 @@ public class CourseService : ICourseService
         return students;
     }
 
-
     public Task<TeacherDto> EnrollTeacherIntoCourseAsync(int courseId, EnrollTeacherToCourseRequestDto enrollRequest)
     {
         var teacherId = enrollRequest.TeacherId;
@@ -201,44 +199,46 @@ public class CourseService : ICourseService
         return Task.FromResult(_mapper.Map<TeacherDto>(teacher));
     }
 
-    public async Task<IEnumerable<CourseDto>> GetEnrolledCourseOfAStudentAsync(int studentId)
+    public async Task<bool> CourseEnrolledUserValidationAsync(int courseId, String userId)
     {
-        var student = await _context.Students
-            .Where(s => s.StudentId == studentId)
-            .FirstOrDefaultAsync();
-
-        if (student == null)
+        var course = _context.Courses.Include(c => c.Teacher).FirstOrDefault(c => c.CourseId == courseId);
+        if (course == null)
         {
-            throw new ResourceNotFoundException("Student not found");
+            throw new ResourceNotFoundException($"Course with id {courseId} not found.");
         }
 
-        var enrollments = await _context.Enrollments.Where(e => e.StudentId == studentId)
-            .Select(enrollment => enrollment.CourseId).ToListAsync();
+        var enrollments = _context.Enrollments.Include(en => en.Student);
+        var isStudentEnrolled = await enrollments.AnyAsync(en =>
+            en.CourseId == courseId && en.Student.UserId == userId);
 
-        var courses = await _context.Courses.Include(course => course.Teacher)
-            .Where(course => enrollments.Contains(course.CourseId)).ToListAsync();
+        var isTeacherEnrolled = course.Teacher!.UserId == userId;
 
-        return _mapper.Map<IEnumerable<CourseDto>>(courses);
+        var isEnrolled = isStudentEnrolled || isTeacherEnrolled;
+
+        return isEnrolled;
     }
 
-    public async Task<CourseDetailDto> GetCourseDetailAsync(int teacherId, int courseId)
+    public async Task<(int, IEnumerable<CourseDto>)> GetEnrolledCoursesOfUserAsync(CourseCollectionQueryDto queryDto,
+        ICourseSpecification spec)
     {
-        var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == teacherId);
-        if (teacher == null)
-        {
-            throw new ResourceNotFoundException("Teacher not found");
-        }
+        var coursesDbSet = _context.Courses;
+        var courses = spec.Apply(coursesDbSet);
+        
+        courses = ApplyFilter(courses, queryDto);
+        courses = ApplyOrder(courses, queryDto);
+        var count = await courses.CountAsync();
+        courses = ApplyPagination(courses, queryDto);
+        
+        return (count, _mapper.Map<IEnumerable<CourseDto>>(courses.ToListAsync()));
+    }
 
+    public async Task<CourseDetailDto> GetCourseDetailAsync(int courseId)
+    {
         var course = await _context.Courses.Include(course => course.Teacher)
             .FirstOrDefaultAsync(course => course.CourseId == courseId);
         if (course == null)
         {
             throw new ResourceNotFoundException("Course not found");
-        }
-
-        if (course.TeacherId != teacherId)
-        {
-            throw new ForbiddenException("This teacher does not have access to this course");
         }
 
         var students = await _context.Enrollments.Where(enrollment => enrollment.CourseId == courseId)
@@ -252,11 +252,6 @@ public class CourseService : ICourseService
 
     private IQueryable<Course> ApplyFilter(IQueryable<Course> query, CourseCollectionQueryDto queryDto)
     {
-        if (queryDto.CourseId != null)
-        {
-            query = query.Where(s => s.CourseId == queryDto.CourseId);
-        }
-
         if (!string.IsNullOrWhiteSpace(queryDto.Name))
         {
             query = query.Where(s => s.Name.ToLower().Contains(queryDto.Name.ToLower()));
@@ -267,9 +262,10 @@ public class CourseService : ICourseService
             var normalizedCodes = queryDto.Code
                 .Where(c => !string.IsNullOrWhiteSpace(c))
                 .Select(c => c.ToUpper());
-        
+
             query = query.Where(s => normalizedCodes.Contains(s.Code.ToUpper()));
         }
+
         if (queryDto.StartDateFrom.HasValue)
         {
             query = query.Where(s => s.StartDate >= queryDto.StartDateFrom.Value);
@@ -329,5 +325,4 @@ public class CourseService : ICourseService
 
         return (true, null);
     }
-
 }
