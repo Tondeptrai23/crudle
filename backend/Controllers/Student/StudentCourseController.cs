@@ -35,7 +35,7 @@ public class CourseController : ControllerBase
         _articleService = articleService;
         _mapper = mapper;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetEnrolledCoursesAsync()
     {
@@ -75,7 +75,7 @@ public class CourseController : ControllerBase
         
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
         IArticleSpecification spec = new StudentArticleSpecification(student.StudentId);
-        var article = await _articleService.GetArticleByIdAsync(articleId, courseId, spec);
+        var article = await _articleService.GetArticleByIdAsync(courseId, articleId, spec);
         return Ok(new ResponseDto<StudentArticleResponseDto>(_mapper.Map<StudentArticleResponseDto>(article)));
     }
 
@@ -88,6 +88,11 @@ public class CourseController : ControllerBase
         if (user == null)
         {
             return Unauthorized();
+        }
+
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This student is not enrolled in the course");
         }
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);

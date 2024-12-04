@@ -70,10 +70,21 @@ public class CourseController : ControllerBase
     [Route("{courseId:int}/Articles")]
     public async Task<IActionResult> GetArticles(int courseId, [FromQuery] ArticleCollectionQueryDto queryDto)
     {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        } 
+        
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This teacher is not enrolled in the course");
+        }
+        
         var specification = new TeacherArticleSpecification();
         var (count, articles) =
             await _articleService.GetArticlesAsync(courseId, specification, queryDto);
-
+        
         return Ok(new PaginationResponseDto<IEnumerable<TeacherMinimalArticleDto>>(
             _mapper.Map<IEnumerable<TeacherMinimalArticleDto>>(articles),
             count,
