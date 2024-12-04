@@ -229,7 +229,7 @@ public class CourseService : ICourseService
         var count = await courses.CountAsync();
         courses = ApplyPagination(courses, queryDto);
         
-        return (count, _mapper.Map<IEnumerable<CourseDto>>(courses));
+        return (count, _mapper.Map<IEnumerable<CourseDto>>(courses.ToListAsync()));
     }
 
     public async Task<CourseDetailDto> GetCourseDetailAsync(int courseId)

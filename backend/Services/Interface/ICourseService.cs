@@ -55,7 +55,7 @@ public interface ICourseService
     /// Enroll student into the course
     /// </summary>
     /// <param name="courseId">The unique identifier of the course</param>
-    /// <param name="studentId">The collection of unique identifier of students</param>
+    /// <param name="enrollRequest">The collection of unique identifier of students</param>
     /// <returns>The task contain a collection of Student</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the course or the student is not found</exception>
     /// <exception cref="ConflictException">Thrown when the student is already enrolled in the course</exception>
@@ -84,7 +84,7 @@ public interface ICourseService
     /// Enroll teacher into the course
     /// </summary>
     /// <param name="courseId">The unique identifier of the course</param>
-    /// <param name="teacherId">The collection of unique identifier of teachers</param>
+    /// <param name="enrollRequest">The collection of unique identifier of teachers</param>
     /// <returns>The task contain a collection of Teacher</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the course or the teacher is not found</exception>
     /// <exception cref="ConflictException">Thrown when the teacher is already enrolled in the course</exception>
@@ -97,5 +97,5 @@ public interface ICourseService
     /// <param name="courseId">The unique identifier of the course</param>
     /// <param name="userId">The unique identifier of the user</param>
     /// <returns>The task contain a boolean value</returns>
-    Task<bool> CourseEnrolledUserValidationAsync(int courseId, String userId);
+    Task<bool> CourseEnrolledUserValidationAsync(int courseId, string userId);
 }
