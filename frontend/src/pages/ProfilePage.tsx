@@ -10,7 +10,8 @@ import {
 } from '@/components/common/ui/card';
 import { Avatar, AvatarFallback } from '@/components/common/ui/avatar';
 import { Skeleton } from '@/components/common/ui/skeleton';
-import { User } from 'lucide-react';
+import { User, KeyRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface ProfileData {
   Email: string;
@@ -53,49 +54,73 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className='container mx-auto p-8'>
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile</CardTitle>
-        </CardHeader>
-        <CardContent className='space-y-8'>
-          <div className='flex items-center space-x-4'>
-            <Avatar className='h-20 w-20'>
-              <AvatarFallback>
-                <User className='h-10 w-10' />
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className='text-2xl font-bold'>{data?.Fullname}</h2>
-              <p className='text-muted-foreground'>Student</p>
-            </div>
+    <div className='container mx-auto max-w-6xl p-8'>
+      <div className='grid grid-cols-[300px_1fr] gap-8'>
+        {/* Left Column - Profile Image */}
+        <div className='space-y-4'>
+          <Avatar className='m-[20px] mb-[40px] h-[260px] w-[260px] rounded-full'>
+            <AvatarFallback className='text-4xl'>
+              <User className='h-32 w-32' />
+            </AvatarFallback>
+          </Avatar>
+          <div className='space-y-2'>
+            <h1 className='text-3 xl font-semibold'>{data?.Fullname}</h1>
+            <p className='text-xl text-muted-foreground'>Student</p>
           </div>
+        </div>
 
-          <div className='grid gap-4'>
-            <div className='space-y-1'>
-              <p className='text-sm font-medium'>Email</p>
-              <p className='text-sm text-muted-foreground'>{data?.Email}</p>
-            </div>
+        {/* Right Column - Profile Details */}
+        <div className='space-y-8'>
+          <Card>
+            <CardHeader>
+              <CardTitle>About</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              <div className='grid gap-4'>
+                <div className='space-y-1'>
+                  <p className='text-sm font-medium'>Student ID</p>
+                  <p className='text-sm text-muted-foreground'>
+                    {data?.StudentId}
+                  </p>
+                </div>
 
-            <div className='space-y-1'>
-              <p className='text-sm font-medium'>Student ID</p>
-              <p className='text-sm text-muted-foreground'>{data?.StudentId}</p>
-            </div>
+                <div className='space-y-1'>
+                  <p className='text-sm font-medium'>Email</p>
+                  <p className='text-sm text-muted-foreground'>{data?.Email}</p>
+                </div>
 
-            <div className='space-y-1'>
-              <p className='text-sm font-medium'>Date of Birth</p>
-              <p className='text-sm text-muted-foreground'>
-                {data?.DateOfBirth && format(new Date(data.DateOfBirth), 'PPP')}
-              </p>
-            </div>
+                <div className='space-y-1'>
+                  <p className='text-sm font-medium'>Date of Birth</p>
+                  <p className='text-sm text-muted-foreground'>
+                    {data?.DateOfBirth &&
+                      format(new Date(data.DateOfBirth), 'PPP')}
+                  </p>
+                </div>
 
-            <div className='space-y-1'>
-              <p className='text-sm font-medium'>User ID</p>
-              <p className='text-sm text-muted-foreground'>{data?.UserId}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                <div className='space-y-1'>
+                  <p className='text-sm font-medium'>Password</p>
+                  <Link
+                    to='/change-password'
+                    className='inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary'
+                  >
+                    <KeyRound className='h-4 w-4' />
+                    Change password
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Enrolled Courses</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className='text-muted-foreground'>No enrolled course.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
