@@ -10,8 +10,9 @@ import {
 } from '@/components/common/ui/card';
 import { Avatar, AvatarFallback } from '@/components/common/ui/avatar';
 import { Skeleton } from '@/components/common/ui/skeleton';
-import { User, KeyRound } from 'lucide-react';
+import { User, KeyRound, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useStudentCourses } from '@/hooks/api/useCourseApi';
 
 interface ProfileData {
   Email: string;
@@ -19,10 +20,11 @@ interface ProfileData {
   Fullname: string;
   DateOfBirth: string;
   UserId: string;
+  Role: string;
 }
 
 const ProfilePage = () => {
-  const { data, isLoading } = useQuery({
+  const { data: profileData, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
       const response = await api.get<{ Success: boolean; Data: ProfileData }>(
@@ -32,7 +34,10 @@ const ProfilePage = () => {
     },
   });
 
-  if (isLoading) {
+  const { data: coursesData, isLoading: isCoursesLoading } =
+    useStudentCourses();
+
+  if (isProfileLoading) {
     return (
       <div className='container mx-auto max-w-6xl p-8'>
         <div className='grid grid-cols-[300px_1fr] gap-8'>
@@ -100,8 +105,8 @@ const ProfilePage = () => {
             </AvatarFallback>
           </Avatar>
           <div className='space-y-2'>
-            <h1 className='text-3xl font-semibold'>{data?.Fullname}</h1>
-            <p className='text-xl text-muted-foreground'>Student</p>
+            <h1 className='text-3xl font-semibold'>{profileData?.Fullname}</h1>
+            <p className='text-xl text-muted-foreground'>{profileData?.Role}</p>
           </div>
         </div>
         {/* Right Column - Profile Details */}
@@ -115,20 +120,26 @@ const ProfilePage = () => {
                 <div className='space-y-1'>
                   <p className='text-sm font-medium'>Student ID</p>
                   <p className='text-sm text-muted-foreground'>
-                    {data?.StudentId}
+                    {profileData?.StudentId}
                   </p>
                 </div>
 
                 <div className='space-y-1'>
                   <p className='text-sm font-medium'>Email</p>
-                  <p className='text-sm text-muted-foreground'>{data?.Email}</p>
+                  <a
+                    href={`mailto:${profileData?.Email}`}
+                    className='inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary'
+                  >
+                    <Mail className='h-4 w-4' />
+                    {profileData?.Email}
+                  </a>
                 </div>
 
                 <div className='space-y-1'>
                   <p className='text-sm font-medium'>Date of Birth</p>
                   <p className='text-sm text-muted-foreground'>
-                    {data?.DateOfBirth &&
-                      format(new Date(data.DateOfBirth), 'PPP')}
+                    {profileData?.DateOfBirth &&
+                      format(new Date(profileData.DateOfBirth), 'PPP')}
                   </p>
                 </div>
 
@@ -151,7 +162,30 @@ const ProfilePage = () => {
               <CardTitle>Enrolled Courses</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className='text-muted-foreground'>No enrolled course.</p>
+              {isCoursesLoading ? (
+                <Skeleton className='h-4 w-full' />
+              ) : coursesData?.length ? (
+                <ul className='space-y-2'>
+                  {coursesData.map((course) => (
+                    <li key={course.CourseId}>
+                      <Link to={`/courses/${course.CourseId}`}>
+                        <div className='rounded-lg border p-4 transition-colors hover:bg-gray-100'>
+                          <div>
+                            <h3 className='text-lg font-semibold'>
+                              {course.Name}
+                            </h3>
+                            <p className='text-sm text-muted-foreground'>
+                              {course.Description}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className='text-muted-foreground'>No enrolled course.</p>
+              )}
             </CardContent>
           </Card>
         </div>
