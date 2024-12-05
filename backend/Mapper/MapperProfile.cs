@@ -41,7 +41,7 @@ public class MappingProfile : Profile
         CreateMap<ArticleDto, Article>();
         CreateMap<Article, ArticleDto>()
             .ForMember(dest => dest.ReadAt,
-                opt => 
+                opt =>
                         opt.MapFrom(scr => scr.ArticleProgresses.Any() ? scr.ArticleProgresses.First().ReadAt : null));
         CreateMap<ArticleDto, StudentArticleResponseDto>()
             .ForMember(dest => dest.IsRead,
@@ -49,7 +49,7 @@ public class MappingProfile : Profile
         CreateMap<ArticleDto, TeacherArticleResponseDto>();
 
         CreateMap<CreateArticleRequestDto, Article>();
-        
+
         CreateMap<ArticleDto, TeacherMinimalArticleDto>();
         CreateMap<ArticleDto, StudentMinimalArticleDto>()
             .ForMember(dest => dest.IsRead, opt =>

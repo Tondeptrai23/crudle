@@ -223,13 +223,13 @@ public class CourseService : ICourseService
     {
         var coursesDbSet = _context.Courses;
         var courses = spec.Apply(coursesDbSet);
-        
+
         courses = ApplyFilter(courses, queryDto);
         courses = ApplyOrder(courses, queryDto);
         var count = await courses.CountAsync();
         courses = ApplyPagination(courses, queryDto);
-        
-        return (count, _mapper.Map<IEnumerable<CourseDto>>(courses.ToListAsync()));
+
+        return (count, _mapper.Map<IEnumerable<CourseDto>>(await courses.ToListAsync()));
     }
 
     public async Task<CourseDetailDto> GetCourseDetailAsync(int courseId)

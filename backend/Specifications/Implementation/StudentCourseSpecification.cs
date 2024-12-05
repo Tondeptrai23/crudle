@@ -15,7 +15,10 @@ public class StudentCourseSpecification : ICourseSpecification
 
     public IQueryable<Course> Apply(IQueryable<Course> query)
     {
-        return query.Include(c => c.Enrollments).ThenInclude(e => e.Student)
+        return query
+            .Include(c => c.Enrollments)
+                .ThenInclude(e => e.Student)
+            .Include(c => c.Teacher)
             .Where(c => c.Enrollments.Any(e => e.StudentId == _studentId));
     }
 }
