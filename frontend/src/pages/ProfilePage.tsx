@@ -34,21 +34,57 @@ const ProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className='container mx-auto p-8'>
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile</CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-8'>
-            <div className='flex items-center space-x-4'>
-              <Skeleton className='h-20 w-20 rounded-full' />
-              <div className='space-y-2'>
-                <Skeleton className='h-6 w-40' />
-                <Skeleton className='h-4 w-24' />
-              </div>
+      <div className='container mx-auto max-w-6xl p-8'>
+        <div className='grid grid-cols-[300px_1fr] gap-8'>
+          {/* Left Column - Profile Image */}
+          <div className='space-y-4'>
+            <Skeleton className='m-[20px] mb-[40px] h-[260px] w-[260px] rounded-full' />
+            <div className='space-y-2'>
+              <Skeleton className='h-8 w-48' />
+              <Skeleton className='h-6 w-32' />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          {/* Right Column - Profile Details */}
+          <div className='space-y-8'>
+            <Card>
+              <CardHeader>
+                <Skeleton className='h-6 w-24' />
+              </CardHeader>
+              <CardContent className='space-y-4'>
+                <div className='grid gap-4'>
+                  <div className='space-y-1'>
+                    <Skeleton className='h-4 w-24' />
+                    <Skeleton className='h-4 w-40' />
+                  </div>
+
+                  <div className='space-y-1'>
+                    <Skeleton className='h-4 w-24' />
+                    <Skeleton className='h-4 w-40' />
+                  </div>
+
+                  <div className='space-y-1'>
+                    <Skeleton className='h-4 w-24' />
+                    <Skeleton className='h-4 w-40' />
+                  </div>
+
+                  <div className='space-y-1'>
+                    <Skeleton className='h-4 w-24' />
+                    <Skeleton className='h-4 w-40' />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <Skeleton className='h-6 w-36' />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className='h-4 w-full' />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -64,11 +100,10 @@ const ProfilePage = () => {
             </AvatarFallback>
           </Avatar>
           <div className='space-y-2'>
-            <h1 className='text-3 xl font-semibold'>{data?.Fullname}</h1>
+            <h1 className='text-3xl font-semibold'>{data?.Fullname}</h1>
             <p className='text-xl text-muted-foreground'>Student</p>
           </div>
         </div>
-
         {/* Right Column - Profile Details */}
         <div className='space-y-8'>
           <Card>

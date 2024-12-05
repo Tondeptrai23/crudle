@@ -104,6 +104,6 @@ export const mapToCourse = (response: CourseResponse) => ({
   description: response.Description,
   code: response.Code,
   startDate: response.StartDate,
-  teacherId: response.Teacher.TeacherId.toString(),
-  teacherName: response.Teacher.Fullname,
+  teacherId: response.Teacher?.TeacherId.toString(),
+  teacherName: response.Teacher?.Fullname,
 });
