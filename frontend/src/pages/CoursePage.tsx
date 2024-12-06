@@ -1,24 +1,24 @@
-import api from '@/utils/api';
-import { useQuery } from '@tanstack/react-query';
-import { useStudentCourses } from '@/hooks/api/useCourseApi';
-import { Navigate } from 'react-router-dom';
-import { CourseCard } from '@/components/course/CourseCard';
-import { Breadcrumb } from '@/components/common/ui/breadcrumb';
 import React from 'react';
-import { CourseResponse } from '@/types/course';
-import Course from '@/types/course';
+import { useRoleBasedCourses } from '@/hooks/api/useCourseApi';
+import { CourseCard } from '@/components/course/CourseCard';
 import CourseSkeleton from '@/components/course/CourseSkeleton';
 import { mapToCourse } from '@/services/CourseService';
 
 const CoursePage: React.FC = () => {
-  const { data: courses, isPending, error } = useStudentCourses();
+  const role = sessionStorage.getItem('role');
+  const {
+    data: courses,
+    isLoading: isLoading,
+    error: error,
+  } = useRoleBasedCourses(role);
 
-  if (isPending)
+  if (isLoading) {
     return (
       <div className='container mx-auto px-4 py-8'>
         <CourseSkeleton />
       </div>
     );
+  }
 
   if (error) {
     throw error;
