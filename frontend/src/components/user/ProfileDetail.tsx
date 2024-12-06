@@ -19,7 +19,9 @@ const ProfileDetail = ({ profileData }) => (
         <div className='space-y-1'>
           <p className='text-sm font-medium'>{sessionStorage.role} ID</p>
           <p className='text-sm text-muted-foreground'>
-            {profileData?.StudentId}
+            {sessionStorage.role === 'Student'
+              ? profileData?.StudentId
+              : profileData?.TeacherId}
           </p>
         </div>
 
