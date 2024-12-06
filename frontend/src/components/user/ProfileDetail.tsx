@@ -17,7 +17,7 @@ const ProfileDetail = ({ profileData }) => (
     <CardContent className='space-y-4'>
       <div className='grid gap-4'>
         <div className='space-y-1'>
-          <p className='text-sm font-medium'>Student ID</p>
+          <p className='text-sm font-medium'>{sessionStorage.role} ID</p>
           <p className='text-sm text-muted-foreground'>
             {profileData?.StudentId}
           </p>
@@ -34,13 +34,14 @@ const ProfileDetail = ({ profileData }) => (
           </a>
         </div>
 
-        <div className='space-y-1'>
-          <p className='text-sm font-medium'>Date of Birth</p>
-          <p className='text-sm text-muted-foreground'>
-            {profileData?.DateOfBirth &&
-              format(new Date(profileData.DateOfBirth), 'PPP')}
-          </p>
-        </div>
+        {profileData?.DateOfBirth && (
+          <div className='space-y-1'>
+            <p className='text-sm font-medium'>Date of Birth</p>
+            <p className='text-sm text-muted-foreground'>
+              {format(new Date(profileData.DateOfBirth), 'PPP')}
+            </p>
+          </div>
+        )}
 
         <div className='space-y-1'>
           <p className='text-sm font-medium'>Password</p>
