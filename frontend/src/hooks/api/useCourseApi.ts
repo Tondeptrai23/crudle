@@ -86,3 +86,10 @@ export const useStudentCourses = () => {
     queryFn: courseService.getCoursesByStudent,
   });
 };
+
+export const useTeacherCourses = () => {
+  return useQuery({
+    queryKey: ['courses'],
+    queryFn: courseService.getCoursesByTeacher,
+  });
+};

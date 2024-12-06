@@ -1,41 +1,29 @@
 // src/pages/ProfilePage.tsx
-import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import api from '@/utils/api';
+import { Link } from 'react-router-dom';
+import { User, KeyRound, Mail } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/common/ui/avatar';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/components/common/ui/card';
-import { Avatar, AvatarFallback } from '@/components/common/ui/avatar';
 import { Skeleton } from '@/components/common/ui/skeleton';
-import { User, KeyRound, Mail } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useStudentCourses } from '@/hooks/api/useCourseApi';
-
-interface ProfileData {
-  Email: string;
-  StudentId: number;
-  Fullname: string;
-  DateOfBirth: string;
-  UserId: string;
-  Role: string;
-}
+import { useProfileData } from '@/hooks/api/useProfileApi';
+import { useStudentCourses, useTeacherCourses } from '@/hooks/api/useCourseApi';
 
 const ProfilePage = () => {
-  const { data: profileData, isLoading: isProfileLoading } = useQuery({
-    queryKey: ['profile'],
-    queryFn: async () => {
-      const response = await api.get<{ Success: boolean; Data: ProfileData }>(
-        '/api/User/me',
-      );
-      return response.data.Data;
-    },
-  });
+  const { data: profileData, isLoading: isProfileLoading } = useProfileData();
 
-  const { data: coursesData, isLoading: isCoursesLoading } =
-    useStudentCourses();
+  const role = sessionStorage.role;
+  const studentCourses = useStudentCourses();
+  const teacherCourses = useTeacherCourses();
+
+  const coursesData =
+    role === 'Student' ? studentCourses.data : teacherCourses.data;
+  const isCoursesLoading =
+    role === 'Student' ? studentCourses.isLoading : teacherCourses.isLoading;
 
   if (isProfileLoading) {
     return (
@@ -106,7 +94,9 @@ const ProfilePage = () => {
           </Avatar>
           <div className='space-y-2'>
             <h1 className='text-3xl font-semibold'>{profileData?.Fullname}</h1>
-            <p className='text-xl text-muted-foreground'>{profileData?.Role}</p>
+            <p className='text-xl text-muted-foreground'>
+              {sessionStorage.role}
+            </p>
           </div>
         </div>
         {/* Right Column - Profile Details */}
@@ -168,7 +158,7 @@ const ProfilePage = () => {
                 <ul className='space-y-2'>
                   {coursesData.map((course) => (
                     <li key={course.CourseId}>
-                      <Link to={`/courses/${course.CourseId}`}>
+                      <Link to={`/course/${course.CourseId}`}>
                         <div className='rounded-lg border p-4 transition-colors hover:bg-gray-100'>
                           <div>
                             <h3 className='text-lg font-semibold'>
