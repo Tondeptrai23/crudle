@@ -51,14 +51,13 @@ public class UserController : ControllerBase
                 var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
                 var teacherDetail = await _teacherService.GetTeacherByIdAsync(teacher.TeacherId);
                 return Ok(new ResponseDto<TeacherDetailDto>(teacherDetail));
-            // default:
-            //     return Ok(new ResponseDto<UserResponse>(new UserResponse
-            //     {
-            //         UserId = user.Id,
-            //         Email = user.Email
-            //     }));
             default:
-                return BadRequest("Profile not found");
+                return Ok(new ResponseDto<object>(new
+                {
+                    StudentId = user.Id, // because of we don't have 'AdminId'.
+                    Email = user.Email,
+                    Fullname = "System Admin",
+                }));
         }
     }
 }
