@@ -75,6 +75,14 @@ const App: React.FC = () => {
                           path='/course/:courseId'
                           element={<CourseDetailPage />}
                         />
+                        <Route
+                          path='student/:studentId'
+                          element={<ProfilePage />}
+                        />
+                        <Route
+                          path='teacher/:teacherId'
+                          element={<ProfilePage />}
+                        />
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path='/settings' element={<div>Settings</div>} />
                         <Route path='*' element={<div>Not Found</div>} />

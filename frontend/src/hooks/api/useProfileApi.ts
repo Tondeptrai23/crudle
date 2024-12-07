@@ -1,25 +1,37 @@
 import { useQuery } from '@tanstack/react-query';
-import api from '@/utils/api';
+import StudentService from '@/services/StudentService';
+import TeacherService from '@/services/TeacherService';
+import UserService from '@/services/UserService';
+import { ProfileData } from '@/types/user';
 
-interface ProfileData {
-  Email: string;
-  StudentId: number;
-  Fullname: string;
-  DateOfBirth: string;
-  UserId: string;
-  Role: string;
-}
+export const useProfileData = (id: string, role: string) => {
+  return useQuery<ProfileData>({
+    queryKey: ['profile', id, role],
+    queryFn: async () => {
+      if (!id) {
+        const userService = new UserService();
+        console.log(await userService.getMe());
+        return await userService.getMe();
+      }
 
-const fetchProfileData = async (): Promise<ProfileData> => {
-  const response = await api.get<{ Success: boolean; Data: ProfileData }>(
-    '/api/User/me',
-  );
-  return response.data.Data;
-};
-
-export const useProfileData = () => {
-  return useQuery({
-    queryKey: ['profile'],
-    queryFn: fetchProfileData,
+      switch (role) {
+        case 'Student': {
+          const studentService = new StudentService();
+          return studentService.getStudentById(id) as Promise<ProfileData>;
+        }
+        case 'Teacher': {
+          const teacherService = new TeacherService();
+          const teacher = await teacherService.getTeacherById(id);
+          return {
+            id: teacher.id,
+            fullname: teacher.fullname,
+            role: 'Teacher',
+            email: teacher.contactEmail,
+          };
+        }
+        default:
+          throw new Error('Invalid role');
+      }
+    },
   });
 };

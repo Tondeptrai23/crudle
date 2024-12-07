@@ -3,6 +3,7 @@ export default interface Student {
   fullname: string;
   userId: string;
   dob: string;
+  email: string;
 }
 
 export interface StudentCollectionResponse {

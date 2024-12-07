@@ -1,5 +1,4 @@
-// src/pages/ProfilePage.tsx
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/common/ui/avatar';
 import {
@@ -15,10 +14,23 @@ import { ProfileSkeleton } from '@/components/user/ProfileSkeleton';
 import ProfileDetail from '@/components/user/ProfileDetail';
 
 const ProfilePage = () => {
-  const { data: profileData, isLoading: isProfileLoading } = useProfileData();
-  const role = localStorage.getItem('role');
+  const { studentId, teacherId } = useParams();
+  const id = studentId ?? teacherId;
+  const role = studentId
+    ? 'Student'
+    : teacherId
+      ? 'Teacher'
+      : sessionStorage.getItem('role');
+  const selfViewed = !studentId && !teacherId;
+
+  const { data: profileData, isLoading: isProfileLoading } = useProfileData(
+    id,
+    role,
+  );
   const { data: coursesData, isLoading: isCoursesLoading } =
     useRoleBasedCourses(role);
+
+  console.log(profileData);
 
   if (isProfileLoading) {
     return <ProfileSkeleton />;
@@ -35,47 +47,50 @@ const ProfilePage = () => {
             </AvatarFallback>
           </Avatar>
           <div className='space-y-2'>
-            <h1 className='text-3xl font-semibold'>{profileData?.Fullname}</h1>
-            <p className='text-xl text-muted-foreground'>
-              {sessionStorage.role}
-            </p>
+            <h1 className='text-3xl font-semibold'>{profileData?.fullname}</h1>
+            <p className='text-xl text-muted-foreground'>{role}</p>
           </div>
         </div>
         {/* Right Column - Profile Details */}
         <div className='space-y-8'>
-          <ProfileDetail profileData={profileData} />
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Enrolled Courses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isCoursesLoading ? (
-                <Skeleton className='h-4 w-full' />
-              ) : coursesData?.length ? (
-                <ul className='space-y-2'>
-                  {coursesData.map((course) => (
-                    <li key={course.CourseId}>
-                      <Link to={`/course/${course.CourseId}`}>
-                        <div className='rounded-lg border p-4 transition-colors hover:bg-gray-100'>
-                          <div>
-                            <h3 className='text-lg font-semibold'>
-                              {course.Name}
-                            </h3>
-                            <p className='text-sm text-muted-foreground'>
-                              {course.Description}
-                            </p>
+          <ProfileDetail
+            profileData={profileData}
+            role={role}
+            selfViewed={selfViewed}
+          />
+          {selfViewed && role !== 'Admin' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Enrolled Courses</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isCoursesLoading ? (
+                  <Skeleton className='h-4 w-full' />
+                ) : coursesData?.length ? (
+                  <ul className='space-y-2'>
+                    {coursesData.map((course) => (
+                      <li key={course.CourseId}>
+                        <Link to={`/course/${course.CourseId}`}>
+                          <div className='rounded-lg border p-4 transition-colors hover:bg-gray-100'>
+                            <div>
+                              <h3 className='text-lg font-semibold'>
+                                {course.Name}
+                              </h3>
+                              <p className='text-sm text-muted-foreground'>
+                                {course.Description}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className='text-muted-foreground'>No enrolled course.</p>
-              )}
-            </CardContent>
-          </Card>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className='text-muted-foreground'>No enrolled course.</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
