@@ -32,8 +32,6 @@ const ProfilePage = () => {
   const { data: coursesData, isLoading: isCoursesLoading } =
     useRoleBasedCourses(role);
 
-  console.log(profileData);
-
   if (isProfileLoading) {
     return <ProfileSkeleton />;
   }

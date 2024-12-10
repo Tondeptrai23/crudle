@@ -106,7 +106,6 @@ export default class StudentService {
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
-    console.log(response.data.Data);
 
     return {
       id: response.data.Data.StudentId,
