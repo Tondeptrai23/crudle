@@ -3,6 +3,7 @@ import StudentService from '@/services/StudentService';
 import TeacherService from '@/services/TeacherService';
 import UserService from '@/services/UserService';
 import { ProfileData } from '@/types/user';
+import { Role } from '@/types/enums';
 
 export const useProfileData = (id: string, role: string) => {
   return useQuery<ProfileData>({
@@ -10,22 +11,21 @@ export const useProfileData = (id: string, role: string) => {
     queryFn: async () => {
       if (!id) {
         const userService = new UserService();
-        console.log(await userService.getMe());
         return await userService.getMe();
       }
 
       switch (role) {
-        case 'Student': {
+        case Role.Student: {
           const studentService = new StudentService();
           return studentService.getStudentById(id) as Promise<ProfileData>;
         }
-        case 'Teacher': {
+        case Role.Teacher: {
           const teacherService = new TeacherService();
           const teacher = await teacherService.getTeacherById(id);
           return {
             id: teacher.id,
             fullname: teacher.fullname,
-            role: 'Teacher',
+            role: Role.Teacher,
             email: teacher.contactEmail,
           };
         }

@@ -12,21 +12,23 @@ import { useProfileData } from '@/hooks/api/useProfileApi';
 import { useRoleBasedCourses } from '@/hooks/api/useCourseApi';
 import { ProfileSkeleton } from '@/components/user/ProfileSkeleton';
 import ProfileDetail from '@/components/user/ProfileDetail';
+import { Role } from '@/types/enums';
 
 const ProfilePage = () => {
   const { studentId, teacherId } = useParams();
   const id = studentId ?? teacherId;
   const role = studentId
-    ? 'Student'
+    ? Role.Student
     : teacherId
-      ? 'Teacher'
+      ? Role.Teacher
       : sessionStorage.getItem('role');
   const selfViewed = !studentId && !teacherId;
 
-  const { data: profileData, isLoading: isProfileLoading } = useProfileData(
-    id,
-    role,
-  );
+  const {
+    data: profileData,
+    isLoading: isProfileLoading,
+    error: error,
+  } = useProfileData(id, role);
   const { data: coursesData, isLoading: isCoursesLoading } =
     useRoleBasedCourses(role);
 
@@ -34,6 +36,10 @@ const ProfilePage = () => {
 
   if (isProfileLoading) {
     return <ProfileSkeleton />;
+  }
+
+  if (error) {
+    throw error;
   }
 
   return (
