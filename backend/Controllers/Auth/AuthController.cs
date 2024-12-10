@@ -1,13 +1,10 @@
 using _3w1m.Dtos;
 using _3w1m.Services.Interface;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using _3w1m.Models.Domain;
-using _3w1m.Services;
 using Microsoft.AspNetCore.Authorization;
-using _3w1m.Dtos.Auth;
 using System.ComponentModel.DataAnnotations;
+using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 
 namespace _3w1m.Controllers.Auth;

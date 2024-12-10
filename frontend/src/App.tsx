@@ -17,6 +17,7 @@ import { LoginPage } from './pages/LoginPage.tsx';
 import { WeatherPage } from './pages/WeatherPage.tsx';
 import CourseDetailPage from './pages/CourseDetailPage.tsx';
 import { Role } from './types/enums.ts';
+import ProfilePage from './pages/ProfilePage.tsx';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 
 const queryClient = new QueryClient({
@@ -74,7 +75,15 @@ const App: React.FC = () => {
                           path='/course/:courseId'
                           element={<CourseDetailPage />}
                         />
-                        <Route path='/profile' element={<div>Profile</div>} />
+                        <Route
+                          path='student/:studentId'
+                          element={<ProfilePage />}
+                        />
+                        <Route
+                          path='teacher/:teacherId'
+                          element={<ProfilePage />}
+                        />
+                        <Route path='/profile' element={<ProfilePage />} />
                         <Route path='/settings' element={<div>Settings</div>} />
                         <Route path='*' element={<div>Not Found</div>} />
                       </Routes>

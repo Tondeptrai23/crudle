@@ -51,7 +51,7 @@ export default class StudentService {
       throw new Error(response.data.Message);
     }
 
-    let students: Student[] = response.data.Data.map(
+    const students: Student[] = response.data.Data.map(
       (student: StudentCollectionResponse) => {
         return {
           id: student.StudentId,
@@ -97,5 +97,23 @@ export default class StudentService {
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
+  };
+
+  getStudentById: (id: string) => Promise<Student> = async (id) => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const response = await api.get(`/api/student/${id}`);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return {
+      id: response.data.Data.StudentId,
+      fullname: response.data.Data.Fullname,
+      email: response.data.Data.Email,
+      role: 'Student',
+      dob: response.data.Data.DateOfBirth,
+      userId: response.data.Data.UserId,
+    };
   };
 }

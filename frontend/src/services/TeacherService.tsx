@@ -92,4 +92,22 @@ export default class TeacherService {
       throw new Error(response.data.Message);
     }
   };
+  
+  getTeacherById: (id: string) => Promise<Teacher> = async (id) => {  
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const response = await api.get(`/api/teacher/${id}`);
+  
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+  
+    const teacher: Teacher = {
+      id: response.data.Data.TeacherId,
+      fullname: response.data.Data.Fullname,
+      contactEmail: response.data.Data.ContactEmail,
+      contactPhone: response.data.Data.ContactPhone,
+    };
+  
+    return teacher;
+  }
 }

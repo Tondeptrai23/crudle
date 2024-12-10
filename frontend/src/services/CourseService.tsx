@@ -12,6 +12,11 @@ export default class CourseService {
     return response.data.Data;
   }
 
+  async getCoursesByTeacher(): Promise<CourseResponse[]> {
+    const response = await api.get('/api/Teacher/Course');
+    return response.data.Data;
+  }
+
   getCoursesByAdmin: (data: {
     page?: number;
     size?: number;
@@ -104,6 +109,6 @@ export const mapToCourse = (response: CourseResponse) => ({
   description: response.Description,
   code: response.Code,
   startDate: response.StartDate,
-  teacherId: response.Teacher.TeacherId.toString(),
-  teacherName: response.Teacher.Fullname,
+  teacherId: response.Teacher?.TeacherId.toString(),
+  teacherName: response.Teacher?.Fullname,
 });
