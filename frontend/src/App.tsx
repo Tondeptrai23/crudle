@@ -12,12 +12,13 @@ import AdminCoursePage from './pages/admin/AdminCoursePage.tsx';
 import AdminHomePage from './pages/admin/AdminHomePage.tsx';
 import AdminStudentPage from './pages/admin/AdminStudentPage.tsx';
 import AdminTeacherPage from './pages/admin/AdminTeacherPage.tsx';
+import TeacherAssignmentPage from './pages/assignments/TeacherAssignmentPage.tsx';
+import CourseDetailPage from './pages/CourseDetailPage.tsx';
 import CoursePage from './pages/CoursePage.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
-import { WeatherPage } from './pages/WeatherPage.tsx';
-import CourseDetailPage from './pages/CourseDetailPage.tsx';
-import { Role } from './types/enums.ts';
 import ProfilePage from './pages/ProfilePage.tsx';
+import { WeatherPage } from './pages/WeatherPage.tsx';
+import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 
 const queryClient = new QueryClient({
@@ -42,6 +43,14 @@ const App: React.FC = () => {
       <QueryClientProvider client={queryClient}>
         <Router>
           <Routes>
+            <Route
+              path='/assignment'
+              element={
+                <MainLayout>
+                  <TeacherAssignmentPage />
+                </MainLayout>
+              }
+            />
             <Route path='/login' element={<LoginPage />} />
             <Route
               path='/admin/*'
