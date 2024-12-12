@@ -19,6 +19,7 @@ export type CreateAssignmentDto = {
   canViewScore: boolean;
   canRetry: boolean;
   type: 'file' | 'questions';
+  questions?: CreateQuestionDto[];
 };
 
 export interface Question {
@@ -32,6 +33,20 @@ export interface Question {
 export interface Answer {
   answerId: string;
   questionId: string;
+  value: string;
+  isCorrect: boolean;
+}
+
+export interface CreateQuestionDto {
+  assignmentId: string;
+  questionId: number;
+  content: string;
+  type: 'Multiple Choice' | 'Fill In Blank';
+  answers: CreateAnswerDto[];
+}
+
+export interface CreateAnswerDto {
+  answerId: number;
   value: string;
   isCorrect: boolean;
 }

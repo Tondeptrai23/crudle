@@ -1,34 +1,29 @@
 // components/AnswerCard.tsx
-import { Input } from '@/components/common/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/common/ui/radio-group';
+import { cn } from '@/lib/utils';
+import { CreateAnswerDto } from '@/types/assignment';
+import { AlphabetMapper } from '@/utils/helper';
 
 interface AnswerCardProps {
-  answer: {
-    answerId: string;
-    value: string;
-    isCorrect: boolean;
-  };
-  onAnswerChange: (value: string) => void;
-  onCorrectChange: () => void;
+  answer: CreateAnswerDto;
+  index: number;
 }
 
-export const AnswerCard = ({
-  answer,
-  onAnswerChange,
-  onCorrectChange,
-}: AnswerCardProps) => {
+const AnswerCard = ({ answer, index }: AnswerCardProps) => {
   return (
-    <div className='flex items-center space-x-2'>
-      <RadioGroup
-        value={String(answer.isCorrect)}
-        onValueChange={onCorrectChange}
+    <div className='flex items-center space-x-4 rounded-lg bg-slate-200 p-2'>
+      <div
+        className={cn(
+          'flex h-12 w-12 items-center justify-center rounded-md border border-gray-300 font-semibold',
+          answer.isCorrect
+            ? 'bg-green-500 text-white'
+            : 'bg-white text-gray-800',
+        )}
       >
-        <RadioGroupItem value={String(answer.answerId)} />
-      </RadioGroup>
-      <Input
-        value={answer.value}
-        onChange={(e) => onAnswerChange(e.target.value)}
-      />
+        {AlphabetMapper.numberToLetter(index)}
+      </div>
+      <div>{answer.value}</div>
     </div>
   );
 };
+
+export default AnswerCard;

@@ -4,15 +4,15 @@ import { Checkbox } from '@/components/common/ui/checkbox';
 import { Input } from '@/components/common/ui/input';
 import { Label } from '@/components/common/ui/label';
 import { Textarea } from '@/components/common/ui/textarea';
-import { CreateAssignmentDto, Question } from '@/types/assignment';
+import { CreateAssignmentDto, CreateQuestionDto } from '@/types/assignment';
 import { Plus } from 'lucide-react';
 import { QuestionCard } from './QuestionCard';
 
 interface AssignmentFormProps {
   formData: CreateAssignmentDto;
-  questions: Question[];
+  questions: CreateQuestionDto[];
   onFormChange: (data: CreateAssignmentDto) => void;
-  onQuestionsChange: (questions: Question[]) => void;
+  onQuestionsChange: (questions: CreateQuestionDto[]) => void;
   onSave: () => void;
 }
 
@@ -23,7 +23,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   onQuestionsChange,
   onSave,
 }) => {
-  const handleQuestionContentChange = (questionId: string, content: string) => {
+  const handleQuestionContentChange = (questionId: number, content: string) => {
     const updatedQuestions = questions.map((q) =>
       q.questionId === questionId ? { ...q, content } : q,
     );
@@ -31,8 +31,8 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   };
 
   const handleAnswerChange = (
-    questionId: string,
-    answerId: string,
+    questionId: number,
+    answerId: number,
     value: string,
   ) => {
     const updatedQuestions = questions.map((q) =>
@@ -48,7 +48,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
     onQuestionsChange(updatedQuestions);
   };
 
-  const handleAnswerCorrectChange = (questionId: string, answerId: string) => {
+  const handleAnswerCorrectChange = (questionId: number, answerId: number) => {
     const updatedQuestions = questions.map((q) =>
       q.questionId === questionId
         ? {
@@ -64,27 +64,24 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   };
 
   const handleAddQuestion = () => {
-    const newQuestion: Question = {
+    const newQuestion: CreateQuestionDto = {
       assignmentId: 'a2',
-      questionId: `q${questions.length + 1}`,
+      questionId: questions.length + 1,
       content: '',
       type: 'Multiple Choice',
       answers: [
         {
-          answerId: `a${questions.length}_1`,
-          questionId: `q${questions.length + 1}`,
+          answerId: 0,
           value: '',
           isCorrect: true,
         },
         {
-          answerId: `a${questions.length}_2`,
-          questionId: `q${questions.length + 1}`,
+          answerId: 1,
           value: '',
           isCorrect: false,
         },
         {
-          answerId: `a${questions.length}_3`,
-          questionId: `q${questions.length + 1}`,
+          answerId: 2,
           value: '',
           isCorrect: false,
         },
@@ -94,11 +91,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   };
 
   return (
-    <div className='mx-auto max-w-4xl space-y-6 p-6'>
-      <h1 className='text-2xl font-bold'>
-        Object Oriented Programming - Add Assignment
-      </h1>
-
+    <>
       <div className='space-y-4'>
         <div className='grid grid-cols-2 gap-4'>
           <div>
@@ -160,6 +153,19 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
         </div>
       </div>
 
+      <div className='flex flex-row items-center justify-between'>
+        <h2 className='text-lg font-semibold'>Questions</h2>
+
+        <Button
+          onClick={handleAddQuestion}
+          variant='default'
+          className='w-40 bg-blue-500 hover:bg-blue-700'
+        >
+          <Plus className='mr-2 h-4 w-4' />
+          Add Question
+        </Button>
+      </div>
+
       <div className='space-y-4'>
         {questions.map((question, index) => (
           <QuestionCard
@@ -171,22 +177,12 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
             onAnswerCorrectChange={handleAnswerCorrectChange}
           />
         ))}
-
-        <Button
-          onClick={handleAddQuestion}
-          variant='outline'
-          className='w-full'
-        >
-          <Plus className='mr-2 h-4 w-4' />
-          Add Question
-        </Button>
       </div>
-
       <div className='flex justify-end space-x-2'>
         <Button variant='outline'>Cancel</Button>
         <Button onClick={onSave}>Save Assignment</Button>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-// components/QuestionCard.tsx
+// components/EditingQuestionCard.tsx
 import { Button } from '@/components/common/ui/button';
 import { Card } from '@/components/common/ui/card';
 import { Input } from '@/components/common/ui/input';
@@ -6,7 +6,7 @@ import { CreateQuestionDto } from '@/types/assignment';
 import { Edit, Trash } from 'lucide-react';
 import { EditingAnswerCard } from './EditingAnswerCard.tsx';
 
-interface QuestionCardProps {
+interface EditingQuestionCardProps {
   question: CreateQuestionDto;
   index: number;
   onQuestionChange: (questionId: number, content: string) => void;
@@ -14,13 +14,13 @@ interface QuestionCardProps {
   onAnswerCorrectChange: (questionId: number, answerId: number) => void;
 }
 
-export const QuestionCard = ({
+export const EditingQuestionCard = ({
   question,
   index,
   onQuestionChange,
   onAnswerChange,
   onAnswerCorrectChange,
-}: QuestionCardProps) => {
+}: EditingQuestionCardProps) => {
   return (
     <Card className='p-4'>
       <div className='mb-4 flex items-center justify-between'>
