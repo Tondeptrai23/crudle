@@ -13,6 +13,7 @@ const courseService = new CourseService();
 const courseKeys = {
   lists: () => ['courses'],
   detail: (id: string) => ['courses', id],
+  articles: (courseId: string) => ['courses', courseId, 'articles'],
 };
 
 export const useCourses = (data: QueryHookParams) => {
@@ -97,3 +98,34 @@ export const useRoleBasedCourses = (role: string) => {
     queryFn,
   });
 };
+
+export const useArticles = (role: string, { courseId } : { courseId: string}) => {
+  // TODO: Add pagination, sorting, and filtering
+  const queryFn = role === 'Student'
+    ? () => courseService.getArticlesByStudent(courseId, {})
+    : () => courseService.getArticlesByTeacher(courseId, {});
+
+  return useQuery({
+    queryKey: courseKeys.articles(courseId),
+    queryFn: queryFn,
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+}
+
+export const useArticleDetail = (role: string, { courseId, articleId } : { courseId: string, articleId: string }) => {
+  const queryFn = role === 'Student'
+    ? () => courseService.getArticleDetailByStudent(courseId, articleId)
+    : () => courseService.getArticleDetailByTeacher(courseId, articleId);
+
+  return useQuery({
+    queryKey: ['courses', courseId, 'articles', articleId],
+    queryFn: queryFn,
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+}

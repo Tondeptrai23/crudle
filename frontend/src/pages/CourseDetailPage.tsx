@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import api from '@/utils/api';
 import { CourseResponse } from '@/types/course';
 import Course from '@/types/course';
+import ArticleList from '@/components/articles/ArticleList';
 
 const mapToCourseDetail = (response: CourseResponse): Course => ({
   id: response.CourseId.toString(),
@@ -66,6 +67,11 @@ const CourseDetailPage: React.FC = () => {
               {new Date(course.startDate).toLocaleDateString()}
             </p>
           </div>
+        </div>
+
+        <div className='mt-8'>
+          <h2 className='text-2xl font-semibold'>Assignments</h2>
+          <ArticleList courseId={course.id} />
         </div>
       </div>
     </div>

@@ -15,6 +15,7 @@ import AdminTeacherPage from './pages/admin/AdminTeacherPage.tsx';
 import CoursePage from './pages/CoursePage.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { WeatherPage } from './pages/WeatherPage.tsx';
+import ArticleDetailPage from './pages/ArticleDetailPage.tsx';
 import CourseDetailPage from './pages/CourseDetailPage.tsx';
 import { Role } from './types/enums.ts';
 import ProfilePage from './pages/ProfilePage.tsx';
@@ -74,6 +75,10 @@ const App: React.FC = () => {
                         <Route
                           path='/course/:courseId'
                           element={<CourseDetailPage />}
+                        />
+                        <Route
+                          path='/course/:courseId/article/:articleId'
+                          element={<ArticleDetailPage />}
                         />
                         <Route
                           path='student/:studentId'
