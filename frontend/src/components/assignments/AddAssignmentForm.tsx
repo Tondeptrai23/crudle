@@ -23,44 +23,14 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   onQuestionsChange,
   onSave,
 }) => {
-  const handleQuestionContentChange = (questionId: number, content: string) => {
-    const updatedQuestions = questions.map((q) =>
-      q.questionId === questionId ? { ...q, content } : q,
-    );
-    onQuestionsChange(updatedQuestions);
-  };
-
-  const handleAnswerChange = (
-    questionId: number,
-    answerId: number,
-    value: string,
-  ) => {
-    const updatedQuestions = questions.map((q) =>
-      q.questionId === questionId
-        ? {
-            ...q,
-            answers: q.answers.map((a) =>
-              a.answerId === answerId ? { ...a, value } : a,
-            ),
-          }
-        : q,
-    );
-    onQuestionsChange(updatedQuestions);
-  };
-
-  const handleAnswerCorrectChange = (questionId: number, answerId: number) => {
-    const updatedQuestions = questions.map((q) =>
-      q.questionId === questionId
-        ? {
-            ...q,
-            answers: q.answers.map((a) => ({
-              ...a,
-              isCorrect: a.answerId === answerId,
-            })),
-          }
-        : q,
-    );
-    onQuestionsChange(updatedQuestions);
+  const handleQuestionContentChange = (question: CreateQuestionDto) => {
+    const newQuestions = questions.map((q) => {
+      if (q.questionId === question.questionId) {
+        return question;
+      }
+      return q;
+    });
+    onQuestionsChange(newQuestions);
   };
 
   const handleAddQuestion = () => {
@@ -174,8 +144,6 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
             question={question}
             index={index}
             onQuestionChange={handleQuestionContentChange}
-            onAnswerChange={handleAnswerChange}
-            onAnswerCorrectChange={handleAnswerCorrectChange}
           />
         ))}
       </div>

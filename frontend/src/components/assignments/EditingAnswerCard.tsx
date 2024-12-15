@@ -17,10 +17,10 @@ const EditingAnswerCard = ({
   return (
     <div className='flex items-center space-x-2'>
       <RadioGroup
-        value={String(answer.isCorrect)}
+        value={answer.isCorrect ? 'true' : 'false'}
         onValueChange={onCorrectChange}
       >
-        <RadioGroupItem value={String(answer.answerId)} />
+        <RadioGroupItem value='true' />
       </RadioGroup>
       <Input
         value={answer.value}

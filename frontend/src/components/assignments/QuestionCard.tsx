@@ -11,9 +11,7 @@ interface QuestionCardProps {
   question: CreateQuestionDto;
   index: number;
   showButton: boolean;
-  onQuestionChange: (questionId: number, content: string) => void;
-  onAnswerChange: (questionId: number, answerId: number, value: string) => void;
-  onAnswerCorrectChange: (questionId: number, answerId: number) => void;
+  onQuestionChange: (content: CreateQuestionDto) => void;
 }
 
 const QuestionCard = ({
@@ -21,8 +19,6 @@ const QuestionCard = ({
   index,
   showButton,
   onQuestionChange,
-  onAnswerChange,
-  onAnswerCorrectChange,
 }: QuestionCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -30,9 +26,11 @@ const QuestionCard = ({
     <EditingQuestionCard
       question={question}
       index={index}
-      onQuestionChange={onQuestionChange}
-      onAnswerChange={onAnswerChange}
-      onAnswerCorrectChange={onAnswerCorrectChange}
+      onCancel={() => setIsEditing(false)}
+      onDone={(question) => {
+        onQuestionChange(question);
+        setIsEditing(false);
+      }}
     />
   ) : (
     <Card className='p-4'>
