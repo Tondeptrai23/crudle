@@ -21,11 +21,13 @@ const EditingQuestionCard = ({
 }: EditingQuestionCardProps) => {
   const [answers, setAnswers] = useState(question.answers);
   const [questionContent, setQuestionContent] = useState(question.content);
-  const [questionError, setQuestionError] = useState('');
-  const [answerErrors, setAnswerErrors] = useState<Record<number, string>>({});
+  const [questionError, setQuestionError] = useState<string | null>(null);
+  const [answerErrors, setAnswerErrors] = useState<
+    Record<number, string | null>
+  >({});
 
   const onAnswerChange = (answerId: number, value: string) => {
-    const newAnswerErrors = { ...answerErrors, [answerId]: '' };
+    const newAnswerErrors = { ...answerErrors, [answerId]: null };
     setAnswerErrors(newAnswerErrors);
 
     const newAnswers = answers.map((answer) => {
@@ -41,27 +43,33 @@ const EditingQuestionCard = ({
   const onAnswerCorrectChange = (answerId: number) => {
     const newAnswers = answers.map((answer) => {
       if (answer.answerId === answerId) {
-        return { ...answer, isCorrect: !answer.isCorrect };
+        return { ...answer, isCorrect: true };
       }
-      return answer;
+      return { ...answer, isCorrect: false };
     });
 
     setAnswers(newAnswers);
   };
 
   const validate = () => {
-    if (!questionContent) {
+    if (!questionContent || questionContent.length === 0) {
       setQuestionError('Question content is required');
+    } else {
+      setQuestionError(null);
     }
 
-    const errors: Record<number, string> = {};
+    const errors: Record<number, string | null> = {};
     answers.forEach((answer) => {
-      if (!answer.value) {
+      if (!answer.value || answer.value.length === 0) {
         errors[answer.answerId] = 'Answer content is required';
+      } else {
+        errors[answer.answerId] = null;
       }
     });
 
     setAnswerErrors(errors);
+
+    return errors;
   };
 
   return (
@@ -75,7 +83,7 @@ const EditingQuestionCard = ({
           value={questionContent}
           onChange={(e) => {
             setQuestionContent(e.target.value);
-            setQuestionError('');
+            setQuestionError(null);
           }}
         />
         {questionError && (
@@ -90,7 +98,11 @@ const EditingQuestionCard = ({
             answer={answer}
             error={answerErrors[answer.answerId]}
             onDelete={() =>
-              setAnswers(answers.filter((a) => a.answerId !== answer.answerId))
+              setAnswers(
+                answers
+                  .filter((a) => a.answerId !== answer.answerId)
+                  .map((a, i) => ({ ...a, answerId: i })),
+              )
             }
             onAnswerChange={(value: string) =>
               onAnswerChange(answer.answerId, value)
@@ -112,8 +124,6 @@ const EditingQuestionCard = ({
               isCorrect: false,
             },
           ]);
-
-          setAnswerErrors({ ...answerErrors, [answers.length]: '' });
         }}
       >
         Add Answer
@@ -126,17 +136,21 @@ const EditingQuestionCard = ({
         <Button
           variant='default'
           className='bg-blue-500 hover:bg-blue-700'
-          onClick={() => {
-            validate();
+          onClick={async () => {
+            let answerErrors = validate();
 
-            if (questionError || Object.keys(answerErrors).length > 0) {
+            const errors = Object.values(answerErrors).filter(
+              (error) => error !== null,
+            );
+
+            if (questionError !== null || errors.length > 0) {
               return;
             }
 
             onDone({ ...question, content: questionContent, answers });
           }}
         >
-          Done Editing
+          {question.isNew ? 'Add' : 'Save'}
         </Button>
       </div>
     </Card>

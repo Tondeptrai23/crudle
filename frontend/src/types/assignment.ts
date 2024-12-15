@@ -43,6 +43,7 @@ export interface CreateQuestionDto {
   content: string;
   type: 'Multiple Choice' | 'Fill In Blank';
   answers: CreateAnswerDto[];
+  isNew?: boolean;
 }
 
 export interface CreateAnswerDto {

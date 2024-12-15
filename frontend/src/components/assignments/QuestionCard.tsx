@@ -8,27 +8,34 @@ import AnswerCard from './AnswerCard.tsx';
 import EditingQuestionCard from './EdittingQuestionCard.tsx';
 
 interface QuestionCardProps {
-  question: CreateQuestionDto & { isNew?: boolean };
+  question: CreateQuestionDto;
   index: number;
   showButton: boolean;
   onQuestionChange: (content: CreateQuestionDto) => void;
+  onDelete: (questionId: number) => void;
 }
 
 const QuestionCard = ({
   question,
   index,
   showButton,
+  onDelete,
   onQuestionChange,
 }: QuestionCardProps) => {
-  const [isEditing, setIsEditing] = useState(false || question.isNew);
+  const [isEditing, setIsEditing] = useState(false);
 
-  return isEditing ? (
+  return isEditing || question.isNew ? (
     <EditingQuestionCard
       question={question}
       index={index}
-      onCancel={() => setIsEditing(false)}
+      onCancel={() => {
+        setIsEditing(false);
+        if (question.isNew) {
+          onDelete(question.questionId);
+        }
+      }}
       onDone={(question) => {
-        onQuestionChange(question);
+        onQuestionChange({ ...question, isNew: false });
         setIsEditing(false);
       }}
     />
@@ -48,7 +55,10 @@ const QuestionCard = ({
                 <Edit className='h-4 w-4' />
                 Edit
               </Button>
-              <Button variant='outline'>
+              <Button
+                variant='outline'
+                onClick={() => onDelete(question.questionId)}
+              >
                 <Trash className='h-4 w-4' />
                 Delete
               </Button>

@@ -6,6 +6,7 @@ import { Label } from '@/components/common/ui/label';
 import { Textarea } from '@/components/common/ui/textarea';
 import { CreateAssignmentDto, CreateQuestionDto } from '@/types/assignment';
 import { Plus } from 'lucide-react';
+import LoadingButton from '../common/ui/LoadingButton';
 import QuestionCard from './QuestionCard';
 
 interface AssignmentFormProps {
@@ -34,7 +35,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   };
 
   const handleAddQuestion = () => {
-    const newQuestion: CreateQuestionDto & { isNew?: boolean } = {
+    const newQuestion: CreateQuestionDto = {
       assignmentId: 'a2',
       questionId: questions.length + 1,
       content: '',
@@ -59,6 +60,14 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
       ],
     };
     onQuestionsChange([...questions, newQuestion]);
+  };
+
+  const handleDeleteQuestion = (questionId: number) => {
+    const result = questions
+      .filter((q) => q.questionId !== questionId)
+      .map((q, i) => ({ ...q, questionId: i }));
+
+    onQuestionsChange(result);
   };
 
   return (
@@ -144,13 +153,19 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
             showButton={true}
             question={question}
             index={index}
+            onDelete={handleDeleteQuestion}
             onQuestionChange={handleQuestionContentChange}
           />
         ))}
       </div>
       <div className='flex justify-end space-x-2'>
         <Button variant='outline'>Cancel</Button>
-        <Button onClick={onSave}>Save Assignment</Button>
+        <LoadingButton
+          onClick={onSave}
+          className='bg-blue-500 hover:bg-blue-700'
+        >
+          Save Assignment
+        </LoadingButton>
       </div>
     </>
   );
