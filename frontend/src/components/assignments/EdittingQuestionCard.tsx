@@ -61,6 +61,9 @@ const EditingQuestionCard = ({
           <EditingAnswerCard
             key={answer.answerId}
             answer={answer}
+            onDelete={() =>
+              setAnswers(answers.filter((a) => a.answerId !== answer.answerId))
+            }
             onAnswerChange={(value: string) =>
               onAnswerChange(answer.answerId, value)
             }
@@ -68,6 +71,23 @@ const EditingQuestionCard = ({
           />
         ))}
       </div>
+
+      <Button
+        className='text-md mb-4 w-full font-semibold'
+        variant='outline'
+        onClick={() =>
+          setAnswers([
+            ...answers,
+            {
+              answerId: answers.length,
+              value: '',
+              isCorrect: false,
+            },
+          ])
+        }
+      >
+        Add Answer
+      </Button>
 
       <div className='flex flex-row justify-end gap-4'>
         <Button variant='outline' onClick={onCancel}>

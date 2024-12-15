@@ -1,5 +1,4 @@
 import AddAssignmentForm from '@/components/assignments/AddAssignmentForm';
-import AnswerCard from '@/components/assignments/AnswerCard';
 import { CreateAssignmentDto, CreateQuestionDto } from '@/types/assignment';
 import { useState } from 'react';
 
@@ -70,24 +69,6 @@ const AddAssignmentPage = () => {
 
   return (
     <div className='mx-auto max-w-4xl space-y-6 p-6'>
-      <AnswerCard
-        answer={{
-          answerId: 0,
-          value: 'A programming language',
-          isCorrect: true,
-        }}
-        index={0}
-      />
-
-      <AnswerCard
-        answer={{
-          answerId: 0,
-          value: 'A programming language',
-          isCorrect: false,
-        }}
-        index={1}
-      />
-
       <h1 className='text-2xl font-bold'>
         Object Oriented Programming - Add Assignment
       </h1>

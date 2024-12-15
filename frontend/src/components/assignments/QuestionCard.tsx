@@ -8,7 +8,7 @@ import AnswerCard from './AnswerCard.tsx';
 import EditingQuestionCard from './EdittingQuestionCard.tsx';
 
 interface QuestionCardProps {
-  question: CreateQuestionDto;
+  question: CreateQuestionDto & { isNew?: boolean };
   index: number;
   showButton: boolean;
   onQuestionChange: (content: CreateQuestionDto) => void;
@@ -20,7 +20,7 @@ const QuestionCard = ({
   showButton,
   onQuestionChange,
 }: QuestionCardProps) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false || question.isNew);
 
   return isEditing ? (
     <EditingQuestionCard

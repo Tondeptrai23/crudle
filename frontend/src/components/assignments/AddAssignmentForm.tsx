@@ -34,10 +34,11 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   };
 
   const handleAddQuestion = () => {
-    const newQuestion: CreateQuestionDto = {
+    const newQuestion: CreateQuestionDto & { isNew?: boolean } = {
       assignmentId: 'a2',
       questionId: questions.length + 1,
       content: '',
+      isNew: true,
       type: 'Multiple Choice',
       answers: [
         {
