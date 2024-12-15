@@ -54,6 +54,8 @@ const EditingQuestionCard = ({
   const validate = () => {
     if (!questionContent || questionContent.length === 0) {
       setQuestionError('Question content is required');
+    } else if (answers.length < 1) {
+      setQuestionError('At least one answer is required');
     } else {
       setQuestionError(null);
     }

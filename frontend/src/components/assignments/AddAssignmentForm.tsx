@@ -1,13 +1,35 @@
-// components/AssignmentForm.tsx
 import { Button } from '@/components/common/ui/button';
 import { Checkbox } from '@/components/common/ui/checkbox';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/common/ui/form';
 import { Input } from '@/components/common/ui/input';
-import { Label } from '@/components/common/ui/label';
 import { Textarea } from '@/components/common/ui/textarea';
 import { CreateAssignmentDto, CreateQuestionDto } from '@/types/assignment';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
-import LoadingButton from '../common/ui/LoadingButton';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 import QuestionCard from './QuestionCard';
+
+// Define the form schema
+const assignmentFormSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  duedAt: z.date({
+    required_error: 'Due date is required',
+  }),
+  content: z.string().min(1, 'Content is required'),
+  canViewScore: z.boolean().default(false),
+  canRetry: z.boolean().default(false),
+});
+
+// Infer the type from the schema
+type AssignmentFormValues = z.infer<typeof assignmentFormSchema>;
 
 interface AssignmentFormProps {
   formData: CreateAssignmentDto;
@@ -24,6 +46,22 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   onQuestionsChange,
   onSave,
 }) => {
+  const form = useForm<AssignmentFormValues>({
+    resolver: zodResolver(assignmentFormSchema),
+    defaultValues: {
+      name: formData.name,
+      duedAt: formData.duedAt || new Date(),
+      content: formData.content,
+      canViewScore: formData.canViewScore,
+      canRetry: formData.canRetry,
+    },
+  });
+
+  const onSubmit = (values: AssignmentFormValues) => {
+    onFormChange(values as CreateAssignmentDto);
+    onSave();
+  };
+
   const handleQuestionContentChange = (question: CreateQuestionDto) => {
     const newQuestions = questions.map((q) => {
       if (q.questionId === question.questionId) {
@@ -42,21 +80,9 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
       isNew: true,
       type: 'Multiple Choice',
       answers: [
-        {
-          answerId: 0,
-          value: '',
-          isCorrect: true,
-        },
-        {
-          answerId: 1,
-          value: '',
-          isCorrect: false,
-        },
-        {
-          answerId: 2,
-          value: '',
-          isCorrect: false,
-        },
+        { answerId: 0, value: '', isCorrect: true },
+        { answerId: 1, value: '', isCorrect: false },
+        { answerId: 2, value: '', isCorrect: false },
       ],
     };
     onQuestionsChange([...questions, newQuestion]);
@@ -66,108 +92,138 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
     const result = questions
       .filter((q) => q.questionId !== questionId)
       .map((q, i) => ({ ...q, questionId: i }));
-
     onQuestionsChange(result);
   };
 
   return (
-    <>
-      <div className='space-y-4'>
-        <div className='grid grid-cols-2 gap-4'>
-          <div>
-            <Label htmlFor='name'>Name</Label>
-            <Input
-              id='name'
-              value={formData.name}
-              onChange={(e) =>
-                onFormChange({ ...formData, name: e.target.value })
-              }
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+        <div className='space-y-4'>
+          <div className='grid grid-cols-2 gap-4'>
+            <FormField
+              control={form.control}
+              name='name'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <Label htmlFor='dueDate'>Due Date</Label>
-            <Input
-              id='dueDate'
-              type='date'
-              value={formData.duedAt?.toLocaleDateString()}
-              onChange={(e) =>
-                onFormChange({ ...formData, duedAt: new Date(e.target.value) })
-              }
-            />
-          </div>
-        </div>
 
-        <div>
-          <Label htmlFor='content'>Content</Label>
-          <Textarea
-            id='content'
-            value={formData.content}
-            onChange={(e) =>
-              onFormChange({ ...formData, content: e.target.value })
-            }
+            <FormField
+              control={form.control}
+              name='duedAt'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Due Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='date'
+                      {...field}
+                      value={
+                        field.value
+                          ? new Date(field.value).toISOString().split('T')[0]
+                          : ''
+                      }
+                      onChange={(e) => field.onChange(new Date(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name='content'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Content</FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
+
+          <div className='flex space-x-6'>
+            <FormField
+              control={form.control}
+              name='canViewScore'
+              render={({ field }) => (
+                <FormItem className='flex items-center space-x-2'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel>Can View Score</FormLabel>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='canRetry'
+              render={({ field }) => (
+                <FormItem className='flex items-center space-x-2'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel>Can Retry</FormLabel>
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
-        <div className='flex space-x-6'>
-          <div className='flex items-center space-x-2'>
-            <Checkbox
-              id='canViewScore'
-              checked={formData.canViewScore}
-              onCheckedChange={(checked) =>
-                onFormChange({ ...formData, canViewScore: Boolean(checked) })
-              }
-            />
-            <Label htmlFor='canViewScore'>Can View Score</Label>
-          </div>
-
-          <div className='flex items-center space-x-2'>
-            <Checkbox
-              id='canRetry'
-              checked={formData.canRetry}
-              onCheckedChange={(checked) =>
-                onFormChange({ ...formData, canRetry: Boolean(checked) })
-              }
-            />
-            <Label htmlFor='canRetry'>Can Retry</Label>
-          </div>
+        {/* Questions section  */}
+        <div className='flex flex-row items-center justify-between'>
+          <h2 className='text-lg font-semibold'>Questions</h2>
+          <Button
+            type='button'
+            onClick={handleAddQuestion}
+            variant='default'
+            className='w-40 bg-blue-500 hover:bg-blue-700'
+          >
+            <Plus className='mr-2 h-4 w-4' />
+            Add Question
+          </Button>
         </div>
-      </div>
 
-      <div className='flex flex-row items-center justify-between'>
-        <h2 className='text-lg font-semibold'>Questions</h2>
+        <div className='space-y-4'>
+          {questions.map((question, index) => (
+            <QuestionCard
+              key={question.questionId}
+              showButton={true}
+              question={question}
+              index={index}
+              onDelete={handleDeleteQuestion}
+              onQuestionChange={handleQuestionContentChange}
+            />
+          ))}
+        </div>
 
-        <Button
-          onClick={handleAddQuestion}
-          variant='default'
-          className='w-40 bg-blue-500 hover:bg-blue-700'
-        >
-          <Plus className='mr-2 h-4 w-4' />
-          Add Question
-        </Button>
-      </div>
-
-      <div className='space-y-4'>
-        {questions.map((question, index) => (
-          <QuestionCard
-            key={question.questionId}
-            showButton={true}
-            question={question}
-            index={index}
-            onDelete={handleDeleteQuestion}
-            onQuestionChange={handleQuestionContentChange}
-          />
-        ))}
-      </div>
-      <div className='flex justify-end space-x-2'>
-        <Button variant='outline'>Cancel</Button>
-        <LoadingButton
-          onClick={onSave}
-          className='bg-blue-500 hover:bg-blue-700'
-        >
-          Save Assignment
-        </LoadingButton>
-      </div>
-    </>
+        <div className='flex justify-end space-x-2'>
+          <Button type='button' variant='outline'>
+            Cancel
+          </Button>
+          <Button type='submit' className='bg-blue-500 hover:bg-blue-700'>
+            Save Assignment
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 

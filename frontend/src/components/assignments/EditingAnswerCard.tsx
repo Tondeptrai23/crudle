@@ -7,7 +7,7 @@ import { Button } from '../common/ui/button';
 
 interface EditingAnswerCardProps {
   answer: CreateAnswerDto;
-  error: string;
+  error: string | null;
   onAnswerChange: (value: string) => void;
   onCorrectChange: () => void;
   onDelete: () => void;
