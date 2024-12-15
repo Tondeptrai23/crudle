@@ -17,7 +17,6 @@ public interface IArticleService
     Task<(int, IEnumerable<ArticleDto>)> GetArticlesAsync(int courseId, IArticleSpecification serviceSpecification,
         ArticleCollectionQueryDto? queryDto);
 
-
     /// <summary>
     /// Get article by articleId and courseId
     /// </summary>
