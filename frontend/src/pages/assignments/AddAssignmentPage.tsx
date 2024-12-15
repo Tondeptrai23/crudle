@@ -1,59 +1,15 @@
 import AddAssignmentForm from '@/components/assignments/AddAssignmentForm';
+import { useCreateAssignment } from '@/hooks/api/useAssignmentApi';
 import { CreateAssignmentDto, CreateQuestionDto } from '@/types/assignment';
+import { UrlExtractor } from '@/utils/helper';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AddAssignmentPage = () => {
-  const [questions, setQuestions] = useState<CreateQuestionDto[]>([
-    {
-      assignmentId: 'a2',
-      questionId: 1,
-      content: 'What is TypeScript?',
-      answers: [
-        {
-          answerId: 0,
-          value: 'A programming language',
-          isCorrect: true,
-        },
-        {
-          answerId: 1,
-          value: 'A type of coffee',
-          isCorrect: false,
-        },
-        {
-          answerId: 2,
-          value: 'A music genre',
-          isCorrect: false,
-        },
-      ],
-      type: 'Multiple Choice',
-    },
-    {
-      questionId: 2,
-      assignmentId: 'a2',
-      content: 'Explain the concept of interfaces in TypeScript.',
-      answers: [
-        {
-          answerId: 0,
-          value: 'Interfaces define the structure of an object.',
-          isCorrect: true,
-        },
-        {
-          answerId: 1,
-          value: 'Interfaces are used to style web pages.',
-          isCorrect: false,
-        },
-        {
-          answerId: 2,
-          value: 'Interfaces are a type of database.',
-          isCorrect: false,
-        },
-      ],
-      type: 'Multiple Choice',
-    },
-  ]);
+  const [questions, setQuestions] = useState<CreateQuestionDto[]>([]);
 
   const [formData, setFormData] = useState<CreateAssignmentDto>({
-    courseId: '',
+    courseId: UrlExtractor.extractCourseId(),
     name: '',
     content: '',
     duedAt: null,
@@ -62,9 +18,13 @@ const AddAssignmentPage = () => {
     type: 'questions',
   });
 
-  const handleSave = () => {
-    console.log('Form Data:', formData);
-    console.log('Questions:', questions);
+  const createAssignment = useCreateAssignment();
+  const navigate = useNavigate();
+
+  const handleSave = async () => {
+    await createAssignment.mutateAsync(formData);
+
+    navigate(`/course/${formData.courseId}/assignment`);
   };
 
   return (

@@ -15,6 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { Separator } from '../common/ui/separator';
 import QuestionCard from './QuestionCard';
 
 // Define the form schema
@@ -74,7 +75,6 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
 
   const handleAddQuestion = () => {
     const newQuestion: CreateQuestionDto = {
-      assignmentId: 'a2',
       questionId: questions.length + 1,
       content: '',
       isNew: true,
@@ -187,6 +187,8 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
           </div>
         </div>
 
+        <Separator />
+
         {/* Questions section  */}
         <div className='flex flex-row items-center justify-between'>
           <h2 className='text-lg font-semibold'>Questions</h2>
@@ -213,6 +215,8 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
             />
           ))}
         </div>
+
+        <Separator />
 
         <div className='flex justify-end space-x-2'>
           <Button type='button' variant='outline'>

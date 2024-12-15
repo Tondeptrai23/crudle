@@ -23,3 +23,15 @@ export class AlphabetMapper {
     return letter.charCodeAt(0) - 65;
   }
 }
+
+export class UrlExtractor {
+  static extractCourseId(): number {
+    const match = window.location.pathname.match(/course\/(\d+)/);
+
+    if (!match) {
+      return 0;
+    }
+
+    return parseInt(match[1]);
+  }
+}

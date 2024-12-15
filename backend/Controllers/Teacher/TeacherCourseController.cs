@@ -207,46 +207,4 @@ public class CourseController : ControllerBase
         return Ok(new ResponseDto<IEnumerable<TeacherMinimalArticleDto>>(
             _mapper.Map<IEnumerable<TeacherMinimalArticleDto>>(article)));
     }
-
-    [HttpPost]
-    [Route("{courseId:int}/Assignments")]
-    public async Task<IActionResult> CreateAssignment([FromRoute] int courseId,
-        [FromBody] CreateAssignmentRequestDto createAssignmentRequestDto)
-    {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null)
-        {
-            return Unauthorized();
-        }
-
-        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
-        {
-            throw new ForbiddenException("This teacher is not allowed to create assignment for this course");
-        }
-
-        var assignment = await _assignmentService.CreateAssignmentAsync(courseId, createAssignmentRequestDto);
-        return Ok(new ResponseDto<AssignmentDto>(assignment));
-    }
-
-
-    [HttpGet]
-    [Route("{courseId:int}/Assignments")]
-    public async Task<IActionResult> GetAssignments([FromRoute] int courseId,
-        [FromQuery] AssignmentCollectionQueryDto queryDto)
-    {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null)
-        {
-            return Unauthorized();
-        }
-
-        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
-        {
-            throw new ForbiddenException("This teacher is not allowed to create assignment for this course");
-        }
-
-        var (count, assignments) = await _assignmentService.GetAssignmentsAsync(courseId, queryDto);
-        return Ok(new PaginationResponseDto<IEnumerable<AssignmentDto>>(assignments, count, queryDto.Page,
-            queryDto.Size));
-    }
 }

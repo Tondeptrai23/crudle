@@ -1,6 +1,6 @@
 export default interface Assignment {
-  assignmentId: string;
-  courseId: string;
+  assignmentId: number;
+  courseId: number;
   name: string;
   content: string;
   duedAt: Date | null;
@@ -11,8 +11,21 @@ export default interface Assignment {
   type: 'file' | 'questions';
 }
 
+export interface AssignmentResponse {
+  AssignmentId: number;
+  CourseId: number;
+  Name: string;
+  Content: string;
+  DuedAt: Date | null;
+  CreatedAt: Date;
+  UpdatedAt: Date;
+  CanViewScore: boolean;
+  CanRetry: boolean;
+  Type: 'file' | 'questions';
+}
+
 export type CreateAssignmentDto = {
-  courseId: string;
+  courseId: number;
   name: string;
   content: string;
   duedAt: Date | null;
@@ -23,22 +36,21 @@ export type CreateAssignmentDto = {
 };
 
 export interface Question {
-  questionId: string;
-  assignmentId: string;
+  questionId: number;
+  assignmentId: number;
   content: string;
   answers: Answer[];
   type: 'Multiple Choice' | 'Fill In Blank';
 }
 
 export interface Answer {
-  answerId: string;
-  questionId: string;
+  answerId: number;
+  questionId: number;
   value: string;
   isCorrect: boolean;
 }
 
 export interface CreateQuestionDto {
-  assignmentId: string;
   questionId: number;
   content: string;
   type: 'Multiple Choice' | 'Fill In Blank';

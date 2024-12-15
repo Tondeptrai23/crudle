@@ -44,24 +44,6 @@ const App: React.FC = () => {
       <QueryClientProvider client={queryClient}>
         <Router>
           <Routes>
-            <Route
-              path='/assignment'
-              element={
-                <MainLayout>
-                  <TeacherAssignmentPage />
-                </MainLayout>
-              }
-            />
-
-            <Route
-              path='/add-assignment'
-              element={
-                <MainLayout>
-                  <AddAssignmentPage />
-                </MainLayout>
-              }
-            />
-
             <Route path='/login' element={<LoginPage />} />
             <Route
               path='/admin/*'
@@ -103,6 +85,17 @@ const App: React.FC = () => {
                           path='teacher/:teacherId'
                           element={<ProfilePage />}
                         />
+
+                        <Route
+                          path='/course/:courseId/assignment'
+                          element={<TeacherAssignmentPage />}
+                        />
+
+                        <Route
+                          path='/course/:courseId/assignment/add'
+                          element={<AddAssignmentPage />}
+                        />
+
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path='/settings' element={<div>Settings</div>} />
                         <Route path='*' element={<div>Not Found</div>} />
