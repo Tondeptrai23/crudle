@@ -3,8 +3,8 @@ import { Button } from '@/components/common/ui/button';
 import { Card } from '@/components/common/ui/card';
 import { Input } from '@/components/common/ui/input';
 import { CreateQuestionDto } from '@/types/assignment';
-import { Edit, Trash } from 'lucide-react';
-import { EditingAnswerCard } from './EditingAnswerCard.tsx';
+import { Trash } from 'lucide-react';
+import EditingAnswerCard from './EditingAnswerCard.tsx';
 
 interface EditingQuestionCardProps {
   question: CreateQuestionDto;
@@ -14,7 +14,7 @@ interface EditingQuestionCardProps {
   onAnswerCorrectChange: (questionId: number, answerId: number) => void;
 }
 
-export const EditingQuestionCard = ({
+const EditingQuestionCard = ({
   question,
   index,
   onQuestionChange,
@@ -26,10 +26,6 @@ export const EditingQuestionCard = ({
       <div className='mb-4 flex items-center justify-between'>
         <h3 className='font-semibold'>Question {index + 1}</h3>
         <div className='flex space-x-2'>
-          <Button variant='outline'>
-            <Edit className='h-4 w-4' />
-            Edit
-          </Button>
           <Button variant='outline'>
             <Trash className='h-4 w-4' />
             Delete
@@ -48,7 +44,7 @@ export const EditingQuestionCard = ({
           <EditingAnswerCard
             key={answer.answerId}
             answer={answer}
-            onAnswerChange={(value) =>
+            onAnswerChange={(value: string) =>
               onAnswerChange(question.questionId, answer.answerId, value)
             }
             onCorrectChange={() =>
@@ -57,6 +53,10 @@ export const EditingQuestionCard = ({
           />
         ))}
       </div>
+
+      <Button variant='outline'>Add Answer</Button>
     </Card>
   );
 };
+
+export default EditingQuestionCard;

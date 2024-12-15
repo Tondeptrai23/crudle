@@ -6,7 +6,7 @@ import { Label } from '@/components/common/ui/label';
 import { Textarea } from '@/components/common/ui/textarea';
 import { CreateAssignmentDto, CreateQuestionDto } from '@/types/assignment';
 import { Plus } from 'lucide-react';
-import { QuestionCard } from './QuestionCard';
+import QuestionCard from './QuestionCard';
 
 interface AssignmentFormProps {
   formData: CreateAssignmentDto;
@@ -170,6 +170,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
         {questions.map((question, index) => (
           <QuestionCard
             key={question.questionId}
+            showButton={true}
             question={question}
             index={index}
             onQuestionChange={handleQuestionContentChange}

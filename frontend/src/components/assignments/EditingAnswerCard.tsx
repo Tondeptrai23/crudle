@@ -9,7 +9,7 @@ interface EditingAnswerCardProps {
   onCorrectChange: () => void;
 }
 
-export const EditingAnswerCard = ({
+const EditingAnswerCard = ({
   answer,
   onAnswerChange,
   onCorrectChange,
@@ -29,3 +29,5 @@ export const EditingAnswerCard = ({
     </div>
   );
 };
+
+export default EditingAnswerCard;

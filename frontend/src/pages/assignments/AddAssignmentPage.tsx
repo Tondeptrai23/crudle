@@ -49,7 +49,7 @@ const AddAssignmentPage = () => {
           isCorrect: false,
         },
       ],
-      type: 'Fill In Blank',
+      type: 'Multiple Choice',
     },
   ]);
 
