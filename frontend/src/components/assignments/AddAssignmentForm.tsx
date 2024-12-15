@@ -10,16 +10,19 @@ import {
 } from '@/components/common/ui/form';
 import { Input } from '@/components/common/ui/input';
 import { Textarea } from '@/components/common/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { getErrorMessage } from '@/lib/utils';
 import { CreateAssignmentDto, CreateQuestionDto } from '@/types/assignment';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Separator } from '../common/ui/separator';
 import QuestionCard from './QuestionCard';
-
 // Define the form schema
 const assignmentFormSchema = z.object({
+  courseId: z.number(),
   name: z.string().min(1, 'Name is required'),
   duedAt: z.date({
     required_error: 'Due date is required',
@@ -27,40 +30,75 @@ const assignmentFormSchema = z.object({
   content: z.string().min(1, 'Content is required'),
   canViewScore: z.boolean().default(false),
   canRetry: z.boolean().default(false),
+  type: z.string().default('questions'),
 });
 
 // Infer the type from the schema
 type AssignmentFormValues = z.infer<typeof assignmentFormSchema>;
 
 interface AssignmentFormProps {
-  formData: CreateAssignmentDto;
+  initialData: CreateAssignmentDto;
   questions: CreateQuestionDto[];
-  onFormChange: (data: CreateAssignmentDto) => void;
   onQuestionsChange: (questions: CreateQuestionDto[]) => void;
-  onSave: () => void;
+  onSave: (formData: CreateAssignmentDto) => void;
+  onCancel: () => void;
 }
 
 const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
-  formData,
+  initialData,
   questions,
-  onFormChange,
   onQuestionsChange,
   onSave,
+  onCancel,
 }) => {
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+
   const form = useForm<AssignmentFormValues>({
     resolver: zodResolver(assignmentFormSchema),
     defaultValues: {
-      name: formData.name,
-      duedAt: formData.duedAt || new Date(),
-      content: formData.content,
-      canViewScore: formData.canViewScore,
-      canRetry: formData.canRetry,
+      courseId: initialData.courseId,
+      name: initialData.name,
+      duedAt: initialData.duedAt || new Date(),
+      content: initialData.content,
+      canViewScore: initialData.canViewScore,
+      canRetry: initialData.canRetry,
     },
   });
 
   const onSubmit = (values: AssignmentFormValues) => {
-    onFormChange(values as CreateAssignmentDto);
-    onSave();
+    if (isSaving) return;
+
+    setIsSaving(true);
+    const result = values as CreateAssignmentDto;
+    result.questions = questions;
+
+    if (result.questions.some((q) => q.isNew)) {
+      toast({
+        title: 'Error',
+        description: 'Please complete all questions',
+        variant: 'destructive',
+      });
+
+      setIsSaving(false);
+      return;
+    }
+    try {
+      onSave(result);
+
+      toast({
+        title: 'Saved',
+        description: 'Successfully saved the assignment',
+      });
+    } catch (error) {
+      toast({
+        title: 'Failed to save',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleQuestionContentChange = (question: CreateQuestionDto) => {
@@ -219,7 +257,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
         <Separator />
 
         <div className='flex justify-end space-x-2'>
-          <Button type='button' variant='outline'>
+          <Button type='button' variant='outline' onClick={onCancel}>
             Cancel
           </Button>
           <Button type='submit' className='bg-blue-500 hover:bg-blue-700'>

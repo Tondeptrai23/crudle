@@ -7,24 +7,15 @@ import { useNavigate } from 'react-router-dom';
 
 const AddAssignmentPage = () => {
   const [questions, setQuestions] = useState<CreateQuestionDto[]>([]);
-
-  const [formData, setFormData] = useState<CreateAssignmentDto>({
-    courseId: UrlExtractor.extractCourseId(),
-    name: '',
-    content: '',
-    duedAt: null,
-    canViewScore: false,
-    canRetry: false,
-    type: 'questions',
-  });
+  const courseId = UrlExtractor.extractCourseId();
 
   const createAssignment = useCreateAssignment();
   const navigate = useNavigate();
 
-  const handleSave = async () => {
-    await createAssignment.mutateAsync(formData);
+  const handleSave = async (formData: CreateAssignmentDto) => {
+    // await createAssignment.mutateAsync(formData);
 
-    navigate(`/course/${formData.courseId}/assignment`);
+    navigate(`/course/${courseId}/assignment`);
   };
 
   return (
@@ -33,11 +24,19 @@ const AddAssignmentPage = () => {
         Object Oriented Programming - Add Assignment
       </h1>
       <AddAssignmentForm
-        formData={formData}
+        initialData={{
+          courseId: courseId,
+          name: '',
+          content: '',
+          duedAt: null,
+          canViewScore: false,
+          canRetry: false,
+          type: 'questions',
+        }}
         questions={questions}
-        onFormChange={setFormData}
         onQuestionsChange={setQuestions}
         onSave={handleSave}
+        onCancel={() => navigate('..', { relative: 'path' })}
       />
     </div>
   );
