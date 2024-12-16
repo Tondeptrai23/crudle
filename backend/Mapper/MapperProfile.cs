@@ -68,7 +68,7 @@ public class MappingProfile : Profile
         CreateMap<Assignment, AssignmentDto>();
         CreateMap<AssignmentDto, Assignment>();
         CreateMap<UpdateAssignmentRequestDto, Assignment>();
-        CreateMap<UpdateAssignmentDescriptionRequestDto, Assignment>();
+        CreateMap<UpdateAssignmentRequestDto, Assignment>();
  
         CreateMap<CreateQuestionRequestDto, Question>();
         CreateMap<Question, QuestionDto>();

@@ -5,4 +5,5 @@ public class AnswerDto
     public int QuestionId { get; set; }
     public int AnswerId { get; set; }
     public string Value { get; set; }
+    public bool IsCorrect { get; set; }
 }

@@ -54,6 +54,27 @@ public class AssignmentController : Controller
     [HttpPut]
     [Route("{assignmentId:int}")]
     public async Task<IActionResult> UpdateAssignment([FromRoute] int courseId, [FromRoute] int assignmentId,
+        [FromBody] CreateAssignmentRequestDto updateAssignmentRequestDto)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This teacher is not enrolled in the course");
+        }
+
+        var assignment =
+            await _assignmentService.ReplaceAssignmentAsync(courseId, assignmentId, updateAssignmentRequestDto);
+        return Ok(new ResponseDto<AssignmentDto>(assignment));
+    }
+
+    [HttpPatch]
+    [Route("{assignmentId:int}")]
+    public async Task<IActionResult> UpdateAssignmentDescription([FromRoute] int courseId, int assignmentId,
         [FromBody] UpdateAssignmentRequestDto updateAssignmentRequestDto)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -68,30 +89,8 @@ public class AssignmentController : Controller
             throw new ForbiddenException("This teacher is not enrolled in the course");
         }
 
-        var assignment =
-            await _assignmentService.UpdateAssignmentAsync(courseId, assignmentId, updateAssignmentRequestDto);
-        return Ok(new ResponseDto<AssignmentDto>(assignment));
-    }
-
-    [HttpPatch]
-    [Route("{assignmentId:int}")]
-    public async Task<IActionResult> UpdateAssignmentDescription([FromRoute] int courseId, int assignmentId,
-        [FromBody] UpdateAssignmentDescriptionRequestDto updateAssignmentDescriptionRequestDto)
-    {
-        var user = await _userManager.GetUserAsync(User);
-
-        if (user == null)
-        {
-            return Unauthorized();
-        }
-
-        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
-        {
-            throw new ForbiddenException("This teacher is not enrolled in the course");
-        }
-
         var assignment = await _assignmentService.UpdateAssignmentDescriptionAsync(courseId,
-            assignmentId, updateAssignmentDescriptionRequestDto);
+            assignmentId, updateAssignmentRequestDto);
         return Ok(new ResponseDto<AssignmentDto>(assignment));
     }
     
@@ -134,5 +133,24 @@ public class AssignmentController : Controller
         var (count, assignments) = await _assignmentService.GetAssignmentsAsync(courseId, queryDto);
         return Ok(new PaginationResponseDto<IEnumerable<AssignmentDto>>(assignments, count, queryDto.Page,
             queryDto.Size));
+    }
+    
+    [HttpGet]
+    [Route("{assignmentId:int}")]
+    public async Task<IActionResult> GetAssignment([FromRoute] int courseId, [FromRoute] int assignmentId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This teacher is not allowed to create assignment for this course");
+        }
+
+        var assignment = await _assignmentService.GetAssignmentAsync(courseId, assignmentId);
+        return Ok(new ResponseDto<AssignmentDto>(assignment));
     }
 }

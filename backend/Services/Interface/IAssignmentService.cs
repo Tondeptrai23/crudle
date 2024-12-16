@@ -16,9 +16,9 @@ public interface IAssignmentService
 
     public Task<bool> DeleteAssignmentAsync(int courseId, int assignmentId);
 
-    public Task<AssignmentDto> UpdateAssignmentAsync(int courseId, int assignmentId,
-        UpdateAssignmentRequestDto updateAssignmentRequestDto);
+    public Task<AssignmentDto> ReplaceAssignmentAsync(int courseId, int assignmentId,
+        CreateAssignmentRequestDto updateAssignmentRequestDto);
 
     public Task<AssignmentDto> UpdateAssignmentDescriptionAsync(int courseId, int assignmentId,
-        UpdateAssignmentDescriptionRequestDto updateAssignmentDescriptionRequestDto);
+        UpdateAssignmentRequestDto updateAssignmentRequestDto);
 }

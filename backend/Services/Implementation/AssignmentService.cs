@@ -52,17 +52,11 @@ public class AssignmentService : IAssignmentService
 
     public async Task<AssignmentDto> GetAssignmentAsync(int courseId, int assignmentId)
     {
-        var course = await _dbContext.Courses.Include(c => c.Assignments)
-            .ThenInclude(asgmt => asgmt.Questions).ThenInclude(question => question.Answers)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId);
-
-        if (course == null)
-        {
-            throw new ResourceNotFoundException("Course not found");
-        }
-
-        var assignment = course.Assignments.AsQueryable()
-            .FirstOrDefaultAsync(asgmt => asgmt.AssignmentId == assignmentId);
+        var assignment = await _dbContext.Assignments
+            .Include(asgmt => asgmt.Questions)
+            .ThenInclude(question => question.Answers)
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId);
+        
         if (assignment == null)
         {
             throw new ResourceNotFoundException("Assignment not found");
@@ -166,16 +160,10 @@ public class AssignmentService : IAssignmentService
 
     public async Task<bool> DeleteAssignmentAsync(int courseId, int assignmentId)
     {
-        var course = await _dbContext.Courses.Include(c => c.Assignments)
-            .ThenInclude(asgmt => asgmt.Questions).ThenInclude(question => question.Answers)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId);
-        if (course == null)
-        {
-            throw new ResourceNotFoundException("Course not found");
-        }
-
-        var assignment = await course.Assignments.AsQueryable()
-            .FirstOrDefaultAsync(asgmt => asgmt.AssignmentId == assignmentId);
+        var assignment = await _dbContext.Assignments
+            .Include(asgmt => asgmt.Questions)
+            .ThenInclude(question => question.Answers)
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId);
         if (assignment == null)
         {
             throw new ResourceNotFoundException("Assignment not found");
@@ -185,7 +173,41 @@ public class AssignmentService : IAssignmentService
         return await _dbContext.SaveChangesAsync() > 0;
     }
 
-    public async Task<AssignmentDto> UpdateAssignmentAsync(int courseId, int assignmentId,
+    public async Task<AssignmentDto> ReplaceAssignmentAsync(int courseId, int assignmentId,
+        CreateAssignmentRequestDto updateAssignmentRequestDto)
+    {
+        ArgumentNullException.ThrowIfNull(updateAssignmentRequestDto);
+
+        var assignment = await _dbContext.Assignments
+            .Include(asgmt => asgmt.Questions)
+            .ThenInclude(question => question.Answers)
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId);
+        if (assignment == null)
+        {
+            throw new ResourceNotFoundException("Assignment not found");
+        }
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            _dbContext.RemoveRange(assignment.Questions.SelectMany(q => q.Answers));
+            _dbContext.RemoveRange(assignment.Questions);
+
+            // Update properties instead of creating new entity
+            _mapper.Map(updateAssignmentRequestDto, assignment);
+            assignment.UpdatedAt = DateTime.UtcNow;
+            
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return _mapper.Map<AssignmentDto>(assignment);
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<AssignmentDto> UpdateAssignmentDescriptionAsync(int courseId, int assignmentId,
         UpdateAssignmentRequestDto updateAssignmentRequestDto)
     {
         ArgumentNullException.ThrowIfNull(updateAssignmentRequestDto);
@@ -193,6 +215,7 @@ public class AssignmentService : IAssignmentService
         var course = await _dbContext.Courses.Include(c => c.Assignments)
             .ThenInclude(asgmt => asgmt.Questions).ThenInclude(question => question.Answers)
             .FirstOrDefaultAsync(c => c.CourseId == courseId);
+
         if (course == null)
         {
             throw new ResourceNotFoundException("Course not found");
@@ -213,48 +236,6 @@ public class AssignmentService : IAssignmentService
         if (updateAssignmentRequestDto.DueDate != null)
         {
             assignment.DueDate = updateAssignmentRequestDto.DueDate.Value;
-        }
-
-        if (updateAssignmentRequestDto.Questions != null)
-        {
-            assignment.Questions = _mapper.Map<ICollection<Question>>(updateAssignmentRequestDto.Questions);
-        }
-
-        assignment.UpdatedAt = DateTime.Now;
-
-        await _dbContext.SaveChangesAsync();
-        return _mapper.Map<AssignmentDto>(assignment);
-    }
-
-    public async Task<AssignmentDto> UpdateAssignmentDescriptionAsync(int courseId, int assignmentId,
-        UpdateAssignmentDescriptionRequestDto updateAssignmentDescriptionRequestDto)
-    {
-        ArgumentNullException.ThrowIfNull(updateAssignmentDescriptionRequestDto);
-
-        var course = await _dbContext.Courses.Include(c => c.Assignments)
-            .ThenInclude(asgmt => asgmt.Questions).ThenInclude(question => question.Answers)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId);
-
-        if (course == null)
-        {
-            throw new ResourceNotFoundException("Course not found");
-        }
-
-        var assignment = await course.Assignments.AsQueryable()
-            .FirstOrDefaultAsync(asgmt => asgmt.AssignmentId == assignmentId);
-        if (assignment == null)
-        {
-            throw new ResourceNotFoundException("Assignment not found");
-        }
-
-        if (updateAssignmentDescriptionRequestDto.Name != null)
-        {
-            assignment.Name = updateAssignmentDescriptionRequestDto.Name;
-        }
-
-        if (updateAssignmentDescriptionRequestDto.DueDate != null)
-        {
-            assignment.DueDate = updateAssignmentDescriptionRequestDto.DueDate.Value;
         }
 
         assignment.UpdatedAt = DateTime.Now;
