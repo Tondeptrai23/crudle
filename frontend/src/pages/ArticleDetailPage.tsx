@@ -1,5 +1,5 @@
 import { Separator } from "@/components/common/ui/separator";
-import { useArticleDetail } from "@/hooks/api/useCourseApi";
+import { useArticleDetail } from "@/hooks/api/useArticleApi";
 import useAuth from "@/hooks/useAuth";
 import { CalendarDays, Clock } from "lucide-react";
 import { useParams } from "react-router-dom";

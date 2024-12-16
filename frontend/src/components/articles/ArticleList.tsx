@@ -1,8 +1,9 @@
-import { useArticles, useReadArticle } from '@/hooks/api/useCourseApi';
+import { useArticles, useReadArticle } from '@/hooks/api/useArticleApi';
 import { Skeleton } from '@/components/common/ui/skeleton';
 import { Link } from 'react-router-dom';
 import ArticleCard from './ArticleCard';
 import useAuth from '@/hooks/useAuth';
+import { Article } from '@/types/article';
 
 const ArticleList = ({ courseId }: { courseId: string }) => {
   // TODO: Add pagination, sorting, and filtering
@@ -10,8 +11,9 @@ const ArticleList = ({ courseId }: { courseId: string }) => {
   const { data: articles, isLoading } = useArticles(role, { courseId });
   const mutation = useReadArticle();
 
-  const handleReadArticle = async (articleId: string) => {
-    await mutation.mutateAsync({ courseId, articleId });
+  const handleReadArticle = async (article: Article) => {
+    if (role === 'teacher' || article.isRead) return;
+    await mutation.mutateAsync({ courseId, articleId: article.id });
   }
 
   if (isLoading) {
@@ -32,7 +34,7 @@ const ArticleList = ({ courseId }: { courseId: string }) => {
         {articles?.data.map((article) => (
           <Link 
             to={`article/${article.id}`}
-            onClick={() => {if (!article.isRead) handleReadArticle(article.id)}} 
+            onClick={() => {handleReadArticle(article)}} 
             key={article.id} >
             <ArticleCard article={article} />
           </Link>
