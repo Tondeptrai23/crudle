@@ -4,7 +4,7 @@ namespace _3w1m.Dtos.Questions;
 
 public class ReplaceQuestionRequestDto
 {
-    public string? Name { get; set; }
+    public string? Content { get; set; }
     public string? Type { get; set; }
     public ICollection<CreateAnswerRequestDto>? Answers { get; set; }
 }

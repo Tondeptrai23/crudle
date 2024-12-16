@@ -79,9 +79,9 @@ public class QuestionService : IQuestionService
             throw new ResourceNotFoundException("Question not found");
         }
 
-        if (replaceQuestionRequestDto.Name != null)
+        if (replaceQuestionRequestDto.Content != null)
         {
-            question.Name = replaceQuestionRequestDto.Name;
+            question.Content = replaceQuestionRequestDto.Content;
         }        
         
         if (replaceQuestionRequestDto.Type != null)

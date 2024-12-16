@@ -381,14 +381,14 @@ public class ApplicationDbContext : IdentityDbContext<User>
             {
                 QuestionId = 1,
                 AssignmentId = 1,
-                Name = "Question 1",
+                Content = "Question 1",
                 Type = "Multiple Choice",
             },
             new()
             {
                 QuestionId = 2,
                 AssignmentId = 1,
-                Name = "Question 2",
+                Content = "Question 2",
                 Type = "Multiple Choice",
             }
         };
