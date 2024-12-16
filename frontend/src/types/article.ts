@@ -9,7 +9,7 @@ export interface ArticleResponse {
   Order: number;
   CreatedAt: string;
   UpdatedAt: string;
-  ReadAt: string | null;
+  ReadAt: Date | null;
 }
 
 export interface Article {
@@ -22,4 +22,5 @@ export interface Article {
   createdAt: string;
   updatedAt: string;
   isRead: boolean;
+  readAt: Date | null;
 }

@@ -62,7 +62,7 @@ export default class CourseService {
       throw new Error(response.data.Message);
     }
 
-    let courses: Course[] = response.data.Data.map((course: CourseResponse) => {
+    const courses: Course[] = response.data.Data.map((course: CourseResponse) => {
       return {
         id: course.CourseId,
         name: course.Name,
@@ -119,6 +119,8 @@ export default class CourseService {
         content: article.Content,
         createdAt: article.CreatedAt,
         updatedAt: article.UpdatedAt,
+        isRead: article.IsRead,
+        readAt: article.ReadAt,
       };
     });
 
@@ -175,6 +177,7 @@ export default class CourseService {
       createdAt: response.data.Data.CreatedAt,
       updatedAt: response.data.Data.UpdatedAt,
       isRead: response.data.Data.IsRead,
+      readAt: response.data.Data.ReadAt,
     };
   };
 
@@ -206,6 +209,16 @@ export default class CourseService {
 
     return response.data.Data;
   };
+
+  readArticle = async (courseId: string, articleId: string) => {
+    const response = await api.post(`/api/student/course/${courseId}/article/${articleId}/read`);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
+  }
 }
 
 export const mapToCourse = (response: CourseResponse) => ({

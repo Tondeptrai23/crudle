@@ -129,3 +129,14 @@ export const useArticleDetail = (role: string, { courseId, articleId } : { cours
     retry: false,
   });
 }
+
+export const useReadArticle = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ courseId, articleId }: { courseId: string, articleId: string }) => {
+      await courseService.readArticle(courseId, articleId);
+      queryClient.invalidateQueries({ queryKey: courseKeys.articles(courseId) });
+    },
+  });
+};

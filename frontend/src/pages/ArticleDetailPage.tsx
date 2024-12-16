@@ -16,7 +16,7 @@ const ArticleDetailPage : React.FC = () => {
 
   if (isLoading) return <div>Loading...</div>;
 
-  if (error || !article) return <div>Error loading article</div>;
+  if (error || !article) throw new Error("Error loading article");
 
   return (
     <div className="container mx-auto p-6">
@@ -44,7 +44,7 @@ const ArticleDetailPage : React.FC = () => {
 
         <Separator className="my-6" />
 
-        <div className="pt-6"> {/* Replacing CardContent */}
+        <div className="pt-6"> 
           <div className="prose prose-gray max-w-none">
             {article.content.split('\n\n').map((paragraph, index) => {
               if (paragraph.startsWith('•')) {
