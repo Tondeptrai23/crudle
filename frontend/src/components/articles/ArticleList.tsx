@@ -9,11 +9,11 @@ const ArticleList = ({ courseId }: { courseId: string }) => {
   // TODO: Add pagination, sorting, and filtering
   const { role } = useAuth();
   const { data: articles, isLoading } = useArticles(role, { courseId });
-  const mutation = useReadArticle();
+  const readArticle = useReadArticle();
 
   const handleReadArticle = async (article: Article) => {
-    if (role === 'teacher' || article.isRead) return;
-    await mutation.mutateAsync({ courseId, articleId: article.id });
+    if (role.toLowerCase() !== 'student' || article.isRead) return;
+    await readArticle.mutateAsync({ courseId, articleId: article.id });
   }
 
   if (isLoading) {

@@ -24,3 +24,9 @@ export interface Article {
   isRead: boolean;
   readAt: Date | null;
 }
+
+export interface ArticleCreateRequest {
+  title: string;
+  summary: string;
+  content: string;
+};

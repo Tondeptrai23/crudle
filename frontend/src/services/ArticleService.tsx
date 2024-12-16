@@ -119,4 +119,22 @@ export default class ArticleService {
 
     return response.data.Data;
   };
+
+  createArticle = async (courseId: string, data: {
+    title: string;
+    summary: string;
+    content: string;
+  }) => {
+    const response = await api.post(`/api/teacher/course/${courseId}/article`, {
+      title: data.title,
+      summary: data.summary,
+      content: data.content,
+    });
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
+  };
 }

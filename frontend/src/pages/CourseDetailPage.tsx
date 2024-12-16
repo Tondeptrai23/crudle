@@ -5,6 +5,7 @@ import api from '@/utils/api';
 import { CourseResponse } from '@/types/course';
 import Course from '@/types/course';
 import ArticleList from '@/components/articles/ArticleList';
+import useAuth from '@/hooks/useAuth';
 
 const mapToCourseDetail = (response: CourseResponse): Course => ({
   id: response.CourseId.toString(),
@@ -18,6 +19,7 @@ const mapToCourseDetail = (response: CourseResponse): Course => ({
 
 const CourseDetailPage: React.FC = () => {
   const { courseId } = useParams();
+  const { role } = useAuth();
 
   const {
     data: courseResponse,
@@ -26,7 +28,7 @@ const CourseDetailPage: React.FC = () => {
   } = useQuery({
     queryKey: ['course', courseId],
     queryFn: async (): Promise<CourseResponse> => {
-      const response = await api.get(`/api/Student/Course/${courseId}`);
+      const response = await api.get(`/api/${role}/Course/${courseId}`);
       return response.data.Data;
     },
   });
@@ -70,7 +72,15 @@ const CourseDetailPage: React.FC = () => {
         </div>
 
         <div className='mt-8'>
-          <h2 className='text-2xl font-semibold'>Assignments</h2>
+          <h2 className='text-2xl font-semibold'>Articles</h2>
+          { role.toLowerCase() === "teacher" ? <div className='mt-4'>
+            <Link
+              to={`/course/${course.id}/article/new`}
+              className='btn btn-primary'
+            >
+              New
+            </Link>
+          </div> : null }
           <ArticleList courseId={course.id} />
         </div>
       </div>

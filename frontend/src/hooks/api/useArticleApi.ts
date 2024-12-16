@@ -1,4 +1,5 @@
 import ArticleService from "@/services/ArticleService";
+import { ArticleCreateRequest } from "@/types/article";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const articleService = new ArticleService();
@@ -48,3 +49,11 @@ export const useReadArticle = () => {
     },
   });
 };
+
+export const useCreateArticle = (courseId: string) => {
+  return useMutation({
+    mutationFn: async (data: ArticleCreateRequest) => {
+      return await articleService.createArticle(courseId, data);
+    }
+  });
+}
