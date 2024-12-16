@@ -29,8 +29,11 @@ const ProfilePage = () => {
     isLoading: isProfileLoading,
     error: error,
   } = useProfileData(id, role);
-  const { data: coursesData, isLoading: isCoursesLoading } =
-    useRoleBasedCourses(role);
+
+  const shouldLoadCourses = !id;
+  const { data: coursesData, isLoading: isCoursesLoading } = shouldLoadCourses
+    ? useRoleBasedCourses(role)
+    : { data: [], isLoading: false };
 
   if (isProfileLoading) {
     return <ProfileSkeleton />;
