@@ -1,11 +1,13 @@
+import QuestionCard from '@/components/assignments/QuestionCard';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/common/ui/accordion';
 import { Badge } from '@/components/common/ui/badge';
 import { Button } from '@/components/common/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/common/ui/card';
+import { Card } from '@/components/common/ui/card';
 import { useGetAssignment } from '@/hooks/api/useAssignmentApi';
 import useAuth from '@/hooks/useAuth';
 import { useCustomParams } from '@/utils/helper';
@@ -45,9 +47,9 @@ const AssignmentDetailPage = () => {
         Sidebar
       </div>
 
-      <div className='container m-8 max-w-4xl'>
+      <div className='container m-4 max-w-4xl'>
         {/* Header Section */}
-        <div className='mb-8 space-y-4'>
+        <div className='mb-8'>
           <div className='flex items-center justify-between'>
             <div className='space-y-2'>
               <h1 className='text-3xl font-bold tracking-tight'>
@@ -84,51 +86,77 @@ const AssignmentDetailPage = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className='space-y-6'>
+        <div className='space-y-4'>
+          {/* Main Content */}
           <Card className='border-2'>
-            <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
-                <FileText className='h-5 w-5 text-blue-600' />
-                <p className='text-base'>Assignment Details</p>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className='prose max-w-none space-y-6'>
-                <div className='rounded-lg bg-slate-100 p-6'>
-                  <div className='whitespace-pre-wrap'>
-                    {assignment.content}
+            <Accordion
+              type='single'
+              collapsible
+              className='w-full'
+              defaultValue='assignment-details'
+            >
+              <AccordionItem value='assignment-details' className='border-none'>
+                <AccordionTrigger className='px-6 py-4 hover:no-underline'>
+                  <div className='flex items-center gap-2'>
+                    <FileText className='h-5 w-5 text-blue-600' />
+                    <p className='text-base'>Assignment Details</p>
                   </div>
-                </div>
+                </AccordionTrigger>
+                <AccordionContent className='px-6 pb-4'>
+                  <div className='prose max-w-none space-y-6'>
+                    <div className='rounded-lg bg-slate-100 p-6'>
+                      <div className='whitespace-pre-wrap'>
+                        {assignment.content}
+                      </div>
+                    </div>
 
-                <div className='flex justify-between text-sm text-slate-600'>
-                  <div className='space-y-1'>
-                    <p>Created: {formatDate(assignment.createdAt)}</p>
-                    <p>Last updated: {formatDate(assignment.updatedAt)}</p>
+                    <div className='flex justify-between text-sm text-slate-600'>
+                      <div className='space-y-1'>
+                        <p>Created: {formatDate(assignment.createdAt)}</p>
+                        <p>Last updated: {formatDate(assignment.updatedAt)}</p>
+                      </div>
+                      {assignment.canViewScore && (
+                        <Badge variant='secondary'>
+                          Scores visible to students
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  {assignment.canViewScore && (
-                    <Badge variant='secondary'>
-                      Scores visible to students
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </CardContent>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </Card>
 
+          {/* Questions Section */}
           {role === 'Teacher' ? (
             <Card className='border-2'>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <FileQuestion className='h-5 w-5 text-blue-600' />
-                  <p className='text-base'>Questions Section</p>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='rounded-lg bg-slate-50 p-6'>
-                  <p>Questions will be displayed here for teachers</p>
-                </div>
-              </CardContent>
+              <Accordion type='single' collapsible className='w-full'>
+                <AccordionItem
+                  value='questions-section'
+                  className='border-none'
+                >
+                  <AccordionTrigger className='px-6 py-4 hover:no-underline'>
+                    <div className='flex items-center gap-2'>
+                      <FileQuestion className='h-5 w-5 text-blue-600' />
+                      <p className='text-base'>Questions Section</p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className='px-6 pb-4'>
+                    <div className='space-y-4'>
+                      {assignment.questions.map((question, index) => (
+                        <QuestionCard
+                          key={question.questionId}
+                          showButton={false}
+                          question={question}
+                          index={index}
+                          onDelete={() => {}}
+                          onQuestionChange={() => {}}
+                        />
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </Card>
           ) : (
             <Button

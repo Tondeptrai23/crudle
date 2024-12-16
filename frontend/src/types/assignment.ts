@@ -9,6 +9,7 @@ export default interface Assignment {
   canViewScore: boolean;
   canRetry: boolean;
   type: 'file' | 'questions';
+  questions: Question[];
 }
 
 export interface AssignmentResponse {

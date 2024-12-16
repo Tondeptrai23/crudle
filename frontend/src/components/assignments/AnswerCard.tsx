@@ -10,10 +10,10 @@ interface AnswerCardProps {
 
 const AnswerCard = ({ answer, index }: AnswerCardProps) => {
   return (
-    <div className='flex items-center space-x-4 rounded-lg bg-slate-200 p-2'>
+    <div className='flex items-center space-x-4 rounded-lg bg-slate-200 p-1'>
       <div
         className={cn(
-          'flex h-12 w-12 items-center justify-center rounded-md border border-gray-300 font-semibold',
+          'flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 font-semibold',
           answer.isCorrect
             ? 'bg-green-500 text-white'
             : 'bg-white text-gray-800',
