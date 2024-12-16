@@ -21,6 +21,7 @@ import { Role } from './types/enums.ts';
 import ProfilePage from './pages/ProfilePage.tsx';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 import ArticleCreatePage from './pages/teachers/ArticleCreatePage.tsx';
+import ArticleUpdatePage from './pages/teachers/ArticleUpdatePage.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -85,6 +86,8 @@ const App: React.FC = () => {
                           path='/course/:courseId/article/:articleId'
                           element={<ArticleDetailPage />}
                         />
+                        <Route 
+                          path='/course/:courseId/article/:articleId/edit' element={<ArticleUpdatePage />} />
                         <Route
                           path='student/:studentId'
                           element={<ProfilePage />}

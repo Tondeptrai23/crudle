@@ -1,6 +1,5 @@
 import { useArticles, useReadArticle } from '@/hooks/api/useArticleApi';
 import { Skeleton } from '@/components/common/ui/skeleton';
-import { Link } from 'react-router-dom';
 import ArticleCard from './ArticleCard';
 import useAuth from '@/hooks/useAuth';
 import { Article } from '@/types/article';
@@ -32,12 +31,12 @@ const ArticleList = ({ courseId }: { courseId: string }) => {
     <div className='container mx-auto p-6'>
       <div className='space-y-4 flex flex-col gap-2'>
         {articles?.data.map((article) => (
-          <Link 
-            to={`article/${article.id}`}
-            onClick={() => {handleReadArticle(article)}} 
-            key={article.id} >
-            <ArticleCard article={article} />
-          </Link>
+          <ArticleCard 
+            key={article.id}
+            article={article}
+            courseId={courseId}
+            onRead={() => handleReadArticle(article)}
+          />
         ))}
       </div>
     </div>

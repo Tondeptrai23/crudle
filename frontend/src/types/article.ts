@@ -25,7 +25,7 @@ export interface Article {
   readAt: Date | null;
 }
 
-export interface ArticleCreateRequest {
+export interface ArticleRequest {
   title: string;
   summary: string;
   content: string;

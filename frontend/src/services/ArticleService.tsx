@@ -137,4 +137,32 @@ export default class ArticleService {
 
     return response.data.Data;
   };
+
+  updateArticle = async (courseId: string, articleId: string, data: {
+    title: string;
+    summary: string;
+    content: string;
+  }) => {
+    const response = await api.put(`/api/teacher/course/${courseId}/article/${articleId}`, {
+      title: data.title,
+      summary: data.summary,
+      content: data.content,
+    });
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
+  };
+
+  deleteArticle = async (courseId: string, articleId: string) => {
+    const response = await api.delete(`/api/teacher/course/${courseId}/article/${articleId}`);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
+  };
 }

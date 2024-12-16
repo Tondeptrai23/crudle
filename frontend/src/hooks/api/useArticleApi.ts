@@ -1,5 +1,5 @@
 import ArticleService from "@/services/ArticleService";
-import { ArticleCreateRequest } from "@/types/article";
+import { ArticleRequest } from "@/types/article";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const articleService = new ArticleService();
@@ -51,9 +51,34 @@ export const useReadArticle = () => {
 };
 
 export const useCreateArticle = (courseId: string) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (data: ArticleCreateRequest) => {
-      return await articleService.createArticle(courseId, data);
+    mutationFn: async (data: ArticleRequest) => {
+      await articleService.createArticle(courseId, data);
+      queryClient.invalidateQueries({ queryKey: articleKeys.articles(courseId) });
     }
+  });
+}
+
+export const useUpdateArticle = (courseId: string, articleId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: ArticleRequest) => {
+      await articleService.updateArticle(courseId, articleId, data);
+      queryClient.invalidateQueries({ queryKey: articleKeys.articles(courseId) });
+    }
+  });
+}
+
+export const useDeleteArticle = (courseId: string, articleId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      await articleService.deleteArticle(courseId, articleId);
+      queryClient.invalidateQueries({ queryKey: articleKeys.articles(courseId) });
+    },
   });
 }
