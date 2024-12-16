@@ -4,12 +4,11 @@ import {
   useUpdateAssignment,
 } from '@/hooks/api/useAssignmentApi';
 import { CreateAssignmentDto } from '@/types/assignment';
-import { UrlExtractor } from '@/utils/helper';
+import { useCustomParams } from '@/utils/helper';
 import { useNavigate } from 'react-router-dom';
 
 const EditAssignmentPage = () => {
-  const courseId = UrlExtractor.extractCourseId();
-  const assignmentId = UrlExtractor.extractAssignmentId();
+  const { courseId, assignmentId } = useCustomParams();
 
   const updateAssignment = useUpdateAssignment();
   const navigate = useNavigate();

@@ -4,12 +4,12 @@ import {
   useAssignments,
   useDeleteAssignment,
 } from '@/hooks/api/useAssignmentApi';
-import { UrlExtractor } from '@/utils/helper';
+import { useCustomParams } from '@/utils/helper';
 import { useNavigate } from 'react-router-dom';
 
-const TeacherAssignmentPage = () => {
-  let { data: assignments } = useAssignments(UrlExtractor.extractCourseId());
-  const courseId = UrlExtractor.extractCourseId();
+const TeacherAssignmentsPage = () => {
+  const { courseId } = useCustomParams();
+  let { data: assignments } = useAssignments(courseId);
   const navigate = useNavigate();
   const deleteAssignment = useDeleteAssignment();
 
@@ -63,4 +63,4 @@ const TeacherAssignmentPage = () => {
   );
 };
 
-export default TeacherAssignmentPage;
+export default TeacherAssignmentsPage;

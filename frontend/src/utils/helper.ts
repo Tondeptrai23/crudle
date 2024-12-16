@@ -1,3 +1,5 @@
+import { useParams } from 'react-router-dom';
+
 export class AlphabetMapper {
   private static readonly letterMap: Map<number, string> = new Map();
 
@@ -24,24 +26,17 @@ export class AlphabetMapper {
   }
 }
 
-export class UrlExtractor {
-  static extractCourseId(): number {
-    const match = window.location.pathname.match(/course\/(\d+)/);
+export const useCustomParams = () => {
+  const params = useParams();
+  const customParams = Object.fromEntries(
+    Object.entries(params).map(([key, value]) => {
+      if (value === 'undefined') {
+        return [key, -1];
+      }
 
-    if (!match) {
-      return 0;
-    }
+      return [key, parseInt(value ?? '')];
+    }),
+  );
 
-    return parseInt(match[1]);
-  }
-
-  static extractAssignmentId(): number {
-    const match = window.location.pathname.match(/assignment\/(\d+)/);
-
-    if (!match) {
-      return 0;
-    }
-
-    return parseInt(match[1]);
-  }
-}
+  return customParams;
+};

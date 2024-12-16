@@ -1,11 +1,11 @@
 import AddAssignmentForm from '@/components/assignments/AddAssignmentForm';
 import { useCreateAssignment } from '@/hooks/api/useAssignmentApi';
 import { CreateAssignmentDto } from '@/types/assignment';
-import { UrlExtractor } from '@/utils/helper';
+import { useCustomParams } from '@/utils/helper';
 import { useNavigate } from 'react-router-dom';
 
 const AddAssignmentPage = () => {
-  const courseId = UrlExtractor.extractCourseId();
+  const { courseId } = useCustomParams();
 
   const createAssignment = useCreateAssignment();
   const navigate = useNavigate();
