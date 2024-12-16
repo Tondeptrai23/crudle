@@ -25,6 +25,17 @@ export const useAssignments = (courseId: number) => {
   });
 };
 
+export const useGetAssignment = (courseId: number, assignmentId: number) => {
+  return useQuery({
+    queryKey: assignmentKeys.detail(assignmentId.toString()),
+    queryFn: () => assignmentService.getAssignment(courseId, assignmentId),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+};
+
 export const useCreateAssignment = () => {
   const queryClient = useQueryClient();
 
@@ -52,6 +63,9 @@ export const useUpdateAssignment = () => {
       );
 
       queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
+      queryClient.invalidateQueries({
+        queryKey: assignmentKeys.detail(data.assignmentId.toString()),
+      });
     },
   });
 };
@@ -67,6 +81,9 @@ export const useDeleteAssignment = () => {
       );
 
       queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
+      queryClient.invalidateQueries({
+        queryKey: assignmentKeys.detail(data.assignmentId.toString()),
+      });
     },
   });
 };

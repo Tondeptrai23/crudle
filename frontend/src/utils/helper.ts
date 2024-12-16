@@ -34,4 +34,14 @@ export class UrlExtractor {
 
     return parseInt(match[1]);
   }
+
+  static extractAssignmentId(): number {
+    const match = window.location.pathname.match(/assignment\/(\d+)/);
+
+    if (!match) {
+      return 0;
+    }
+
+    return parseInt(match[1]);
+  }
 }

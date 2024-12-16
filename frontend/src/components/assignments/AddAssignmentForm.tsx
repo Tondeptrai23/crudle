@@ -24,7 +24,7 @@ import QuestionCard from './QuestionCard';
 const assignmentFormSchema = z.object({
   courseId: z.number(),
   name: z.string().min(1, 'Name is required'),
-  duedAt: z.date({
+  dueDate: z.date({
     required_error: 'Due date is required',
   }),
   content: z.string().min(1, 'Content is required'),
@@ -38,7 +38,7 @@ type AssignmentFormValues = z.infer<typeof assignmentFormSchema>;
 
 interface AssignmentFormProps {
   initialData: CreateAssignmentDto;
-  onSave: (formData: CreateAssignmentDto) => void;
+  onSave: (formData: CreateAssignmentDto) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -49,20 +49,22 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
 }) => {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
-  const [questions, setQuestions] = useState<CreateQuestionDto[]>([]);
+  const [questions, setQuestions] = useState<CreateQuestionDto[]>(
+    initialData.questions || [],
+  );
   const form = useForm<AssignmentFormValues>({
     resolver: zodResolver(assignmentFormSchema),
     defaultValues: {
       courseId: initialData.courseId,
       name: initialData.name,
-      duedAt: initialData.duedAt || new Date(),
+      dueDate: initialData.dueDate || new Date(),
       content: initialData.content,
       canViewScore: initialData.canViewScore,
       canRetry: initialData.canRetry,
     },
   });
 
-  const onSubmit = (values: AssignmentFormValues) => {
+  const onSubmit = async (values: AssignmentFormValues) => {
     if (isSaving) return;
 
     setIsSaving(true);
@@ -80,7 +82,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
       return;
     }
     try {
-      onSave(result);
+      await onSave(result);
 
       toast({
         title: 'Saved',
@@ -149,7 +151,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
 
             <FormField
               control={form.control}
-              name='duedAt'
+              name='dueDate'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Due Date</FormLabel>

@@ -26,23 +26,25 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
 
         <div className='flex items-center'>
           <span className='mr-2 text-xs text-gray-500'>
-            {assignment.duedAt?.toLocaleDateString() || 'No due date'}
+            {assignment.dueDate
+              ? new Date(assignment.dueDate).toLocaleDateString()
+              : 'No due date'}
           </span>
 
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger className='focus:outline-none'>
               <MoreVertical className='h-5 w-5 text-gray-500' />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem
-                className='flex items-center gap-2'
+                className='flex cursor-pointer items-center gap-2'
                 onClick={onEdit}
               >
                 <Edit className='h-4 w-4' />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem
-                className='flex items-center gap-2 text-red-600'
+                className='flex cursor-pointer items-center gap-2 text-red-600'
                 onClick={onDelete}
               >
                 <Trash className='h-4 w-4' />

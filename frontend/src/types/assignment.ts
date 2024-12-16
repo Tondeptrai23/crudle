@@ -3,7 +3,7 @@ export default interface Assignment {
   courseId: number;
   name: string;
   content: string;
-  duedAt: Date | null;
+  dueDate: Date | null;
   createdAt: Date;
   updatedAt: Date;
   canViewScore: boolean;
@@ -16,19 +16,35 @@ export interface AssignmentResponse {
   CourseId: number;
   Name: string;
   Content: string;
-  DuedAt: Date | null;
+  DueDate: Date | null;
   CreatedAt: Date;
   UpdatedAt: Date;
   CanViewScore: boolean;
   CanRetry: boolean;
   Type: 'file' | 'questions';
+  Questions: QuestionResponse[];
+}
+
+export interface QuestionResponse {
+  QuestionId: number;
+  AssignmentId: number;
+  Content: string;
+  Answers: AnswerResponse[];
+  Type: 'Multiple Choice' | 'Fill In Blank';
+}
+
+export interface AnswerResponse {
+  AnswerId: number;
+  QuestionId: number;
+  Value: string;
+  IsCorrect: boolean;
 }
 
 export type CreateAssignmentDto = {
   courseId: number;
   name: string;
   content: string;
-  duedAt: Date | null;
+  dueDate: Date | null;
   canViewScore: boolean;
   canRetry: boolean;
   type: 'file' | 'questions';

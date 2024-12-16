@@ -1,16 +1,29 @@
 import AssignmentCard from '@/components/assignments/AssignmentCard';
 import { Button } from '@/components/common/ui/button';
-import { useAssignments } from '@/hooks/api/useAssignmentApi';
+import {
+  useAssignments,
+  useDeleteAssignment,
+} from '@/hooks/api/useAssignmentApi';
 import { UrlExtractor } from '@/utils/helper';
 import { useNavigate } from 'react-router-dom';
 
 const TeacherAssignmentPage = () => {
   let { data: assignments } = useAssignments(UrlExtractor.extractCourseId());
+  const courseId = UrlExtractor.extractCourseId();
   const navigate = useNavigate();
+  const deleteAssignment = useDeleteAssignment();
 
   if (!assignments) {
     assignments = [];
   }
+
+  const handleDelete = async (assignmentId: number) => {
+    await deleteAssignment.mutateAsync({ courseId, assignmentId });
+  };
+
+  const handleEdit = (assignmentId: number) => {
+    navigate(`${assignmentId}/edit`);
+  };
 
   return (
     <div className='flex min-h-screen flex-row gap-4'>
@@ -37,10 +50,10 @@ const TeacherAssignmentPage = () => {
               key={assignment.assignmentId}
               assignment={assignment}
               onDelete={() => {
-                console.log('Delete assignment' + assignment.assignmentId);
+                handleDelete(assignment.assignmentId);
               }}
               onEdit={() => {
-                console.log('Edit assignment' + assignment.assignmentId);
+                handleEdit(assignment.assignmentId);
               }}
             />
           ))}
