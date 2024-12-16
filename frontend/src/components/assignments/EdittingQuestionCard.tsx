@@ -99,13 +99,9 @@ const EditingQuestionCard = ({
             key={answer.answerId}
             answer={answer}
             error={answerErrors[answer.answerId]}
-            onDelete={() =>
-              setAnswers(
-                answers
-                  .filter((a) => a.answerId !== answer.answerId)
-                  .map((a, i) => ({ ...a, answerId: i })),
-              )
-            }
+            onDelete={() => {
+              setAnswers(answers.filter((a) => a.answerId !== answer.answerId));
+            }}
             onAnswerChange={(value: string) =>
               onAnswerChange(answer.answerId, value)
             }
@@ -116,28 +112,27 @@ const EditingQuestionCard = ({
 
       <Button
         className='text-md mb-4 w-full font-semibold'
+        type='button'
         variant='outline'
         onClick={() => {
-          setAnswers([
+          const newAnswers = [
             ...answers,
-            {
-              answerId: answers.length,
-              value: '',
-              isCorrect: false,
-            },
-          ]);
+            { answerId: answers.length, value: '', isCorrect: false },
+          ];
+          setAnswers(newAnswers);
         }}
       >
         Add Answer
       </Button>
 
       <div className='flex flex-row justify-end gap-4'>
-        <Button variant='outline' onClick={onCancel}>
+        <Button variant='outline' type='button' onClick={onCancel}>
           Cancel
         </Button>
         <Button
           variant='default'
           className='bg-blue-500 hover:bg-blue-700'
+          type='button'
           onClick={async () => {
             let answerErrors = validate();
 

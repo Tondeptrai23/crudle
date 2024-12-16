@@ -1,19 +1,17 @@
 import AddAssignmentForm from '@/components/assignments/AddAssignmentForm';
 import { useCreateAssignment } from '@/hooks/api/useAssignmentApi';
-import { CreateAssignmentDto, CreateQuestionDto } from '@/types/assignment';
+import { CreateAssignmentDto } from '@/types/assignment';
 import { UrlExtractor } from '@/utils/helper';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AddAssignmentPage = () => {
-  const [questions, setQuestions] = useState<CreateQuestionDto[]>([]);
   const courseId = UrlExtractor.extractCourseId();
 
   const createAssignment = useCreateAssignment();
   const navigate = useNavigate();
 
   const handleSave = async (formData: CreateAssignmentDto) => {
-    // await createAssignment.mutateAsync(formData);
+    await createAssignment.mutateAsync(formData);
 
     navigate(`/course/${courseId}/assignment`);
   };
@@ -33,8 +31,6 @@ const AddAssignmentPage = () => {
           canRetry: false,
           type: 'questions',
         }}
-        questions={questions}
-        onQuestionsChange={setQuestions}
         onSave={handleSave}
         onCancel={() => navigate('..', { relative: 'path' })}
       />

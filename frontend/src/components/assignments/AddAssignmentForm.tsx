@@ -38,22 +38,18 @@ type AssignmentFormValues = z.infer<typeof assignmentFormSchema>;
 
 interface AssignmentFormProps {
   initialData: CreateAssignmentDto;
-  questions: CreateQuestionDto[];
-  onQuestionsChange: (questions: CreateQuestionDto[]) => void;
   onSave: (formData: CreateAssignmentDto) => void;
   onCancel: () => void;
 }
 
 const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   initialData,
-  questions,
-  onQuestionsChange,
   onSave,
   onCancel,
 }) => {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
-
+  const [questions, setQuestions] = useState<CreateQuestionDto[]>([]);
   const form = useForm<AssignmentFormValues>({
     resolver: zodResolver(assignmentFormSchema),
     defaultValues: {
@@ -108,7 +104,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
       }
       return q;
     });
-    onQuestionsChange(newQuestions);
+    setQuestions(newQuestions);
   };
 
   const handleAddQuestion = () => {
@@ -123,14 +119,13 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
         { answerId: 2, value: '', isCorrect: false },
       ],
     };
-    onQuestionsChange([...questions, newQuestion]);
+    setQuestions([...questions, newQuestion]);
   };
 
   const handleDeleteQuestion = (questionId: number) => {
-    const result = questions
-      .filter((q) => q.questionId !== questionId)
-      .map((q, i) => ({ ...q, questionId: i }));
-    onQuestionsChange(result);
+    const result = questions.filter((q) => q.questionId !== questionId);
+
+    setQuestions(result);
   };
 
   return (

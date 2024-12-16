@@ -48,6 +48,7 @@ const QuestionCard = ({
             <>
               <Button
                 variant='outline'
+                type='button'
                 onClick={() => {
                   setIsEditing(!isEditing);
                 }}
@@ -57,6 +58,7 @@ const QuestionCard = ({
               </Button>
               <Button
                 variant='outline'
+                type='button'
                 onClick={() => onDelete(question.questionId)}
               >
                 <Trash className='h-4 w-4' />

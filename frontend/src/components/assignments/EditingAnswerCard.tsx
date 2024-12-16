@@ -33,7 +33,7 @@ const EditingAnswerCard = ({
           value={answer.value}
           onChange={(e) => onAnswerChange(e.target.value)}
         />
-        <Button onClick={onDelete} variant='ghost' size='icon'>
+        <Button onClick={onDelete} type='button' variant='ghost' size='icon'>
           <TrashIcon />
         </Button>
       </div>
