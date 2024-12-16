@@ -4,6 +4,7 @@ import { Card } from '@/components/common/ui/card';
 import { Input } from '@/components/common/ui/input';
 import { CreateQuestionDto } from '@/types/assignment';
 import { useState } from 'react';
+import { Label } from '../common/ui/label.tsx';
 import EditingAnswerCard from './EditingAnswerCard.tsx';
 
 interface EditingQuestionCardProps {
@@ -56,6 +57,8 @@ const EditingQuestionCard = ({
       setQuestionError('Question content is required');
     } else if (answers.length < 1) {
       setQuestionError('At least one answer is required');
+    } else if (question.type === 'Fill In Blank' && answers.length > 1) {
+      setQuestionError('Fill in the blank questions can only have one answer');
     } else {
       setQuestionError(null);
     }
@@ -87,6 +90,11 @@ const EditingQuestionCard = ({
             setQuestionContent(e.target.value);
             setQuestionError(null);
           }}
+          placeholder={
+            question.type === 'Fill In Blank'
+              ? "Enter question with ___ for blank (e.g., 'The capital of France is ___')"
+              : 'Enter your question'
+          }
         />
         {questionError && (
           <p className='text-sm text-red-500'>{questionError}</p>
@@ -94,8 +102,17 @@ const EditingQuestionCard = ({
       </div>
 
       <div className='mb-4 space-y-2'>
+        <div className='flex items-center justify-between'>
+          <Label className='text-sm font-medium'>
+            {question.type === 'Multiple Choice'
+              ? 'Answer Options'
+              : 'Correct Answer'}
+          </Label>
+        </div>
+
         {answers.map((answer) => (
           <EditingAnswerCard
+            questionType={question.type}
             key={answer.answerId}
             answer={answer}
             error={answerErrors[answer.answerId]}
@@ -110,20 +127,22 @@ const EditingQuestionCard = ({
         ))}
       </div>
 
-      <Button
-        className='text-md mb-4 w-full font-semibold'
-        type='button'
-        variant='outline'
-        onClick={() => {
-          const newAnswers = [
-            ...answers,
-            { answerId: answers.length, value: '', isCorrect: false },
-          ];
-          setAnswers(newAnswers);
-        }}
-      >
-        Add Answer
-      </Button>
+      {question.type === 'Multiple Choice' && (
+        <Button
+          className='text-md mb-4 w-full font-semibold'
+          type='button'
+          variant='outline'
+          onClick={() => {
+            const newAnswers = [
+              ...answers,
+              { answerId: answers.length, value: '', isCorrect: false },
+            ];
+            setAnswers(newAnswers);
+          }}
+        >
+          Add Answer
+        </Button>
+      )}
 
       <div className='flex flex-row justify-end gap-4'>
         <Button variant='outline' type='button' onClick={onCancel}>

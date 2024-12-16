@@ -73,7 +73,12 @@ const QuestionCard = ({
 
       <div className='space-y-2'>
         {question.answers.map((answer, index) => (
-          <AnswerCard key={answer.answerId} answer={answer} index={index} />
+          <AnswerCard
+            key={answer.answerId}
+            answer={answer}
+            index={index}
+            questionType={question.type}
+          />
         ))}
       </div>
     </Card>
