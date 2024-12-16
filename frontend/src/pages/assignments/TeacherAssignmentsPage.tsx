@@ -4,11 +4,14 @@ import {
   useAssignments,
   useDeleteAssignment,
 } from '@/hooks/api/useAssignmentApi';
+import { useToast } from '@/hooks/use-toast';
+import { getErrorMessage } from '@/lib/utils';
 import { useCustomParams } from '@/utils/helper';
 import { useNavigate } from 'react-router-dom';
 
 const TeacherAssignmentsPage = () => {
   const { courseId } = useCustomParams();
+  const { toast } = useToast();
   let { data: assignments } = useAssignments(courseId);
   const navigate = useNavigate();
   const deleteAssignment = useDeleteAssignment();
@@ -18,7 +21,20 @@ const TeacherAssignmentsPage = () => {
   }
 
   const handleDelete = async (assignmentId: number) => {
-    await deleteAssignment.mutateAsync({ courseId, assignmentId });
+    try {
+      await deleteAssignment.mutateAsync({ courseId, assignmentId });
+
+      toast({
+        title: 'Success',
+        description: 'Assignment deleted successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleEdit = (assignmentId: number) => {

@@ -23,14 +23,13 @@ const AssignmentDetailPage = () => {
   const { assignmentId, courseId } = useCustomParams();
   const { role } = useAuth();
   const navigate = useNavigate();
-  const isTeacher = true;
   const { data: assignment } = useGetAssignment(courseId, assignmentId);
 
   if (!assignment) {
     return null;
   }
 
-  const formatDate = (date) => {
+  const formatDate = (date: string | Date) => {
     return new Date(date).toLocaleString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -54,7 +53,7 @@ const AssignmentDetailPage = () => {
               <h1 className='text-3xl font-bold tracking-tight'>
                 {assignment.name}
               </h1>
-              <div className='mt-2 flex items-center gap-2'>
+              <div className='mt-2 flex items-center gap-2 sm:flex-col sm:items-start'>
                 {assignment.dueDate && (
                   <Badge
                     variant='secondary'
@@ -72,7 +71,7 @@ const AssignmentDetailPage = () => {
                 </Badge>
               </div>
             </div>
-            {isTeacher && (
+            {role === 'Teacher' && (
               <Button
                 variant='default'
                 className='bg-blue-600 hover:bg-blue-700'
@@ -91,7 +90,7 @@ const AssignmentDetailPage = () => {
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
                 <FileText className='h-5 w-5 text-blue-600' />
-                <p className='text-lg'>Assignment Details</p>
+                <p className='text-base'>Assignment Details</p>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -117,13 +116,12 @@ const AssignmentDetailPage = () => {
             </CardContent>
           </Card>
 
-          {/* Teacher Questions or Student Submit Section */}
           {role === 'Teacher' ? (
             <Card className='border-2'>
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
                   <FileQuestion className='h-5 w-5 text-blue-600' />
-                  <p className='text-lg'>Questions Section</p>
+                  <p className='text-base'>Questions Section</p>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -135,11 +133,11 @@ const AssignmentDetailPage = () => {
           ) : (
             <Button
               size='lg'
-              className='w-full bg-blue-600 hover:bg-blue-700'
+              className='bg-blue-600 hover:bg-blue-700'
               onClick={() => navigate('./submit')}
             >
               <Send className='mr-2 h-5 w-5' />
-              Submit Assignment
+              Start Assignment
             </Button>
           )}
         </div>

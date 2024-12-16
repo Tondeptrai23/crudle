@@ -1,6 +1,14 @@
 import { Button } from '@/components/common/ui/button';
 import { Checkbox } from '@/components/common/ui/checkbox';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/common/ui/select';
+
+import {
   Form,
   FormControl,
   FormField,
@@ -12,7 +20,11 @@ import { Input } from '@/components/common/ui/input';
 import { Textarea } from '@/components/common/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/lib/utils';
-import { CreateAssignmentDto, CreateQuestionDto } from '@/types/assignment';
+import {
+  CreateAssignmentDto,
+  CreateQuestionDto,
+  QuestionType,
+} from '@/types/assignment';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -20,13 +32,14 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Separator } from '../common/ui/separator';
 import QuestionCard from './QuestionCard';
+
 // Define the form schema
 const assignmentFormSchema = z.object({
   courseId: z.number(),
   name: z.string().min(1, 'Name is required'),
-  dueDate: z.date({
-    required_error: 'Due date is required',
-  }),
+  dueDate: z
+    .union([z.date(), z.string().transform((str) => new Date(str)), z.null()])
+    .transform((val) => (val ? new Date(val) : null)),
   content: z.string().min(1, 'Content is required'),
   canViewScore: z.boolean().default(false),
   canRetry: z.boolean().default(false),
@@ -52,6 +65,9 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   const [questions, setQuestions] = useState<CreateQuestionDto[]>(
     initialData.questions || [],
   );
+  const [selectedType, setSelectedType] =
+    useState<QuestionType>('Multiple Choice');
+
   const form = useForm<AssignmentFormValues>({
     resolver: zodResolver(assignmentFormSchema),
     defaultValues: {
@@ -109,17 +125,20 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
     setQuestions(newQuestions);
   };
 
-  const handleAddQuestion = () => {
+  const handleAddQuestion = (type: QuestionType = 'Multiple Choice') => {
     const newQuestion: CreateQuestionDto = {
       questionId: questions.length + 1,
       content: '',
       isNew: true,
-      type: 'Multiple Choice',
-      answers: [
-        { answerId: 0, value: '', isCorrect: true },
-        { answerId: 1, value: '', isCorrect: false },
-        { answerId: 2, value: '', isCorrect: false },
-      ],
+      type,
+      answers:
+        type === 'Multiple Choice'
+          ? [
+              { answerId: 0, value: '', isCorrect: true },
+              { answerId: 1, value: '', isCorrect: false },
+              { answerId: 2, value: '', isCorrect: false },
+            ]
+          : [{ answerId: 0, value: '', isCorrect: true }],
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -164,7 +183,15 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
                           ? new Date(field.value).toISOString().split('T')[0]
                           : ''
                       }
-                      onChange={(e) => field.onChange(new Date(e.target.value))}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          const date = new Date(e.target.value);
+                          console.log('Selected date:', date); // Debug log
+                          field.onChange(date);
+                        } else {
+                          field.onChange(null);
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -187,14 +214,15 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
             )}
           />
 
-          <div className='flex space-x-6'>
+          <div className='flex space-x-6 pt-4'>
             <FormField
               control={form.control}
               name='canViewScore'
               render={({ field }) => (
-                <FormItem className='flex items-center space-x-2'>
+                <FormItem className='flex items-center space-x-2 space-y-0'>
                   <FormControl>
                     <Checkbox
+                      className='data-[state=checked]:border-blue-500 data-[state=checked]:bg-blue-500'
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
@@ -208,9 +236,10 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
               control={form.control}
               name='canRetry'
               render={({ field }) => (
-                <FormItem className='flex items-center space-x-2'>
+                <FormItem className='flex items-center space-x-2 space-y-0'>
                   <FormControl>
                     <Checkbox
+                      className='data-[state=checked]:border-blue-500 data-[state=checked]:bg-blue-500'
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
@@ -227,15 +256,34 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
         {/* Questions section  */}
         <div className='flex flex-row items-center justify-between'>
           <h2 className='text-lg font-semibold'>Questions</h2>
-          <Button
-            type='button'
-            onClick={handleAddQuestion}
-            variant='default'
-            className='w-40 bg-blue-500 hover:bg-blue-700'
-          >
-            <Plus className='mr-2 h-4 w-4' />
-            Add Question
-          </Button>
+          <div className='flex gap-2'>
+            <Select
+              defaultValue='multiple-choice'
+              onValueChange={(value) => {
+                setSelectedType(
+                  value === 'multiple-choice'
+                    ? 'Multiple Choice'
+                    : 'Fill In Blank',
+                );
+              }}
+            >
+              <SelectTrigger className='w-[180px]'>
+                <SelectValue placeholder='Question Type' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='multiple-choice'>Multiple Choice</SelectItem>
+                <SelectItem value='fill-blank'>Fill In Blank</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              type='button'
+              onClick={() => handleAddQuestion(selectedType)}
+              className='bg-blue-500 hover:bg-blue-700'
+            >
+              <Plus className='mr-2 h-4 w-4' />
+              Add
+            </Button>
+          </div>
         </div>
 
         <div className='space-y-4'>

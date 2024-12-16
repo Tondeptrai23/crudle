@@ -30,7 +30,7 @@ export interface QuestionResponse {
   AssignmentId: number;
   Content: string;
   Answers: AnswerResponse[];
-  Type: 'Multiple Choice' | 'Fill In Blank';
+  Type: QuestionType;
 }
 
 export interface AnswerResponse {
@@ -51,12 +51,14 @@ export type CreateAssignmentDto = {
   questions?: CreateQuestionDto[];
 };
 
+export type QuestionType = 'Multiple Choice' | 'Fill In Blank';
+
 export interface Question {
   questionId: number;
   assignmentId: number;
   content: string;
   answers: Answer[];
-  type: 'Multiple Choice' | 'Fill In Blank';
+  type: QuestionType;
 }
 
 export interface Answer {
@@ -69,7 +71,7 @@ export interface Answer {
 export interface CreateQuestionDto {
   questionId: number;
   content: string;
-  type: 'Multiple Choice' | 'Fill In Blank';
+  type: QuestionType;
   answers: CreateAnswerDto[];
   isNew?: boolean;
 }
