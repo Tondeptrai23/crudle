@@ -48,13 +48,13 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
                 article.isRead ? 'bg-muted' : 'bg-primary'
               }`}
             /> : null}
-            <h2
+            <div
               className={`text-xl ${
                 article.isRead ? 'text-muted-foreground' : 'font-semibold'
               }`}
             >
               {article.title}
-            </h2>
+            </div>
           </div>
           {(role === Role.Teacher || role === Role.Admin) && (
             <div className="flex gap-2" onClick={e => e.stopPropagation()}>
@@ -79,7 +79,7 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <p className='line-clamp-2 text-muted-foreground'>{article.summary}</p>
+        <div className='line-clamp-2 text-muted-foreground'>{article.summary}</div>
       </CardContent>
     </Card>
   );

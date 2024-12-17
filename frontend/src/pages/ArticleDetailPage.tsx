@@ -45,20 +45,9 @@ const ArticleDetailPage : React.FC = () => {
         <Separator className="my-6" />
 
         <div className="pt-6"> 
-          <div className="prose prose-gray max-w-none">
-            {article.content.split('\n\n').map((paragraph, index) => {
-              if (paragraph.startsWith('•')) {
-                return (
-                  <ul key={index} className="list-disc pl-4">
-                    {paragraph.split('•').filter(Boolean).map((item, i) => (
-                      <li key={i}>{item.trim()}</li>
-                    ))}
-                  </ul>
-                );
-              }
-              return <p key={index}>{paragraph}</p>;
-            })}
-          </div>
+          <div 
+            className="prose prose-neutral max-w-none"
+            dangerouslySetInnerHTML={{__html: article.content}} />
         </div>
       </div>
     </div>

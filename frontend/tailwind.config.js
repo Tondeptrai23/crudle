@@ -4,6 +4,13 @@ export default {
   content: ["./src/**/*.{html,ts,tsx}"],
   theme: {
   	extend: {
+			typography: {
+				DEFAULT: {
+					css: {
+						lineHeight: '1.5',
+					}
+				}
+			},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -75,6 +82,9 @@ export default {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+		require("@tailwindcss/typography"),
+		require("tailwindcss-animate")
+	],
 }
 

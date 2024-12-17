@@ -1,12 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/common/ui/form";
-import { Input } from "@/components/common/ui/input";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/common/ui/form";
 import { AutosizeTextarea } from "@/components/common/ui/autosized-textarea";
 import { Button } from "@/components/common/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Article, ArticleRequest } from "@/types/article";
+import ArticleContentEditor from "./ArticleContentEditor";
 
 const formSchema = z.object({
   title: z.string(),
@@ -26,7 +26,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ article, onSubmit }) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: article?.title,
+      title: article?.title || "Untitled",
       summary: article?.summary,
       content: article?.content,
     },
@@ -44,58 +44,72 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ article, onSubmit }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onFormSubmit)} className='space-y-8'>
-        <FormField
-          control={form.control}
-          name='title'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input placeholder='Enter article title' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onFormSubmit)} className='mx-auto'>
+        <div className='space-y-4 px-8 py-6 border-b'>
+          <FormField
+            control={form.control}
+            name='title'
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <AutosizeTextarea
+                    placeholder='Untitled' 
+                    className='border-none text-4xl font-bold placeholder:text-gray-300 focus-visible:ring-0' 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name='summary'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Summary</FormLabel>
-              <FormControl>
-                <AutosizeTextarea
-                  placeholder='Enter article summary'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name='summary'
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <AutosizeTextarea
+                    placeholder='Write a brief summary...'
+                    className='border-none text-lg text-gray-600 placeholder:text-gray-300 focus-visible:ring-0'
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name='content'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Content</FormLabel>
-              <FormControl>
-                <AutosizeTextarea
-                  placeholder='Enter article content'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        
+        <div className='min-h-[60vh] px-8 py-6'>
+          <FormField
+            control={form.control}
+            name='content'
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  {/* <AutosizeTextarea
+                    placeholder='Start writing your article...'
+                    className='min-h-[50vh] border-none placeholder:text-gray-300 focus-visible:ring-0'
+                    {...field}
+                  /> */}
+                  <ArticleContentEditor 
+                    content={field.value} 
+                    onContentChange={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <div className='flex gap-4'>
-          <Button type='submit'>Submit</Button>
-          <Button type='button' variant='outline' onClick={() => navigate(-1)}>Cancel</Button>
+        {/* Fixed bottom toolbar */}
+        <div className='fixed bottom-0 left-0 right-0 bg-white border-t px-4 py-3'>
+          <div className='max-w-4xl mx-auto flex gap-4 justify-end'>
+            <Button type='button' variant='outline' onClick={() => navigate(-1)}>Cancel</Button>
+            <Button type='submit'>Publish</Button>
+          </div>
         </div>
       </form>
     </Form>

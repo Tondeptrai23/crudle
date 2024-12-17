@@ -6,6 +6,7 @@ import { CourseResponse } from '@/types/course';
 import Course from '@/types/course';
 import ArticleList from '@/components/articles/ArticleList';
 import useAuth from '@/hooks/useAuth';
+import { Role } from '@/types/enums';
 
 const mapToCourseDetail = (response: CourseResponse): Course => ({
   id: response.CourseId.toString(),
@@ -73,7 +74,7 @@ const CourseDetailPage: React.FC = () => {
 
         <div className='mt-8'>
           <h2 className='text-2xl font-semibold'>Articles</h2>
-          { role.toLowerCase() === "teacher" ? <div className='mt-4'>
+          { role === Role.Teacher ? <div className='mt-4'>
             <Link
               to={`/course/${course.id}/article/new`}
               className='btn btn-primary'

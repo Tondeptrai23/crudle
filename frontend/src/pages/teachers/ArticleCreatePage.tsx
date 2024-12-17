@@ -31,10 +31,7 @@ const ArticleCreatePage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="scroll-m-20 text-4xl font-bold tracking-tight mb-8">
-          Create New Article
-        </h1> 
+      <div className="mx-auto">
         <ArticleForm onSubmit={onSubmit} />
       </div>
     </div>
