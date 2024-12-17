@@ -2,7 +2,9 @@
 
 public class AssignmentSubmissionResponseDto
 {
-    public string AssignmentName { get; set; }
+    public int SubmissionId { get; set; }
+    
+    public string Name { get; set; }
     public int Score { get; set; }
     
     public DateTime SubmittedAt { get; set; }

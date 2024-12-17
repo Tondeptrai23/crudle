@@ -138,43 +138,4 @@ public class CourseController : ControllerBase
         var (count, assignments) = await _assignmentService.GetAssignmentsAsync(courseId, queryDto);
         return Ok(new PaginationResponseDto<IEnumerable<AssignmentDto>>(assignments, count, queryDto.Page, queryDto.Size));
     }
-    
-    [HttpGet]
-    [Route("{courseId:int}/Assignments/{assignmentId:int}")]
-    public async Task<IActionResult> GetAssignmentById([FromRoute] int courseId, [FromRoute] int assignmentId)
-    {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null)
-        {
-            return Unauthorized();
-        }
-        
-        if (await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
-        {
-            throw new ForbiddenException("This student is not enrolled in this course.");
-        }
-        
-        var assignment = await _assignmentService.GetAssignmentAsync(courseId, assignmentId);
-        return Ok(new ResponseDto<AssignmentDto>(assignment));
-    }
-    
-    [HttpPost]
-    [Route("{courseId:int}/Assignments/{assignmentId:int}")]
-    public async Task<IActionResult> SubmitAssignment([FromRoute] int courseId, [FromRoute] int assignmentId, [FromBody] AssignmentSubmissionRequestDto submitAssignmentDto)
-    {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null)
-        {
-            return Unauthorized();
-        }
-        
-        if (await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
-        {
-            throw new ForbiddenException("This student is not enrolled in this course.");
-        }
-        
-        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-        var response = await _assignmentService.SubmitAssignmentAsync(courseId, assignmentId, student.StudentId, submitAssignmentDto);
-        return Ok(new ResponseDto<AssignmentSubmissionResponseDto>(response));
-    }
 }
