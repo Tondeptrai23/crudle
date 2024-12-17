@@ -176,11 +176,11 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
                   <FormLabel>Due Date</FormLabel>
                   <FormControl>
                     <Input
-                      type='date'
+                      type='datetime-local'
                       {...field}
                       value={
                         field.value
-                          ? new Date(field.value).toISOString().split('T')[0]
+                          ? new Date(field.value).toISOString().slice(0, 16)
                           : ''
                       }
                       onChange={(e) => {

@@ -82,3 +82,13 @@ export interface CreateAnswerDto {
   value: string;
   isCorrect: boolean;
 }
+
+export interface AssignmentSubmitDto {
+  assignmentId: number;
+  answers: AnswerSubmitDto[];
+}
+
+export interface AnswerSubmitDto {
+  questionId: number;
+  value: string;
+}
