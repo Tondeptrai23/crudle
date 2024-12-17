@@ -13,13 +13,14 @@ import { Card } from '@/components/common/ui/card';
 import { cn } from '@/lib/utils';
 import { AssignmentSubmitDto, CreateQuestionDto } from '@/types/assignment';
 import { useState } from 'react';
+import LoadingButton from '../common/ui/LoadingButton';
 import WorkspaceQuestionCard from './WorkspaceQuestionCard';
 
 interface AssignmentWorkspaceProps {
   assignmentId: number;
   submissionId: number;
   questions: CreateQuestionDto[];
-  onSubmit: (data: AssignmentSubmitDto) => void;
+  onSubmit: (data: AssignmentSubmitDto) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -35,6 +36,7 @@ const AssignmentWorkspace = ({
   >({});
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAnswerSelect = (questionId: number, value: string) => {
     setSelectedAnswers((prev) => ({
@@ -43,18 +45,23 @@ const AssignmentWorkspace = ({
     }));
   };
 
-  const handleSubmit = () => {
-    const submitData = {
-      assignmentId,
-      submissionId,
-      answers: questions.map((q) => ({
-        questionId: q.questionId,
-        value: selectedAnswers[q.questionId] || '',
-      })),
-    };
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      const submitData = {
+        assignmentId,
+        submissionId,
+        answers: questions.map((q) => ({
+          questionId: q.questionId,
+          value: selectedAnswers[q.questionId] || '',
+        })),
+      };
 
-    setShowSubmitDialog(false);
-    onSubmit(submitData);
+      setShowSubmitDialog(false);
+      await onSubmit(submitData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -107,12 +114,13 @@ const AssignmentWorkspace = ({
               ))}
             </div>
             <div className='space-y-2'>
-              <Button
+              <LoadingButton
                 className='w-full bg-blue-500 hover:bg-blue-700'
                 onClick={() => setShowSubmitDialog(true)}
+                isLoading={isSubmitting}
               >
-                Submit
-              </Button>
+                {isSubmitting ? 'Submitting...' : 'Submit'}
+              </LoadingButton>
               <Button
                 variant='outline'
                 className='w-full'

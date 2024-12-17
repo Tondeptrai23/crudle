@@ -30,6 +30,7 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import LoadingButton from '../common/ui/LoadingButton';
 import { Separator } from '../common/ui/separator';
 import QuestionCard from './QuestionCard';
 
@@ -304,9 +305,13 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
           <Button type='button' variant='outline' onClick={onCancel}>
             Cancel
           </Button>
-          <Button type='submit' className='bg-blue-500 hover:bg-blue-700'>
-            Save Assignment
-          </Button>
+          <LoadingButton
+            type='submit'
+            className='bg-blue-500 hover:bg-blue-700'
+            isLoading={isSaving}
+          >
+            {isSaving ? 'Saving...' : 'Save'}
+          </LoadingButton>
         </div>
       </form>
     </Form>

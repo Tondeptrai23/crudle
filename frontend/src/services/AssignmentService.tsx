@@ -10,7 +10,6 @@ import api from '@/utils/api';
 
 export default class AssignmentService {
   async getAssignmentsForTeacher(courseId: number): Promise<Assignment[]> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await api.get(
       `/api/Teacher/Course/${courseId}/Assignment?size=200`,
     );
@@ -23,7 +22,6 @@ export default class AssignmentService {
   }
 
   async getAssignmentsForStudent(courseId: number): Promise<Assignment[]> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await api.get(
       `/api/Student/Course/${courseId}/Assignment?size=200`,
     );
@@ -39,7 +37,6 @@ export default class AssignmentService {
     courseId: number,
     assignmentId: number,
   ): Promise<Assignment> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await api.get(
       `/api/Teacher/Course/${courseId}/Assignment/${assignmentId}`,
     );
@@ -55,7 +52,6 @@ export default class AssignmentService {
     courseId: number,
     assignmentId: number,
   ): Promise<Assignment> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await api.get(
       `/api/Student/Course/${courseId}/Assignment/${assignmentId}`,
     );
@@ -90,7 +86,6 @@ export default class AssignmentService {
       })),
     };
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await api.post(
       `/api/Teacher/Course/${courseId}/Assignment`,
       body,
@@ -126,7 +121,6 @@ export default class AssignmentService {
       })),
     };
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await api.put(
       `/api/Teacher/Course/${courseId}/Assignment/${assignmentId}`,
       body,
@@ -143,7 +137,6 @@ export default class AssignmentService {
     courseId: number,
     assignmentId: number,
   ): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     await api.delete(
       `/api/Teacher/Course/${courseId}/Assignment/${assignmentId}`,
     );
@@ -153,7 +146,6 @@ export default class AssignmentService {
     courseId: number,
     assignmentId: number,
   ): Promise<AssignmentStartDto> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await api.post(
       `/api/Student/Course/${courseId}/Assignment/${assignmentId}/Start`,
     );
@@ -178,7 +170,6 @@ export default class AssignmentService {
     submissionId: number;
     submittedAt: Date;
   }> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await api.post(
       `/api/Student/Course/${courseId}/Assignment/${data.assignmentId}/Submit`,
       {
@@ -206,7 +197,6 @@ export default class AssignmentService {
     assignmentId: number,
     submissionId: number,
   ): Promise<AssignmentStartDto> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const response = await api.get(
       `/api/Student/Course/${courseId}/Assignment/${assignmentId}/Resume/${submissionId}`,
     );

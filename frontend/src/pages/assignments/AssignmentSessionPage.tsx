@@ -64,7 +64,7 @@ const AssignmentSessionPage = () => {
   };
 
   return (
-    <div className='container mx-auto'>
+    <div className='container mx-auto p-4'>
       <div>
         <h1 className='text-2xl font-bold'>{assignment.name}</h1>
       </div>
@@ -103,7 +103,7 @@ const AssignmentSessionPage = () => {
 };
 
 const AssignmentWorkspaceSkeleton = () => (
-  <div className='container h-[calc(100vh-4rem)] p-4'>
+  <div className='container mx-auto h-[calc(100vh-4rem)] p-4'>
     <div className='grid grid-cols-12 gap-4'>
       <div className='col-span-9 space-y-4'>
         {[1, 2, 3].map((i) => (

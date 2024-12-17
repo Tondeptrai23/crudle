@@ -57,15 +57,17 @@ const AssignmentsPage = () => {
       <div className='container m-8'>
         <div className='flex flex-row items-center justify-between'>
           <h1 className='my-8 text-2xl font-semibold'>Assignments</h1>
-          <Button
-            variant='default'
-            className='bg-blue-500 hover:bg-blue-700'
-            onClick={() => {
-              navigate('./add');
-            }}
-          >
-            Add Assignment
-          </Button>
+          {role === 'Teacher' && (
+            <Button
+              variant='default'
+              className='bg-blue-500 hover:bg-blue-700'
+              onClick={() => {
+                navigate('./add');
+              }}
+            >
+              Add Assignment
+            </Button>
+          )}
         </div>
 
         <div className='ml-4 grid grid-cols-2 gap-4'>

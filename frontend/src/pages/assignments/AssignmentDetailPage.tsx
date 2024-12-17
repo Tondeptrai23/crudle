@@ -8,6 +8,7 @@ import {
 import { Badge } from '@/components/common/ui/badge';
 import { Button } from '@/components/common/ui/button';
 import { Card } from '@/components/common/ui/card';
+import LoadingButton from '@/components/common/ui/LoadingButton';
 import { Skeleton } from '@/components/common/ui/skeleton';
 import {
   useGetAssignment,
@@ -26,6 +27,7 @@ import {
   Send,
   Undo2,
 } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AssignmentDetailPage = () => {
@@ -39,6 +41,7 @@ const AssignmentDetailPage = () => {
     error,
   } = useGetAssignment(courseId, assignmentId, role);
   const startAssignment = useStartAssignment();
+  const [isStarting, setIsStarting] = useState(false);
 
   if (isLoading) {
     return (
@@ -59,6 +62,7 @@ const AssignmentDetailPage = () => {
 
   const handleStartAssignment = async () => {
     try {
+      setIsStarting(true);
       const response = await startAssignment.mutateAsync({
         courseId,
         assignmentId,
@@ -71,6 +75,8 @@ const AssignmentDetailPage = () => {
         description: getErrorMessage(error),
         variant: 'destructive',
       });
+    } finally {
+      setIsStarting(false);
     }
   };
 
@@ -212,14 +218,15 @@ const AssignmentDetailPage = () => {
             </Card>
           ) : (
             <div className='flex items-center justify-center'>
-              <Button
+              <LoadingButton
                 size='lg'
-                className='bg-blue-600 hover:bg-blue-700'
+                className='bg-blue-500 hover:bg-blue-700'
                 onClick={handleStartAssignment}
+                isLoading={isStarting}
               >
                 <Send className='mr-2 h-5 w-5' />
-                Start Assignment
-              </Button>
+                {isStarting ? 'Starting...' : 'Start Assignment'}
+              </LoadingButton>
             </div>
           )}
         </div>
