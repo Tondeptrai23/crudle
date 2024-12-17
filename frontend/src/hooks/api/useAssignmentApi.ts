@@ -14,10 +14,15 @@ const assignmentKeys = {
   detail: (id: string) => ['assignments', id],
 };
 
-export const useAssignments = (courseId: number) => {
+export const useAssignments = (courseId: number, role: string) => {
+  const queryFn =
+    role.toLowerCase() === 'teacher'
+      ? () => assignmentService.getAssignmentsForTeacher(courseId)
+      : () => assignmentService.getAssignmentsForStudent(courseId);
+
   return useQuery({
     queryKey: ['assignments'],
-    queryFn: () => assignmentService.getAssignmentsForTeacher(courseId),
+    queryFn: queryFn,
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
@@ -25,10 +30,19 @@ export const useAssignments = (courseId: number) => {
   });
 };
 
-export const useGetAssignment = (courseId: number, assignmentId: number) => {
+export const useGetAssignment = (
+  courseId: number,
+  assignmentId: number,
+  role: string,
+) => {
+  const queryFn =
+    role.toLowerCase() === 'teacher'
+      ? () => assignmentService.getAssignment(courseId, assignmentId)
+      : () => assignmentService.getAssignmentForStudent(courseId, assignmentId);
+
   return useQuery({
     queryKey: assignmentKeys.detail(assignmentId.toString()),
-    queryFn: () => assignmentService.getAssignment(courseId, assignmentId),
+    queryFn: queryFn,
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
@@ -84,6 +98,14 @@ export const useDeleteAssignment = () => {
       queryClient.invalidateQueries({
         queryKey: assignmentKeys.detail(data.assignmentId.toString()),
       });
+    },
+  });
+};
+
+export const useStartAssignment = () => {
+  return useMutation({
+    mutationFn: async (data: { courseId: number; assignmentId: number }) => {
+      await assignmentService.startAssignment(data.courseId, data.assignmentId);
     },
   });
 };

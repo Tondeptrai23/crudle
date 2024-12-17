@@ -5,14 +5,16 @@ import {
   useDeleteAssignment,
 } from '@/hooks/api/useAssignmentApi';
 import { useToast } from '@/hooks/use-toast';
+import useAuth from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/utils';
 import { useCustomParams } from '@/utils/helper';
 import { useNavigate } from 'react-router-dom';
 
-const TeacherAssignmentsPage = () => {
+const AssignmentsPage = () => {
   const { courseId } = useCustomParams();
   const { toast } = useToast();
-  let { data: assignments } = useAssignments(courseId);
+  const { role } = useAuth();
+  let { data: assignments } = useAssignments(courseId, role);
   const navigate = useNavigate();
   const deleteAssignment = useDeleteAssignment();
 
@@ -65,6 +67,7 @@ const TeacherAssignmentsPage = () => {
             <AssignmentCard
               key={assignment.assignmentId}
               assignment={assignment}
+              showButton={role === 'Teacher'}
               onDelete={() => {
                 handleDelete(assignment.assignmentId);
               }}
@@ -79,4 +82,4 @@ const TeacherAssignmentsPage = () => {
   );
 };
 
-export default TeacherAssignmentsPage;
+export default AssignmentsPage;

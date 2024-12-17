@@ -25,7 +25,7 @@ const AssignmentDetailPage = () => {
   const { assignmentId, courseId } = useCustomParams();
   const { role } = useAuth();
   const navigate = useNavigate();
-  const { data: assignment } = useGetAssignment(courseId, assignmentId);
+  const { data: assignment } = useGetAssignment(courseId, assignmentId, role);
 
   if (!assignment) {
     return null;
@@ -159,14 +159,16 @@ const AssignmentDetailPage = () => {
               </Accordion>
             </Card>
           ) : (
-            <Button
-              size='lg'
-              className='bg-blue-600 hover:bg-blue-700'
-              onClick={() => navigate('./submit')}
-            >
-              <Send className='mr-2 h-5 w-5' />
-              Start Assignment
-            </Button>
+            <div className='flex items-center justify-center'>
+              <Button
+                size='lg'
+                className='bg-blue-600 hover:bg-blue-700'
+                onClick={() => navigate('./do')}
+              >
+                <Send className='mr-2 h-5 w-5' />
+                Start Assignment
+              </Button>
+            </div>
           )}
         </div>
       </div>

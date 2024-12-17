@@ -1,6 +1,7 @@
 import Assignment, {
   AnswerResponse,
   AssignmentResponse,
+  AssignmentStartDto,
   CreateAssignmentDto,
   QuestionResponse,
 } from '@/types/assignment';
@@ -10,6 +11,18 @@ export default class AssignmentService {
   async getAssignmentsForTeacher(courseId: number): Promise<Assignment[]> {
     const response = await api.get(
       `/api/Teacher/Course/${courseId}/Assignment?size=200`,
+    );
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data.map(mapToAssignment);
+  }
+
+  async getAssignmentsForStudent(courseId: number): Promise<Assignment[]> {
+    const response = await api.get(
+      `/api/Student/Course/${courseId}/Assignment?size=200`,
     );
 
     if (!response.data.Success) {
@@ -30,6 +43,23 @@ export default class AssignmentService {
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
+
+    return mapToAssignment(response.data.Data);
+  }
+
+  async getAssignmentForStudent(
+    courseId: number,
+    assignmentId: number,
+  ): Promise<Assignment> {
+    const response = await api.get(
+      `/api/Student/Course/${courseId}/Assignment/${assignmentId}`,
+    );
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    console.log(response.data.Data);
 
     return mapToAssignment(response.data.Data);
   }
@@ -112,6 +142,26 @@ export default class AssignmentService {
       `/api/Teacher/Course/${courseId}/Assignment/${assignmentId}`,
     );
   }
+
+  async startAssignment(
+    courseId: number,
+    assignmentId: number,
+  ): Promise<AssignmentStartDto> {
+    const response = await api.post(
+      `/api/Student/Course/${courseId}/Assignment/${assignmentId}/Start`,
+    );
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return {
+      submissionId: response.data.Data.SubmissionId,
+      assignmentId: response.data.Data.AssignmentId,
+      startedAt: response.data.Data.StartedAt,
+      questions: response.data.Data.Questions.map(mapToQuestion),
+    };
+  }
 }
 
 export const mapToAssignment = (response: AssignmentResponse) => ({
@@ -125,14 +175,14 @@ export const mapToAssignment = (response: AssignmentResponse) => ({
   canViewScore: response.CanViewScore,
   canRetry: response.CanRetry,
   type: response.Type,
-  questions: response.Questions.map(mapToQuestion),
+  questions: response.Questions?.map(mapToQuestion),
 });
 
 export const mapToQuestion = (response: QuestionResponse) => ({
   questionId: response.QuestionId,
   assignmentId: response.AssignmentId,
   content: response.Content,
-  answers: response.Answers.map(mapToAnswer),
+  answers: response.Answers?.map(mapToAnswer),
   type: response.Type,
 });
 

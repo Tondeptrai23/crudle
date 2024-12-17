@@ -92,3 +92,10 @@ export interface AnswerSubmitDto {
   questionId: number;
   value: string;
 }
+
+export interface AssignmentStartDto {
+  submissionId: number;
+  assignmentId: number;
+  startedAt: Date;
+  questions: Question[];
+}
