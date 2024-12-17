@@ -186,7 +186,6 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
                       onChange={(e) => {
                         if (e.target.value) {
                           const date = new Date(e.target.value);
-                          console.log('Selected date:', date); // Debug log
                           field.onChange(date);
                         } else {
                           field.onChange(null);

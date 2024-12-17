@@ -27,7 +27,7 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
         <div className='flex items-center'>
           <span className='mr-2 text-xs text-gray-500'>
             {assignment.dueDate
-              ? new Date(assignment.dueDate).toLocaleDateString()
+              ? new Date(assignment.dueDate).toLocaleDateString('en-GB')
               : 'No due date'}
           </span>
 

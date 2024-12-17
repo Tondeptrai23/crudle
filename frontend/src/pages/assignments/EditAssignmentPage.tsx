@@ -16,7 +16,7 @@ const EditAssignmentPage = () => {
   const handleSave = async (formData: CreateAssignmentDto) => {
     await updateAssignment.mutateAsync({ assignmentId, assignment: formData });
 
-    navigate(`/course/${courseId}/assignment`);
+    navigate(`/course/${courseId}/assignment/${assignmentId}`);
   };
 
   const { data: assignment } = useGetAssignment(courseId, assignmentId);
@@ -27,9 +27,7 @@ const EditAssignmentPage = () => {
 
   return (
     <div className='mx-auto max-w-4xl space-y-6 p-6'>
-      <h1 className='text-2xl font-bold'>
-        Object Oriented Programming - Edit Assignment
-      </h1>
+      <h1 className='text-2xl font-bold'>Edit Assignment</h1>
       <AddAssignmentForm
         initialData={assignment}
         onSave={handleSave}
