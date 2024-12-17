@@ -55,7 +55,9 @@ public class StudentAssignmentController : ControllerBase
             throw new ForbiddenException("This student is not enrolled in this course.");
         }
         
-        var assignment = await _assignmentService.GetAssignmentAsync(courseId, assignmentId);
+        var specification = new StudentAssignmentSpecification();
+        
+        var assignment = await _assignmentService.GetAssignmentAsync(courseId, assignmentId, specification);
         return Ok(new ResponseDto<AssignmentForStudentDto>(_mapper.Map<AssignmentForStudentDto>(assignment)));
     }
     
@@ -76,6 +78,25 @@ public class StudentAssignmentController : ControllerBase
         
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
         var response = await _assignmentService.StartAssignmentAsync(courseId, assignmentId, student.StudentId);
+        return Ok(new ResponseDto<AssignmentStartResponseDto>(response));
+    }
+    
+    [HttpGet]
+    [Route("{assignmentId:int}/Resume/{submissionId:int}")]
+    public async Task<IActionResult> ResumeAssignment([FromRoute] int courseId, [FromRoute] int assignmentId, [FromRoute] int submissionId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+        
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This student is not enrolled in this course.");
+        }
+        
+        var response = await _assignmentService.ResumeAssignmentAsync(submissionId);
         return Ok(new ResponseDto<AssignmentStartResponseDto>(response));
     }
     

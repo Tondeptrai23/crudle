@@ -27,4 +27,6 @@ public interface IAssignmentService
         UpdateAssignmentRequestDto updateAssignmentRequestDto);
     
     public Task<AssignmentStartResponseDto> StartAssignmentAsync(int courseId, int assignmentId, int studentId);
+    
+    public Task<AssignmentStartResponseDto> ResumeAssignmentAsync(int submissionId);
 }
