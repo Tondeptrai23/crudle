@@ -165,7 +165,11 @@ export default class AssignmentService {
   async submitAssignment(
     courseId: number,
     data: AssignmentSubmitDto,
-  ): Promise<void> {
+  ): Promise<{
+    score: number;
+    submissionId: number;
+    submittedAt: Date;
+  }> {
     const response = await api.post(
       `/api/Student/Course/${courseId}/Assignment/${data.assignmentId}/Submit`,
       {
@@ -181,7 +185,11 @@ export default class AssignmentService {
       throw new Error(response.data.Message);
     }
 
-    return response.data.Data;
+    return {
+      score: response.data.Data.Score,
+      submissionId: response.data.Data.SubmissionId,
+      submittedAt: response.data.Data.SubmittedAt,
+    };
   }
 
   async resumeAssignment(

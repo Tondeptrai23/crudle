@@ -20,6 +20,7 @@ interface AssignmentWorkspaceProps {
   submissionId: number;
   questions: CreateQuestionDto[];
   onSubmit: (data: AssignmentSubmitDto) => void;
+  onCancel: () => void;
 }
 
 const AssignmentWorkspace = ({
@@ -27,6 +28,7 @@ const AssignmentWorkspace = ({
   submissionId,
   questions,
   onSubmit,
+  onCancel,
 }: AssignmentWorkspaceProps) => {
   const [selectedAnswers, setSelectedAnswers] = useState<
     Record<number, string>
@@ -156,7 +158,10 @@ const AssignmentWorkspace = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>No, continue working</AlertDialogCancel>
-            <AlertDialogAction className='bg-blue-500 hover:bg-blue-700'>
+            <AlertDialogAction
+              className='bg-blue-500 hover:bg-blue-700'
+              onClick={onCancel}
+            >
               Yes, cancel
             </AlertDialogAction>
           </AlertDialogFooter>

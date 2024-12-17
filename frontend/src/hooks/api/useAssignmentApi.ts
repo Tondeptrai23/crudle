@@ -145,11 +145,16 @@ export const useSubmitAssignment = () => {
       courseId: number;
       request: AssignmentSubmitDto;
     }) => {
-      await assignmentService.submitAssignment(data.courseId, data.request);
+      const res = await assignmentService.submitAssignment(
+        data.courseId,
+        data.request,
+      );
 
       queryClient.invalidateQueries({
         queryKey: ['startAssignment', data.courseId, data.request.assignmentId],
       });
+
+      return res;
     },
   });
 };

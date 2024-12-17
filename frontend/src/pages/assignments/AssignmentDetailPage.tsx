@@ -12,7 +12,9 @@ import {
   useGetAssignment,
   useStartAssignment,
 } from '@/hooks/api/useAssignmentApi';
+import { useToast } from '@/hooks/use-toast';
 import useAuth from '@/hooks/useAuth';
+import { getErrorMessage } from '@/lib/utils';
 import { useCustomParams } from '@/utils/helper';
 import {
   Calendar,
@@ -21,12 +23,14 @@ import {
   FileQuestion,
   FileText,
   Send,
+  Undo2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const AssignmentDetailPage = () => {
   const { assignmentId, courseId } = useCustomParams();
   const { role } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const { data: assignment } = useGetAssignment(courseId, assignmentId, role);
   const startAssignment = useStartAssignment();
@@ -36,11 +40,20 @@ const AssignmentDetailPage = () => {
   }
 
   const handleStartAssignment = async () => {
-    const response = await startAssignment.mutateAsync({
-      courseId,
-      assignmentId,
-    });
-    navigate(`session/${response.submissionId}`);
+    try {
+      const response = await startAssignment.mutateAsync({
+        courseId,
+        assignmentId,
+      });
+
+      navigate(`session/${response.submissionId}`);
+    } catch (error) {
+      toast({
+        title: 'Failed to start assignment',
+        description: getErrorMessage(error),
+        variant: 'destructive',
+      });
+    }
   };
 
   const formatDate = (date: string | Date) => {
@@ -85,16 +98,25 @@ const AssignmentDetailPage = () => {
                 </Badge>
               </div>
             </div>
-            {role === 'Teacher' && (
+            <div className='flex flex-col items-end gap-2'>
+              {role === 'Teacher' && (
+                <Button
+                  variant='default'
+                  className='bg-blue-600 hover:bg-blue-700'
+                  onClick={() => navigate(`./edit`)}
+                >
+                  <Edit className='mr-2 h-4 w-4' />
+                  Edit Assignment
+                </Button>
+              )}
               <Button
-                variant='default'
-                className='bg-blue-600 hover:bg-blue-700'
-                onClick={() => navigate(`./edit`)}
+                variant='outline'
+                onClick={() => navigate('..', { relative: 'path' })}
               >
-                <Edit className='mr-2 h-4 w-4' />
-                Edit Assignment
+                <Undo2 className='mr-2 h-4 w-4' />
+                Return
               </Button>
-            )}
+            </div>
           </div>
         </div>
 

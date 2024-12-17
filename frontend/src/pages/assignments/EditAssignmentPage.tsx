@@ -3,6 +3,7 @@ import {
   useGetAssignment,
   useUpdateAssignment,
 } from '@/hooks/api/useAssignmentApi';
+import useAuth from '@/hooks/useAuth';
 import { CreateAssignmentDto } from '@/types/assignment';
 import { useCustomParams } from '@/utils/helper';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +13,7 @@ const EditAssignmentPage = () => {
 
   const updateAssignment = useUpdateAssignment();
   const navigate = useNavigate();
+  const { role } = useAuth();
 
   const handleSave = async (formData: CreateAssignmentDto) => {
     await updateAssignment.mutateAsync({ assignmentId, assignment: formData });
@@ -19,7 +21,7 @@ const EditAssignmentPage = () => {
     navigate(`/course/${courseId}/assignment/${assignmentId}`);
   };
 
-  const { data: assignment } = useGetAssignment(courseId, assignmentId);
+  const { data: assignment } = useGetAssignment(courseId, assignmentId, role);
 
   if (!assignment) {
     return null;
@@ -31,7 +33,7 @@ const EditAssignmentPage = () => {
       <AddAssignmentForm
         initialData={assignment}
         onSave={handleSave}
-        onCancel={() => navigate('..', { relative: 'path' })}
+        onCancel={() => navigate(-1)}
       />
     </div>
   );
