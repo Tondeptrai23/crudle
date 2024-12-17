@@ -28,12 +28,12 @@ export interface ProfileMenuItem {
 const Profile: React.FC<ProfileProps> = (props) => {
   const menuItems = props.items.map((item, index) => (
     <DropdownMenuItem key={index}>
-      <Button variant='ghost' className='h-6 p-0'>
-        <Link to={item.path} className='flex items-center'>
+      <Link to={item.path} className='flex w-full items-center'>
+        <Button variant='ghost' className='h-6 p-0'>
           <div className='flex h-8 w-8 items-center'>{item.icon}</div>
           <span>{item.label}</span>
-        </Link>
-      </Button>
+        </Button>
+      </Link>
     </DropdownMenuItem>
   ));
 
@@ -46,7 +46,7 @@ const Profile: React.FC<ProfileProps> = (props) => {
               {props.avatar ? props.avatar : <User />}
             </AvatarFallback>
           </Avatar>
-          <div className='hidden md:block text-left'>
+          <div className='hidden text-left md:block'>
             <h2 className='text-md font-semibold'>{props.name}</h2>
             <p className='text-gray-500'>{props.role}</p>
           </div>
