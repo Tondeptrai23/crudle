@@ -8,6 +8,7 @@ import {
 import { Badge } from '@/components/common/ui/badge';
 import { Button } from '@/components/common/ui/button';
 import { Card } from '@/components/common/ui/card';
+import { Skeleton } from '@/components/common/ui/skeleton';
 import {
   useGetAssignment,
   useStartAssignment,
@@ -32,11 +33,28 @@ const AssignmentDetailPage = () => {
   const { role } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { data: assignment } = useGetAssignment(courseId, assignmentId, role);
+  const {
+    data: assignment,
+    isLoading,
+    error,
+  } = useGetAssignment(courseId, assignmentId, role);
   const startAssignment = useStartAssignment();
 
-  if (!assignment) {
-    return null;
+  if (isLoading) {
+    return (
+      <div className='flex min-h-screen flex-row gap-4'>
+        <div className='w-72 rounded-md border-2 border-slate-800 text-center'>
+          Sidebar
+        </div>
+        <div className='container m-4'>
+          <AssignmentDetailSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !assignment) {
+    throw error;
   }
 
   const handleStartAssignment = async () => {
@@ -72,7 +90,7 @@ const AssignmentDetailPage = () => {
         Sidebar
       </div>
 
-      <div className='container m-4 max-w-4xl'>
+      <div className='container m-4'>
         {/* Header Section */}
         <div className='mb-8'>
           <div className='flex items-center justify-between'>
@@ -209,5 +227,52 @@ const AssignmentDetailPage = () => {
     </div>
   );
 };
+
+const AssignmentDetailSkeleton = () => (
+  <div className='space-y-6'>
+    <div className='flex items-center justify-between'>
+      <div className='space-y-2'>
+        <Skeleton className='h-8 w-64' />
+        <div className='flex gap-2'>
+          <Skeleton className='h-5 w-32' />
+          <Skeleton className='h-5 w-40' />
+        </div>
+      </div>
+      <div className='space-y-2'>
+        <Skeleton className='h-9 w-32' />
+      </div>
+    </div>
+
+    <Card className='border-2'>
+      <div className='space-y-4 p-6'>
+        <div className='flex items-center gap-2'>
+          <Skeleton className='h-5 w-5' />
+          <Skeleton className='h-5 w-40' />
+        </div>
+        <Skeleton className='h-32 w-full' />
+      </div>
+    </Card>
+
+    <Card className='border-2'>
+      <div className='space-y-4 p-6'>
+        <div className='flex items-center gap-2'>
+          <Skeleton className='h-5 w-5' />
+          <Skeleton className='h-5 w-40' />
+        </div>
+        <div className='space-y-4'>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className='space-y-2'>
+              <Skeleton className='h-4 w-full' />
+              <div className='grid grid-cols-2 gap-4'>
+                <Skeleton className='h-10' />
+                <Skeleton className='h-10' />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  </div>
+);
 
 export default AssignmentDetailPage;

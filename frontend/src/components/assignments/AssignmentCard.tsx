@@ -8,6 +8,7 @@ import {
 import Assignment from '@/types/assignment';
 import { Clock, Edit, MoreVertical, Trash } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Skeleton } from '../common/ui/skeleton';
 
 type AssignmentCardProps = {
   assignment: Assignment;
@@ -72,5 +73,15 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
     </Card>
   );
 };
+
+export const AssignmentCardSkeleton = () => (
+  <Card className='flex flex-row items-center justify-between p-4'>
+    <div className='w-full space-y-3'>
+      <Skeleton className='h-4 w-48' />
+      <Skeleton className='h-3 w-32' />
+    </div>
+    <Skeleton className='h-8 w-8 rounded-full' />
+  </Card>
+);
 
 export default AssignmentCard;
