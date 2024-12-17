@@ -181,6 +181,12 @@ public class AssignmentService : IAssignmentService
             throw new ResourceNotFoundException("Assignment not found");
         }
         
+        // Check if assignment is due
+        if (assignment.DueDate < DateTime.Now)
+        {
+            throw new ResourceNotFoundException("Assignment is due");
+        }
+        
         // Check if the student has already started the assignment
         if (assignment.CanRetry == false)
         {
@@ -188,7 +194,7 @@ public class AssignmentService : IAssignmentService
                 .FirstOrDefaultAsync(s => s.AssignmentId == assignmentId && s.StudentId == studentId);
             if (existingSubmission != null)
             {
-                throw new ResourceNotFoundException("Student has already started the assignment");
+                throw new ResourceNotFoundException("Student is only allowed to start once");
             }
         }
 
@@ -225,11 +231,16 @@ public class AssignmentService : IAssignmentService
         var assignment = await _dbContext.Assignments
             .Include(asgmt => asgmt.Questions)
             .ThenInclude(question => question.Answers)
-            .FirstOrDefaultAsync(c => c.AssignmentId == submission.AssignmentId
-                                                && c.DueDate > DateTime.Now);
+            .FirstOrDefaultAsync(c => c.AssignmentId == submission.AssignmentId);
         if (assignment == null)
         {
             throw new ResourceNotFoundException("Assignment not found");
+        }
+        
+        // Check if assignment is due
+        if (assignment.DueDate < DateTime.Now)
+        {
+            throw new ResourceNotFoundException("Assignment is due");
         }
         
         return new AssignmentStartResponseDto
@@ -274,7 +285,7 @@ public class AssignmentService : IAssignmentService
                     a.Value == answer.Value && a.QuestionId == answer.QuestionId);
                 if (answerInDb == null)
                 {
-                    throw new ResourceNotFoundException("Answer not found");
+                    continue;
                 }
 
                 studentAnswers.Add(new StudentAnswer
