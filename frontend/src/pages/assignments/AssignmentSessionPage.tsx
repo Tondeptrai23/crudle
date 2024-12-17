@@ -1,14 +1,32 @@
 import AssignmentWorkspace from '@/components/assignments/AssignmentWorkspace';
-import { useGetAssignment } from '@/hooks/api/useAssignmentApi';
+import {
+  useGetAssignment,
+  useStartAssignment,
+  useSubmitAssignment,
+} from '@/hooks/api/useAssignmentApi';
+import useAuth from '@/hooks/useAuth';
+import { AssignmentSubmitDto } from '@/types/assignment';
 import { useCustomParams } from '@/utils/helper';
+import { useNavigate } from 'react-router-dom';
 
 const AssignmentSessionPage = () => {
   const { assignmentId, courseId } = useCustomParams();
-  const { data: assignment } = useGetAssignment(courseId, assignmentId);
+  const { role } = useAuth();
+  const navigate = useNavigate();
 
-  if (!assignment) {
+  const { data: assignment } = useGetAssignment(courseId, assignmentId, role);
+  const { data: submission } = useStartAssignment(courseId, assignmentId);
+  const submitAssignment = useSubmitAssignment();
+
+  if (!assignment || !submission) {
     return null;
   }
+
+  const handleSubmit = async (data: AssignmentSubmitDto) => {
+    await submitAssignment.mutateAsync({ courseId, request: data });
+
+    navigate('/assignments');
+  };
 
   return (
     <>
@@ -17,8 +35,9 @@ const AssignmentSessionPage = () => {
       </div>
       <AssignmentWorkspace
         assignmentId={assignmentId}
-        questions={assignment.questions}
-        onSubmit={(data) => console.log('Submit data:', data)}
+        submissionId={submission.submissionId}
+        questions={submission.questions}
+        onSubmit={handleSubmit}
       />
     </>
   );

@@ -11,18 +11,20 @@ import {
 import { Button } from '@/components/common/ui/button';
 import { Card } from '@/components/common/ui/card';
 import { cn } from '@/lib/utils';
-import { CreateQuestionDto } from '@/types/assignment';
+import { AssignmentSubmitDto, CreateQuestionDto } from '@/types/assignment';
 import { useState } from 'react';
 import WorkspaceQuestionCard from './WorkspaceQuestionCard';
 
 interface AssignmentWorkspaceProps {
   assignmentId: number;
+  submissionId: number;
   questions: CreateQuestionDto[];
-  onSubmit: (data: any) => void;
+  onSubmit: (data: AssignmentSubmitDto) => void;
 }
 
 const AssignmentWorkspace = ({
   assignmentId,
+  submissionId,
   questions,
   onSubmit,
 }: AssignmentWorkspaceProps) => {
@@ -42,6 +44,7 @@ const AssignmentWorkspace = ({
   const handleSubmit = () => {
     const submitData = {
       assignmentId,
+      submissionId,
       answers: questions.map((q) => ({
         questionId: q.questionId,
         value: selectedAnswers[q.questionId] || '',

@@ -1,5 +1,5 @@
 import AssignmentService from '@/services/AssignmentService';
-import { CreateAssignmentDto } from '@/types/assignment';
+import { AssignmentSubmitDto, CreateAssignmentDto } from '@/types/assignment';
 import {
   keepPreviousData,
   useMutation,
@@ -102,10 +102,30 @@ export const useDeleteAssignment = () => {
   });
 };
 
-export const useStartAssignment = () => {
+export const useStartAssignment = (courseId: number, assignmentId: number) => {
+  return useQuery({
+    queryKey: ['startAssignment', courseId, assignmentId],
+    queryFn: () => assignmentService.startAssignment(courseId, assignmentId),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+};
+
+export const useSubmitAssignment = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (data: { courseId: number; assignmentId: number }) => {
-      await assignmentService.startAssignment(data.courseId, data.assignmentId);
+    mutationFn: async (data: {
+      courseId: number;
+      request: AssignmentSubmitDto;
+    }) => {
+      await assignmentService.submitAssignment(data.courseId, data.request);
+
+      queryClient.invalidateQueries({
+        queryKey: ['startAssignment', data.courseId, data.request.assignmentId],
+      });
     },
   });
 };

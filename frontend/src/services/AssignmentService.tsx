@@ -2,6 +2,7 @@ import Assignment, {
   AnswerResponse,
   AssignmentResponse,
   AssignmentStartDto,
+  AssignmentSubmitDto,
   CreateAssignmentDto,
   QuestionResponse,
 } from '@/types/assignment';
@@ -58,8 +59,6 @@ export default class AssignmentService {
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
-
-    console.log(response.data.Data);
 
     return mapToAssignment(response.data.Data);
   }
@@ -161,6 +160,30 @@ export default class AssignmentService {
       startedAt: response.data.Data.StartedAt,
       questions: response.data.Data.Questions.map(mapToQuestion),
     };
+  }
+
+  async submitAssignment(
+    courseId: number,
+    data: AssignmentSubmitDto,
+  ): Promise<void> {
+    const response = await api.post(
+      `/api/Student/Course/${courseId}/Assignment/${data.assignmentId}/Submit`,
+      {
+        submissionId: data.submissionId,
+        answers: data.answers.map((answer) => ({
+          questionId: answer.questionId,
+          value: answer.value,
+        })),
+      },
+    );
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    console.log('Submit response:', response.data.Data);
+
+    return response.data.Data;
   }
 }
 

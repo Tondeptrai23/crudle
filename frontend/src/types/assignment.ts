@@ -85,6 +85,7 @@ export interface CreateAnswerDto {
 
 export interface AssignmentSubmitDto {
   assignmentId: number;
+  submissionId: number;
   answers: AnswerSubmitDto[];
 }
 
