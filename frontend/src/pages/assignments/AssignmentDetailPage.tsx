@@ -8,7 +8,10 @@ import {
 import { Badge } from '@/components/common/ui/badge';
 import { Button } from '@/components/common/ui/button';
 import { Card } from '@/components/common/ui/card';
-import { useGetAssignment } from '@/hooks/api/useAssignmentApi';
+import {
+  useGetAssignment,
+  useStartAssignment,
+} from '@/hooks/api/useAssignmentApi';
 import useAuth from '@/hooks/useAuth';
 import { useCustomParams } from '@/utils/helper';
 import {
@@ -26,10 +29,19 @@ const AssignmentDetailPage = () => {
   const { role } = useAuth();
   const navigate = useNavigate();
   const { data: assignment } = useGetAssignment(courseId, assignmentId, role);
+  const startAssignment = useStartAssignment();
 
   if (!assignment) {
     return null;
   }
+
+  const handleStartAssignment = async () => {
+    const response = await startAssignment.mutateAsync({
+      courseId,
+      assignmentId,
+    });
+    navigate(`session/${response.submissionId}`);
+  };
 
   const formatDate = (date: string | Date) => {
     return new Date(date).toLocaleString('en-US', {
@@ -163,7 +175,7 @@ const AssignmentDetailPage = () => {
               <Button
                 size='lg'
                 className='bg-blue-600 hover:bg-blue-700'
-                onClick={() => navigate('./do')}
+                onClick={handleStartAssignment}
               >
                 <Send className='mr-2 h-5 w-5' />
                 Start Assignment

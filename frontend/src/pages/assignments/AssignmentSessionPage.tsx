@@ -1,7 +1,7 @@
 import AssignmentWorkspace from '@/components/assignments/AssignmentWorkspace';
 import {
   useGetAssignment,
-  useStartAssignment,
+  useResumeAssignment,
   useSubmitAssignment,
 } from '@/hooks/api/useAssignmentApi';
 import useAuth from '@/hooks/useAuth';
@@ -10,12 +10,17 @@ import { useCustomParams } from '@/utils/helper';
 import { useNavigate } from 'react-router-dom';
 
 const AssignmentSessionPage = () => {
-  const { assignmentId, courseId } = useCustomParams();
+  const { assignmentId, courseId, submissionId } = useCustomParams();
   const { role } = useAuth();
   const navigate = useNavigate();
 
   const { data: assignment } = useGetAssignment(courseId, assignmentId, role);
-  const { data: submission } = useStartAssignment(courseId, assignmentId);
+  const { data: submission } = useResumeAssignment(
+    courseId,
+    assignmentId,
+    submissionId,
+  );
+
   const submitAssignment = useSubmitAssignment();
 
   if (!assignment || !submission) {

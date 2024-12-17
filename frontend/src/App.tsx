@@ -110,7 +110,7 @@ const App: React.FC = () => {
                         />
 
                         <Route
-                          path='/course/:courseId/assignment/:assignmentId/do'
+                          path='/course/:courseId/assignment/:assignmentId/session/:submissionId'
                           element={<AssignmentSessionPage />}
                         />
 

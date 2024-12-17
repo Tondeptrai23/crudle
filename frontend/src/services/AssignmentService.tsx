@@ -181,9 +181,28 @@ export default class AssignmentService {
       throw new Error(response.data.Message);
     }
 
-    console.log('Submit response:', response.data.Data);
-
     return response.data.Data;
+  }
+
+  async resumeAssignment(
+    courseId: number,
+    assignmentId: number,
+    submissionId: number,
+  ): Promise<AssignmentStartDto> {
+    const response = await api.get(
+      `/api/Student/Course/${courseId}/Assignment/${assignmentId}/Resume/${submissionId}`,
+    );
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return {
+      submissionId: response.data.Data.SubmissionId,
+      assignmentId: response.data.Data.AssignmentId,
+      startedAt: response.data.Data.StartedAt,
+      questions: response.data.Data.Questions.map(mapToQuestion),
+    };
   }
 }
 

@@ -102,14 +102,38 @@ export const useDeleteAssignment = () => {
   });
 };
 
-export const useStartAssignment = (courseId: number, assignmentId: number) => {
+export const useResumeAssignment = (
+  courseId: number,
+  assignmentId: number,
+  submissionId: number,
+) => {
   return useQuery({
-    queryKey: ['startAssignment', courseId, assignmentId],
-    queryFn: () => assignmentService.startAssignment(courseId, assignmentId),
+    queryKey: ['resumeAssignment', courseId, assignmentId, submissionId],
+    queryFn: () =>
+      assignmentService.resumeAssignment(courseId, assignmentId, submissionId),
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     retry: false,
+  });
+};
+
+export const useStartAssignment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { courseId: number; assignmentId: number }) => {
+      const response = await assignmentService.startAssignment(
+        data.courseId,
+        data.assignmentId,
+      );
+
+      queryClient.invalidateQueries({
+        queryKey: ['startAssignment', data.courseId, data.assignmentId],
+      });
+
+      return response;
+    },
   });
 };
 
