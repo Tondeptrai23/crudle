@@ -120,7 +120,7 @@ public class CourseController : ControllerBase
     
     
     [HttpGet]
-    [Route("{courseId:int}/Assignments")]
+    [Route("{courseId:int}/Assignment")]
     public async Task<IActionResult> GetAssignments([FromRoute] int courseId, [FromQuery] AssignmentCollectionQueryDto queryDto)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -134,8 +134,9 @@ public class CourseController : ControllerBase
             throw new ForbiddenException("This student is not enrolled in the course");
         }
 
-        
-        var (count, assignments) = await _assignmentService.GetAssignmentsAsync(courseId, queryDto);
+        var specification = new StudentAssignmentSpecification();
+
+        var (count, assignments) = await _assignmentService.GetAssignmentsAsync(courseId, specification, queryDto);
         return Ok(new PaginationResponseDto<IEnumerable<AssignmentDto>>(assignments, count, queryDto.Page, queryDto.Size));
     }
 }

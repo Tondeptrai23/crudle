@@ -1,8 +1,10 @@
 ﻿using _3w1m.Data;
 using _3w1m.Dtos.Assignment;
+using _3w1m.Dtos.Questions;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
+using _3w1m.Specifications.Interface;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +23,7 @@ public class AssignmentService : IAssignmentService
 
     public async Task<(int count, IEnumerable<AssignmentDto>)> GetAssignmentsAsync(
         int courseId,
+        IAssignmentSpecification spec,
         AssignmentCollectionQueryDto? assignmentCollectionQueryDto)
     {
         assignmentCollectionQueryDto ??= new AssignmentCollectionQueryDto();
@@ -39,8 +42,8 @@ public class AssignmentService : IAssignmentService
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var assignments = _dbContext.Assignments.Include(asgmt => asgmt.Questions).ThenInclude(q => q.Answers)
-            .AsQueryable();
+        var assignments = spec.Apply(_dbContext.Assignments)
+            .Where(asgmt => asgmt.CourseId == courseId);
 
         assignments = ApplyFilter(assignments, assignmentCollectionQueryDto);
         assignments = ApplyOrder(assignments, assignmentCollectionQueryDto);
@@ -50,13 +53,10 @@ public class AssignmentService : IAssignmentService
         return (count, _mapper.Map<IEnumerable<AssignmentDto>>(await assignments.ToListAsync()));
     }
 
-    public async Task<AssignmentDto> GetAssignmentAsync(int courseId, int assignmentId)
+    public async Task<AssignmentDto> GetAssignmentAsync(int courseId, int assignmentId, IAssignmentSpecification spec)
     {
-        var assignment = await _dbContext.Assignments
-            .Include(asgmt => asgmt.Questions)
-            .ThenInclude(question => question.Answers)
-            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId);
-        
+        var assignment = await spec.Apply(_dbContext.Assignments)
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId && c.CourseId == courseId);
         if (assignment == null)
         {
             throw new ResourceNotFoundException("Assignment not found");
@@ -87,29 +87,136 @@ public class AssignmentService : IAssignmentService
         return _mapper.Map<AssignmentDto>(assignment);
     }
 
-    public async Task<AssignmentSubmissionResponseDto> SubmitAssignmentAsync(int courseId, int assignmentId,
-        int studentId,
-        AssignmentSubmissionRequestDto requestDto)
+    public async Task<bool> DeleteAssignmentAsync(int courseId, int assignmentId)
     {
-        var assignment = await _dbContext.Assignments.Include(a => a.Questions)
-            .ThenInclude(q => q.Answers)
+        var assignment = await _dbContext.Assignments
+            .Include(asgmt => asgmt.Questions)
+            .ThenInclude(question => question.Answers)
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId
+                                      && c.CourseId == courseId);   
+        if (assignment == null)
+        {
+            throw new ResourceNotFoundException("Assignment not found");
+        }
+
+        _dbContext.Remove(assignment);
+        return await _dbContext.SaveChangesAsync() > 0;
+    }
+
+    public async Task<AssignmentDto> ReplaceAssignmentAsync(int courseId, int assignmentId,
+        CreateAssignmentRequestDto updateAssignmentRequestDto)
+    {
+        ArgumentNullException.ThrowIfNull(updateAssignmentRequestDto);
+
+        var assignment = await _dbContext.Assignments
+            .Include(asgmt => asgmt.Questions)
+            .ThenInclude(question => question.Answers)
             .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId
                                       && c.CourseId == courseId);
         if (assignment == null)
         {
             throw new ResourceNotFoundException("Assignment not found");
         }
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        try
+        {
+            _dbContext.RemoveRange(assignment.Questions.SelectMany(q => q.Answers));
+            _dbContext.RemoveRange(assignment.Questions);
 
-        var score = 0;
-        var submittedAt = DateTime.Now;
+            // Update properties instead of creating new entity
+            _mapper.Map(updateAssignmentRequestDto, assignment);
+            assignment.UpdatedAt = DateTime.UtcNow;
+            
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return _mapper.Map<AssignmentDto>(assignment);
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
 
+    public async Task<AssignmentDto> UpdateAssignmentDescriptionAsync(int courseId, int assignmentId,
+        UpdateAssignmentRequestDto updateAssignmentRequestDto)
+    {
+        ArgumentNullException.ThrowIfNull(updateAssignmentRequestDto);
+        var assignment = await _dbContext.Assignments
+            .Include(asgmt => asgmt.Questions)
+            .ThenInclude(question => question.Answers)
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId
+                                      && c.CourseId == courseId);
+
+        if (assignment == null)
+        {
+            throw new ResourceNotFoundException("Assignment not found");
+        }
+
+        if (updateAssignmentRequestDto.Name != null)
+        {
+            assignment.Name = updateAssignmentRequestDto.Name;
+        }
+
+        if (updateAssignmentRequestDto.DueDate != null)
+        {
+            assignment.DueDate = updateAssignmentRequestDto.DueDate.Value;
+        }
+
+        assignment.UpdatedAt = DateTime.Now;
+
+        await _dbContext.SaveChangesAsync();
+        return _mapper.Map<AssignmentDto>(assignment);
+    }
+
+    public async Task<AssignmentStartResponseDto> StartAssignmentAsync(int courseId, int assignmentId, int studentId)
+    {
+        var assignment = await _dbContext.Assignments
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId
+                                      && c.CourseId == courseId);
+        if (assignment == null)
+        {
+            throw new ResourceNotFoundException("Assignment not found");
+        }
+        
         var submission = new AssignmentSubmission
         {
             AssignmentId = assignmentId,
             StudentId = studentId,
-            SubmittedAt = submittedAt
+            StartedAt = DateTime.Now
         };
 
+        var submissionEntity = (await _dbContext.AssignmentSubmissions.AddAsync(submission)).Entity;
+
+        await _dbContext.SaveChangesAsync();
+        
+        return new AssignmentStartResponseDto
+        {
+            SubmissionId = submissionEntity.SubmissionId,
+            AssignmentId = assignmentId,
+            StartedAt = submissionEntity.StartedAt,
+            Questions = _mapper.Map<IEnumerable<QuestionForStudentDto>>(assignment.Questions)
+        };
+    }
+    
+     public async Task<AssignmentSubmissionResponseDto> SubmitAssignmentAsync(int courseId, int assignmentId,
+        int studentId,
+        AssignmentSubmissionRequestDto requestDto)
+    {
+        var submission = await _dbContext.AssignmentSubmissions
+            .FirstOrDefaultAsync(s => s.SubmissionId == requestDto.SubmissionId);
+        if (submission == null)
+        {
+            throw new ResourceNotFoundException("Submission not found");
+        }
+        
+        var assignment = await _dbContext.Assignments
+            .Include(asgmt => asgmt.Questions)
+            .ThenInclude(question => question.Answers)
+            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId
+                                      && c.CourseId == courseId);
+
+        var score = 0;
         var studentAnswers = new List<StudentAnswer>();
         foreach (var answer in requestDto.Answers)
         {
@@ -140,108 +247,36 @@ public class AssignmentService : IAssignmentService
                     score++;
                 }
             }
+            else if (questionEntity.Type == "Fill In Blank")
+            {
+                studentAnswers.Add(new StudentAnswer
+                {
+                    SubmissionId = submission.SubmissionId,
+                    QuestionId = answer.QuestionId,
+                    Value = answer.Value
+                });
+                
+                if (questionEntity.Answers.Any(a => a.Value.Equals(answer.Value, StringComparison.OrdinalIgnoreCase)))                {
+                    score++;
+                }
+            }
         }
 
         submission.Score = score;
         submission.Answers = studentAnswers;
+        submission.SubmittedAt = DateTime.Now;
 
-        await _dbContext.AssignmentSubmissions.AddAsync(submission);
         await _dbContext.SaveChangesAsync();
 
         var assignmentSubmission = new AssignmentSubmissionResponseDto
         {
-            AssignmentName = assignment.Name,
-            Score = score,
+            SubmissionId = submission.SubmissionId,
+            Name = assignment.Name,
+            Score = assignment.CanViewScore ? score : null,
             SubmittedAt = DateTime.Now
         };
 
         return assignmentSubmission;
-    }
-
-    public async Task<bool> DeleteAssignmentAsync(int courseId, int assignmentId)
-    {
-        var assignment = await _dbContext.Assignments
-            .Include(asgmt => asgmt.Questions)
-            .ThenInclude(question => question.Answers)
-            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId);
-        if (assignment == null)
-        {
-            throw new ResourceNotFoundException("Assignment not found");
-        }
-
-        _dbContext.Remove(assignment);
-        return await _dbContext.SaveChangesAsync() > 0;
-    }
-
-    public async Task<AssignmentDto> ReplaceAssignmentAsync(int courseId, int assignmentId,
-        CreateAssignmentRequestDto updateAssignmentRequestDto)
-    {
-        ArgumentNullException.ThrowIfNull(updateAssignmentRequestDto);
-
-        var assignment = await _dbContext.Assignments
-            .Include(asgmt => asgmt.Questions)
-            .ThenInclude(question => question.Answers)
-            .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId);
-        if (assignment == null)
-        {
-            throw new ResourceNotFoundException("Assignment not found");
-        }
-        using var transaction = await _dbContext.Database.BeginTransactionAsync();
-        try
-        {
-            _dbContext.RemoveRange(assignment.Questions.SelectMany(q => q.Answers));
-            _dbContext.RemoveRange(assignment.Questions);
-
-            // Update properties instead of creating new entity
-            _mapper.Map(updateAssignmentRequestDto, assignment);
-            assignment.UpdatedAt = DateTime.UtcNow;
-            
-            await _dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
-            return _mapper.Map<AssignmentDto>(assignment);
-        }
-        catch (Exception e)
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
-    }
-
-    public async Task<AssignmentDto> UpdateAssignmentDescriptionAsync(int courseId, int assignmentId,
-        UpdateAssignmentRequestDto updateAssignmentRequestDto)
-    {
-        ArgumentNullException.ThrowIfNull(updateAssignmentRequestDto);
-
-        var course = await _dbContext.Courses.Include(c => c.Assignments)
-            .ThenInclude(asgmt => asgmt.Questions).ThenInclude(question => question.Answers)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId);
-
-        if (course == null)
-        {
-            throw new ResourceNotFoundException("Course not found");
-        }
-
-        var assignment = await course.Assignments.AsQueryable()
-            .FirstOrDefaultAsync(asgmt => asgmt.AssignmentId == assignmentId);
-        if (assignment == null)
-        {
-            throw new ResourceNotFoundException("Assignment not found");
-        }
-
-        if (updateAssignmentRequestDto.Name != null)
-        {
-            assignment.Name = updateAssignmentRequestDto.Name;
-        }
-
-        if (updateAssignmentRequestDto.DueDate != null)
-        {
-            assignment.DueDate = updateAssignmentRequestDto.DueDate.Value;
-        }
-
-        assignment.UpdatedAt = DateTime.Now;
-
-        await _dbContext.SaveChangesAsync();
-        return _mapper.Map<AssignmentDto>(assignment);
     }
 
     private IQueryable<Assignment> ApplyFilter(IQueryable<Assignment> query, AssignmentCollectionQueryDto queryDto)

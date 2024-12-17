@@ -9,7 +9,6 @@ using _3w1m.Dtos.Student;
 using _3w1m.Dtos.Teacher;
 using _3w1m.Models.Domain;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore.Migrations.Operations.Builders;
 
 namespace _3w1m.Mapper;
 
@@ -69,13 +68,35 @@ public class MappingProfile : Profile
         CreateMap<AssignmentDto, Assignment>();
         CreateMap<UpdateAssignmentRequestDto, Assignment>();
         CreateMap<UpdateAssignmentRequestDto, Assignment>();
+        CreateMap<Assignment, AssignmentForStudentDto>();
+        CreateMap<AssignmentDto, AssignmentForStudentDto>();
  
         CreateMap<CreateQuestionRequestDto, Question>();
         CreateMap<Question, QuestionDto>();
         CreateMap<QuestionDto, Question>();
+        CreateMap<Question, QuestionForStudentDto>()
+            .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
+                src.Type == "Fill In Blank" 
+                    ? new List<AnswerForStudentDto>() 
+                    : src.Answers.Select(answer => new AnswerForStudentDto
+                    {
+                        AnswerId = answer.AnswerId,
+                        Value = answer.Value
+                    }).ToList()));
+        CreateMap<QuestionDto, QuestionForStudentDto>()
+            .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
+                src.Type == "Fill In Blank" 
+                    ? new List<AnswerForStudentDto>() 
+                    : src.Answers.Select(answer => new AnswerForStudentDto
+                    {
+                        AnswerId = answer.AnswerId,
+                        Value = answer.Value
+                    }).ToList()));
 
         CreateMap<CreateAnswerRequestDto, Answer>();
         CreateMap<Answer, AnswerDto>();
         CreateMap<AnswerDto, Answer>();
+        CreateMap<Answer, AnswerForStudentDto>();
+        CreateMap<AnswerDto, AnswerForStudentDto>();
     }
 }

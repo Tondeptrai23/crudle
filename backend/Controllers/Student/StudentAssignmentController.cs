@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace _3w1m.Controllers.Student;
 
-[Route("api/Student/Course/{courseId:int}/Assignments")]
+[Route("api/Student/Course/{courseId:int}/Assignment")]
 [ApiController]
 [Authorize(Roles = CourseRoles.Student)]
 [Tags("Student Assignment")]
@@ -50,7 +50,7 @@ public class StudentAssignmentController : ControllerBase
             return Unauthorized();
         }
         
-        if (await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
         {
             throw new ForbiddenException("This student is not enrolled in this course.");
         }
@@ -69,7 +69,7 @@ public class StudentAssignmentController : ControllerBase
             return Unauthorized();
         }
         
-        if (await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
         {
             throw new ForbiddenException("This student is not enrolled in this course.");
         }
@@ -89,7 +89,7 @@ public class StudentAssignmentController : ControllerBase
             return Unauthorized();
         }
         
-        if (await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
         {
             throw new ForbiddenException("This student is not enrolled in this course.");
         }

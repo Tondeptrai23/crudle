@@ -4,6 +4,7 @@ using _3w1m.Dtos.Assignment;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
+using _3w1m.Specifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -129,8 +130,10 @@ public class AssignmentController : Controller
         {
             throw new ForbiddenException("This teacher is not allowed to create assignment for this course");
         }
+        
+        var specification = new TeacherAssignmentSpecification();
 
-        var (count, assignments) = await _assignmentService.GetAssignmentsAsync(courseId, queryDto);
+        var (count, assignments) = await _assignmentService.GetAssignmentsAsync(courseId, specification, queryDto);
         return Ok(new PaginationResponseDto<IEnumerable<AssignmentDto>>(assignments, count, queryDto.Page,
             queryDto.Size));
     }
@@ -150,7 +153,9 @@ public class AssignmentController : Controller
             throw new ForbiddenException("This teacher is not allowed to create assignment for this course");
         }
 
-        var assignment = await _assignmentService.GetAssignmentAsync(courseId, assignmentId);
+        var specification = new TeacherAssignmentSpecification();
+        
+        var assignment = await _assignmentService.GetAssignmentAsync(courseId, assignmentId, specification);
         return Ok(new ResponseDto<AssignmentDto>(assignment));
     }
 }
