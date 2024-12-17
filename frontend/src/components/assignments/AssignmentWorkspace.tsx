@@ -53,20 +53,24 @@ const AssignmentWorkspace = ({
   };
 
   return (
-    <div className='container mx-auto p-4'>
+    <div className='container h-[calc(100vh-4rem)] p-4'>
       <div className='grid grid-cols-12 gap-4'>
         {/* Main workspace */}
         <div className='col-span-9 space-y-4'>
           {questions.map((question, index) => (
-            <WorkspaceQuestionCard
+            <div
               key={question.questionId}
-              question={question}
-              index={index}
-              selectedAnswer={selectedAnswers[question.questionId]}
-              onAnswerSelect={(value) =>
-                handleAnswerSelect(question.questionId, value)
-              }
-            />
+              id={`question-${question.questionId}`}
+            >
+              <WorkspaceQuestionCard
+                question={question}
+                index={index}
+                selectedAnswer={selectedAnswers[question.questionId]}
+                onAnswerSelect={(value) =>
+                  handleAnswerSelect(question.questionId, value)
+                }
+              />
+            </div>
           ))}
         </div>
 
@@ -74,7 +78,7 @@ const AssignmentWorkspace = ({
         <div className='col-span-3'>
           <Card className='sticky top-4 p-4'>
             <h3 className='mb-4 text-lg font-semibold'>Questions</h3>
-            <div className='mb-6 grid grid-cols-5 gap-2'>
+            <div className='mb-6 grid grid-cols-3 gap-2 md:grid-cols-5'>
               {questions.map((question, index) => (
                 <div
                   key={question.questionId}
@@ -85,7 +89,6 @@ const AssignmentWorkspace = ({
                       : 'bg-gray-200 text-gray-700',
                   )}
                   onClick={() => {
-                    // You can add scroll to question functionality here
                     document
                       .getElementById(`question-${question.questionId}`)
                       ?.scrollIntoView({
