@@ -9,9 +9,15 @@ import { Article, ArticleRequest } from "@/types/article";
 import ArticleContentEditor from "./ArticleContentEditor";
 
 const formSchema = z.object({
-  title: z.string(),
-  summary: z.string(),
-  content: z.string(),
+  title: z.string({
+    message: "Title is required",
+  }),
+  summary: z.string({
+    message: "Summary is required",
+  }),
+  content: z.string({
+    message: "Content is required",
+  }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -68,6 +74,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ article, onSubmit }) => {
             name='summary'
             render={({ field }) => (
               <FormItem>
+                <FormMessage />
                 <FormControl>
                   <AutosizeTextarea
                     placeholder='Write a brief summary...'
@@ -75,7 +82,6 @@ const ArticleForm: React.FC<ArticleFormProps> = ({ article, onSubmit }) => {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />

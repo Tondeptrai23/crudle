@@ -6,6 +6,7 @@ import Superscript from '@tiptap/extension-superscript'
 import Underline from '@tiptap/extension-underline'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import TextAlign from '@tiptap/extension-text-align'
+import Placeholder from '@tiptap/extension-placeholder'
 import { common, createLowlight } from 'lowlight'
 import { EditorContent, useEditor } from '@tiptap/react'
 import { BubbleMenu } from './BubbleMenu.tsx'
@@ -34,6 +35,10 @@ const ArticleContentEditor: React.FC<ArticleContentEditorProps> = ({content, onC
       TextAlign.configure({
         types: ['heading', 'paragraph'],
         alignments: ['left', 'center', 'right', 'justify'],
+      }),
+      Placeholder.configure({
+        placeholder: 'Write something...',
+        emptyEditorClass: 'text-gray',
       }),
     ],
     content: content,

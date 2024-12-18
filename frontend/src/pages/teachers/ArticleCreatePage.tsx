@@ -4,6 +4,7 @@ import { ArticleRequest } from "@/types/article";
 import ArticleForm from "@/components/articles/ArticleForm";
 import useAuth from "@/hooks/useAuth";
 import { Role } from "@/types/enums";
+import { useToast } from "@/hooks/use-toast";
 
 const ArticleCreatePage: React.FC = () => {
   const { role } = useAuth();
@@ -11,6 +12,7 @@ const ArticleCreatePage: React.FC = () => {
     throw new Error("Only teachers can create articles");
   }
   
+  const { toast } = useToast();
   const { courseId } = useParams();
   const navigate = useNavigate();
 
@@ -21,12 +23,18 @@ const ArticleCreatePage: React.FC = () => {
 
   // I don't like this code but it's working
   const onSubmit = async (request: ArticleRequest) => {
-    createArticle.mutate(request);
-    if (!createArticle.error) {
-      navigate(`/course/${courseId}`);
-      return;
-    }
-    throw new Error("Failed to create article");
+    createArticle.mutate(request, {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Create article successfully',
+        });
+        navigate(`/course/${courseId}`);
+      },
+      onError: () => {
+        throw new Error("Failed to create article");
+      },
+    });
   };
 
   return (

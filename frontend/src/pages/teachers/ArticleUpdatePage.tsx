@@ -4,6 +4,7 @@ import { ArticleRequest } from "@/types/article";
 import ArticleForm from "@/components/articles/ArticleForm";
 import useAuth from "@/hooks/useAuth";
 import { Role } from "@/types/enums";
+import { useToast } from "@/hooks/use-toast";
 
 const ArticleUpdatePage: React.FC = () => {
   const { role } = useAuth();
@@ -16,7 +17,8 @@ const ArticleUpdatePage: React.FC = () => {
     throw new Error("Missing parameter in the URL");
   }
   
-  const updateArticle = useUpdateArticle(courseId, articleId);
+  const { toast } = useToast();
+  const updateArticle = useUpdateArticle(courseId);
   const navigate = useNavigate();
   const { data: article, isLoading } = useArticleDetail("teacher", { courseId, articleId });
 
@@ -27,12 +29,21 @@ const ArticleUpdatePage: React.FC = () => {
 
   // I don't like this code but it's working
   const onSubmit = async (request: ArticleRequest) => {
-    updateArticle.mutate(request);
-    if (!updateArticle.error) {
-      navigate(`/course/${courseId}`);
-      return;
-    }
-    throw new Error("Failed to update article");
+    updateArticle.mutate({
+      articleId, 
+      data: request
+    }, {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Update article successfully',
+        });
+        navigate(`/course/${courseId}`);
+      },
+      onError: () => {
+        throw new Error("Failed to update article");
+      },
+    });
   };
 
   return (

@@ -39,7 +39,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
     if (editor.isActive({ textAlign: 'right' })) return <AlignRight className="h-3 w-3" />;
     if (editor.isActive({ textAlign: 'justify' })) return <AlignJustify className="h-3 w-3" />;
     return <AlignLeft className="h-3 w-3" />;
-  };
+  };  
 
   return (
     <TiptapBubbleMenu

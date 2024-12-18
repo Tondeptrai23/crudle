@@ -6,6 +6,7 @@ import { Article } from '@/types/article';
 import { Role } from '@/types/enums';
 import { useNavigate } from 'react-router-dom';
 import { useDeleteArticle } from '@/hooks/api/useArticleApi';
+import { useToast } from '@/hooks/use-toast';
 
 interface ArticleCardProps {
   article: Article;
@@ -15,13 +16,21 @@ interface ArticleCardProps {
 
 const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
   const { role } = useAuth();
-  const deleteArticle = useDeleteArticle(courseId, article.id);
+  const { toast } = useToast();
+  const deleteArticle = useDeleteArticle(courseId);
   const navigate = useNavigate();
 
   const onDelete = (e: React.MouseEvent) => {
     console.log(article)
     e.stopPropagation();
-    deleteArticle.mutate();
+    deleteArticle.mutate(article.id, {
+      onSuccess: () => {
+        toast({
+          title: 'Success',
+          description: 'Delete article successfully',
+        });
+      },
+    });
   };
 
   const handleClick = () => {
