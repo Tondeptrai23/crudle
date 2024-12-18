@@ -56,7 +56,7 @@ const ArticleList = ( { courseId } : { courseId : string }) => {
   const readArticle = useReadArticle(courseId);
 
   const handleReadArticle = async (article: Article) => {
-    if (role.toLowerCase() !== 'student' || article.isRead) return;
+    if (role !== Role.Student || article.isRead) return;
     readArticle.mutate({ articleId: article.id });
   }
 
@@ -132,7 +132,7 @@ const ArticleList = ( { courseId } : { courseId : string }) => {
           </div>
         )
       )}
-      {(articles && articles.totalPages) ? articles?.totalPages > 0 && (
+      {articles && articles.totalPages && articles?.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, articles.totalItems)} of {articles?.totalItems} articles
@@ -156,7 +156,7 @@ const ArticleList = ( { courseId } : { courseId : string }) => {
             </Button>
           </div>
         </div>
-      ) : null} 
+      )} 
     </div>
   );
 };

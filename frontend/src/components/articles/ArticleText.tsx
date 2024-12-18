@@ -2,7 +2,7 @@ import useAuth from "@/hooks/useAuth";
 import { Article } from "@/types/article";
 import { Role } from "@/types/enums";
 import { Button } from "@/components/common/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
 import { useDeleteArticle } from "@/hooks/api/useArticleApi";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +18,7 @@ const ArticleText : React.FC<ArticleTextProps> = ({ article, courseId, onRead }:
   const { toast } = useToast();
   const isStudent = role.toLowerCase() === 'student';
   const deleteArticle = useDeleteArticle(courseId);
+  const navigate  = useNavigate();
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -29,12 +30,18 @@ const ArticleText : React.FC<ArticleTextProps> = ({ article, courseId, onRead }:
         });
       },
     });
-  }
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onRead();
+    navigate(`article/${article.id}`);
+  };
 
   return (
     <div 
       className='flex items-center gap-1 px-2 hover:bg-gray-100 rounded cursor-pointer'
-      onClick={onRead}
+      onClick={handleClick}
     >
       {role !== Role.Student && (
         <>

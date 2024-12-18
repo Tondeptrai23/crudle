@@ -52,14 +52,12 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
       <CardHeader className='py-3'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-3'>
-            {(role === 'student') ? <div
-              className={`h-2 w-2 rounded-full ${
-                article.isRead ? 'bg-muted' : 'bg-primary'
-              }`}
-            /> : null}
+            {role === Role.Student && !article.isRead && (
+              <div className='h-2 w-2 rounded-full bg-primary' />
+            )}
             <div
               className={`text-xl ${
-                article.isRead ? 'text-muted-foreground' : 'font-semibold'
+                (role === Role.Student && article.isRead) ? 'text-muted-foreground' : 'font-semibold'
               }`}
             >
               {article.title}
