@@ -61,7 +61,7 @@ public class ArticleService : IArticleService
 
         var article = await spec.Apply(_dbContext.Articles)
             .Where(ar => ar.CourseId == courseId && ar.ArticleId == articleId)
-            .FirstOrDefaultAsync(); 
+            .FirstOrDefaultAsync();
 
         if (article == null)
         {
@@ -295,6 +295,9 @@ public class ArticleService : IArticleService
             "content" => orderDirection == "asc"
                 ? query.OrderBy(ar => ar.Content)
                 : query.OrderByDescending(ar => ar.Content),
+            "order" => orderDirection == "asc"
+                ? query.OrderBy(ar => ar.Order)
+                : query.OrderByDescending(ar => ar.Order),
             "createdat" => orderDirection == "asc"
                 ? query.OrderBy(ar => ar.CreatedAt)
                 : query.OrderByDescending(ar => ar.CreatedAt),
