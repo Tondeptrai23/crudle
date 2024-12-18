@@ -7,8 +7,10 @@ export default class ArticleService {
     title?: string;
     summary?: string;
     content?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    createdAtFrom?: string;
+    createdAtTo?: string;
+    updatedAtFrom?: string;
+    updatedAtTo?: string;
     page?: number;
     size?: number;
     orderBy?: string;
@@ -23,8 +25,10 @@ export default class ArticleService {
     query += data.title ? `&title=${data.title}` : '';
     query += data.summary ? `&summary=${data.summary}` : '';
     query += data.content ? `&content=${data.content}` : '';
-    query += data.createdAt ? `&createdAt=${data.createdAt}` : '';
-    query += data.updatedAt ? `&updatedAt=${data.updatedAt}` : '';
+    query += data.createdAtFrom ? `&createdAtFrom=${data.createdAtFrom}` : '';
+    query += data.createdAtTo ? `&createdAtTo=${data.createdAtTo}` : '';
+    query += data.updatedAtFrom ? `&updatedAtFrom=${data.updatedAtFrom}` : '';
+    query += data.updatedAtTo ? `&updatedAtTo=${data.updatedAtTo}` : '';
 
     const response = await api.get(`/api/${role}/course/${id}/articles?${query}`);
 

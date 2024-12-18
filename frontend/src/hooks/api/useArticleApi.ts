@@ -28,8 +28,10 @@ export const useArticles = (role: string, { courseId } : { courseId: string }, d
     title: titleFilter,
     summary: summaryFilter,
     content: contentFilter,
-    createdAt: createdAtFilter?.[0]?.toDateString(),
-    updatedAt: updatedAtFilter?.[0]?.toDateString(),
+    createdAtFrom: createdAtFilter?.[0]?.toDateString(),
+    createdAtTo: createdAtFilter?.[1]?.toDateString(),
+    updatedAtFrom: updatedAtFilter?.[0]?.toDateString(),
+    updatedAtTo: updatedAtFilter?.[1]?.toDateString(),
     orderBy: sort.key ?? undefined,
     orderDirection: sort.direction || 'asc',
   };

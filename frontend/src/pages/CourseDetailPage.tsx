@@ -1,12 +1,14 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/utils/api';
 import { CourseResponse } from '@/types/course';
 import Course from '@/types/course';
-import ArticleList from '@/components/articles/ArticleList';
 import useAuth from '@/hooks/useAuth';
-import { Role } from '@/types/enums';
+import PageHeader from '@/components/common/layout/PageHeader';
+import CourseTabs from '@/components/course/CourseTabs';
+import CourseInfo from '@/components/course/CourseInfo';
+import CourseInstructor from '@/components/course/CourseInstructor';
 
 const mapToCourseDetail = (response: CourseResponse): Course => ({
   id: response.CourseId.toString(),
@@ -21,6 +23,7 @@ const mapToCourseDetail = (response: CourseResponse): Course => ({
 const CourseDetailPage: React.FC = () => {
   const { courseId } = useParams();
   const { role } = useAuth();
+  const [activeTab, setActiveTab] = useState<'articles' | 'assignments'>('articles');
 
   const {
     data: courseResponse,
@@ -42,47 +45,28 @@ const CourseDetailPage: React.FC = () => {
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      <h1 className='mb-8 scroll-m-20 text-4xl font-bold tracking-tight lg:text-3xl'>
-        {course.name}
-      </h1>
-      <div className='prose max-w-none'>
-        <h2 className='text-2xl font-semibold'>Description</h2>
-        <p>{course.description}</p>
-
-        <h2 className='mt-8 text-2xl font-semibold'>Instructor</h2>
-        <div className='mt-4'>
-          <Link
-            to={`/teacher/${course.teacherId}`}
-            className='text-lg text-gray-600 hover:text-gray-900 hover:underline'
-          >
-            {course.teacherName}
-          </Link>
+      <PageHeader 
+        items={[
+          { label: 'Courses', to: '/course' },
+          { label: course.name }
+        ]}
+      />
+      
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="lg:col-span-3 order-2 lg:order-1">
+          <CourseTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            courseId={course.id}
+          />
         </div>
 
-        <div className='mt-8'>
-          <h2 className='text-2xl font-semibold'>Course Details</h2>
-          <div className='mt-4'>
-            <p>
-              <strong>Course Code:</strong> {course.code}
-            </p>
-            <p>
-              <strong>Start Date:</strong>{' '}
-              {new Date(course.startDate).toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-
-        <div className='mt-8'>
-          <h2 className='text-2xl font-semibold'>Articles</h2>
-          { role === Role.Teacher ? <div className='mt-4'>
-            <Link
-              to={`/course/${course.id}/article/new`}
-              className='btn btn-primary'
-            >
-              New
-            </Link>
-          </div> : null }
-          <ArticleList courseId={course.id} />
+        <div className="lg:col-span-1 order-1 lg:order-2">
+          <CourseInfo course={course} />
+          <CourseInstructor
+            teacherId={course.teacherId}
+            teacherName={course.teacherName}
+          />
         </div>
       </div>
     </div>

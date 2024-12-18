@@ -20,6 +20,14 @@ const ArticleDetailPage : React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {/* <PageHeader
+        items={[
+          { label: 'Courses', to: '/course' },
+          { label: article.course.name, to: `/course/${courseId}` },
+          { label: article.title },
+        ]}
+      /> */}
+
       <div className="max-w-4xl mx-auto">
         <div className="space-y-4">
           <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">
