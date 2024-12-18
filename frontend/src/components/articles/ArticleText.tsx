@@ -33,7 +33,7 @@ const ArticleText : React.FC<ArticleTextProps> = ({ article, courseId, onRead }:
 
   return (
     <div 
-      className='flex items-center gap-1 py-1 px-2 hover:bg-gray-100 rounded cursor-pointer'
+      className='flex items-center gap-1 px-2 hover:bg-gray-100 rounded cursor-pointer'
       onClick={onRead}
     >
       {role !== Role.Student && (

@@ -1,8 +1,9 @@
 import { useArticles, useReadArticle } from '@/hooks/api/useArticleApi';
 import { Skeleton } from '@/components/common/ui/skeleton';
+import { Input } from '@/components/common/ui/input';
 import ArticleCard from './ArticleCard';
 import { Article } from '@/types/article';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/common/ui/button';
 import { LayoutGrid, List } from 'lucide-react';
 import ArticleText from './ArticleText';
@@ -37,17 +38,26 @@ const EmptyState = () => (
 const ArticleList = ( { courseId } : { courseId : string }) => {
   const { role } = useAuth();
   const [displayStyle, setDisplayStyle] = useState<ArticlesDisplayStyle>('card');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  
+  const pageSize = useMemo(() => displayStyle === 'card' ? 10 : 50, [displayStyle]);
+
   const { data: articles, isLoading } = useArticles(role, { courseId }, {
-    page: 1,
-    pageSize: 10,
-    filters: {},
+    page,
+    pageSize,
+    filters: { 
+      title: search,
+      summary: search,
+      // content: search, 
+    },
     sort: { key: 'order', direction: 'asc' },
   });
   const readArticle = useReadArticle(courseId);
 
   const handleReadArticle = async (article: Article) => {
     if (role.toLowerCase() !== 'student' || article.isRead) return;
-    await readArticle.mutateAsync({ articleId: article.id });
+    readArticle.mutate({ articleId: article.id });
   }
 
   if (isLoading) {
@@ -64,7 +74,16 @@ const ArticleList = ( { courseId } : { courseId : string }) => {
 
   return (
     <div className='container mx-auto p-6'>
-      <div className='flex items-center mb-6'>
+      <div className='flex items-center mb-6 gap-4'>
+        <div className='flex-1'>
+          <Input
+            type="search"
+            placeholder="Search articles..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-sm"
+          />
+        </div>
         <div className='flex items-center gap-4'>
           {role === Role.Teacher && (
             <Link
@@ -89,26 +108,55 @@ const ArticleList = ( { courseId } : { courseId : string }) => {
       {articles?.data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className='space-y-4 flex flex-col gap-1'>
-          {articles?.data.map((article) => (
-            displayStyle === 'card' ? (
+        displayStyle === 'card' ? (
+          <div className='space-y-4 flex flex-col gap-1'>
+            {articles?.data.map((article) => (
               <ArticleCard 
                 key={article.id}
                 article={article}
                 courseId={courseId}
                 onRead={() => handleReadArticle(article)}
               />
-            ) : (
+            ))}
+          </div>
+        ) : (
+          <div className='space-y-2 flex flex-col'>
+            {articles?.data.map((article) => (
               <ArticleText
                 key={article.id}
                 article={article}
                 courseId={courseId}
                 onRead={() => handleReadArticle(article)}
               />
-            )
-          ))}
-        </div>
+            ))}
+          </div>
+        )
       )}
+      {(articles && articles.totalPages) ? articles?.totalPages > 0 && (
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, articles.totalItems)} of {articles?.totalItems} articles
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => (articles && articles.totalPages) ? Math.min(articles.totalPages, p + 1) : p + 1)}
+              disabled={page === articles?.totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      ) : null} 
     </div>
   );
 };

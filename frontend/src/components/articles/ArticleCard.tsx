@@ -78,7 +78,7 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="h-8 w-8 text-destructive" 
+                className="h-8 w-8" 
                 onClick={onDelete}
               >
                 <Trash2 className="h-4 w-4" />
