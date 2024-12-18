@@ -256,14 +256,14 @@ public class ArticleService : IArticleService
             query = query.Where(x => x.Content.Contains(queryDto.Content));
         }
 
-        if (queryDto.CreatedAt != default)
+        if (queryDto is { CreatedAtFrom: not null, CreatedAtTo: not null })
         {
-            query = query.Where(x => x.CreatedAt == queryDto.CreatedAt);
+            query = query.Where(x => x.CreatedAt >= queryDto.CreatedAtFrom && x.CreatedAt <= queryDto.CreatedAtTo);
         }
 
-        if (queryDto.UpdatedAt != default)
+        if (queryDto is { UpdatedAtFrom: not null, CreatedAtTo: not null})
         {
-            query = query.Where(x => x.UpdatedAt == queryDto.UpdatedAt);
+            query = query.Where(x => x.UpdatedAt == queryDto.UpdatedAtFrom && x.UpdatedAt == queryDto.UpdatedAtTo);
         }
 
         return query;
