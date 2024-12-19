@@ -20,5 +20,7 @@ public class Course
     
     public ICollection<Enrollment> Enrollments { get; set; }
     
+    public ICollection<Assignment> Assignments { get; set; }
+    
     public ICollection<Article> Articles { get; set; }
 }

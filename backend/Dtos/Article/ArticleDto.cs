@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace _3w1m.Dtos.Article;
 

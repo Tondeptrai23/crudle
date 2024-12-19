@@ -69,9 +69,17 @@
     font-family: 'Inter', sans-serif;
   }
   body {
-    @apply bg-background text-foreground overflow-x-hidden;
+    @apply bg-background text-foreground overflow-x-hidden ;
   }
   #root {
     @apply min-h-full w-full flex flex-col;
+  }
+
+}
+
+@supports (scrollbar-gutter: stable) {
+  html {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
   }
 }

@@ -28,5 +28,5 @@ export interface UpdateTeacherDTO {
 
 export interface TeacherResponse {
   TeacherId: string;
-  Fullname: string;
+Fullname: string;
 }
