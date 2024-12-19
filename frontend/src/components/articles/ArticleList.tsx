@@ -41,8 +41,6 @@ const ArticleList = ({ courseId }: { courseId: string }) => {
       pageSize,
       filters: {
         title: search,
-        summary: search,
-        // content: search,
       },
       sort: { key: 'order', direction: 'asc' },
     },

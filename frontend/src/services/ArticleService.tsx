@@ -21,16 +21,16 @@ export default class ArticleService {
       data.page = 1;
     }
 
-    let query = `page=${data.page || 1}&size=${data.size || 10}&orderBy=${data.orderBy || 'createdAt'}&orderDirection=${data.orderDirection || 'asc'}`;
-    query += data.title ? `&title=${data.title}` : '';
-    query += data.summary ? `&summary=${data.summary}` : '';
-    query += data.content ? `&content=${data.content}` : '';
-    query += data.createdAtFrom ? `&createdAtFrom=${data.createdAtFrom}` : '';
-    query += data.createdAtTo ? `&createdAtTo=${data.createdAtTo}` : '';
-    query += data.updatedAtFrom ? `&updatedAtFrom=${data.updatedAtFrom}` : '';
-    query += data.updatedAtTo ? `&updatedAtTo=${data.updatedAtTo}` : '';
+    let query = `Page=${data.page || 1}&Size=${data.size || 10}&OrderBy=${data.orderBy || 'createdAt'}&OrderDirection=${data.orderDirection || 'asc'}`;
+    query += data.title ? `&Title=${data.title}` : '';
+    query += data.summary ? `&Summary=${data.summary}` : '';
+    query += data.content ? `&Content=${data.content}` : '';
+    query += data.createdAtFrom ? `&CreatedAtFrom=${data.createdAtFrom}` : '';
+    query += data.createdAtTo ? `&CreatedAtTo=${data.createdAtTo}` : '';
+    query += data.updatedAtFrom ? `&UpdatedAtFrom=${data.updatedAtFrom}` : '';
+    query += data.updatedAtTo ? `&UpdatedAtTo=${data.updatedAtTo}` : '';
 
-    const response = await api.get(`/api/${role}/course/${id}/articles?${query}`);
+    const response = await api.get(`/api/${role}/Course/${id}/Articles?${query}`);
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
