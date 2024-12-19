@@ -167,12 +167,22 @@ namespace _3w1m.Migrations
                         },
                         new
                         {
+                            UserId = "00000000-0000-0000-0000-000000000006",
+                            RoleId = "2"
+                        },
+                        new
+                        {
                             UserId = "00000000-0000-0000-0000-000000000002",
                             RoleId = "3"
                         },
                         new
                         {
                             UserId = "00000000-0000-0000-0000-000000000003",
+                            RoleId = "3"
+                        },
+                        new
+                        {
+                            UserId = "00000000-0000-0000-0000-000000000007",
                             RoleId = "3"
                         });
                 });
@@ -194,6 +204,61 @@ namespace _3w1m.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("UserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.Answer", b =>
+                {
+                    b.Property<int>("AnswerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AnswerId"));
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("AnswerId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("Answers");
+
+                    b.HasData(
+                        new
+                        {
+                            AnswerId = 1,
+                            IsCorrect = true,
+                            QuestionId = 1,
+                            Value = "Answer 1"
+                        },
+                        new
+                        {
+                            AnswerId = 2,
+                            IsCorrect = false,
+                            QuestionId = 1,
+                            Value = "Answer 2"
+                        },
+                        new
+                        {
+                            AnswerId = 3,
+                            IsCorrect = true,
+                            QuestionId = 2,
+                            Value = "Answer 3"
+                        },
+                        new
+                        {
+                            AnswerId = 4,
+                            IsCorrect = false,
+                            QuestionId = 2,
+                            Value = "Answer 4"
+                        });
                 });
 
             modelBuilder.Entity("_3w1m.Models.Domain.Article", b =>
@@ -239,22 +304,22 @@ namespace _3w1m.Migrations
                             ArticleId = 1,
                             Content = "Content 1",
                             CourseId = 1,
-                            CreatedAt = new DateTime(2024, 11, 25, 8, 46, 56, 813, DateTimeKind.Local).AddTicks(7849),
+                            CreatedAt = new DateTime(2024, 12, 17, 16, 34, 55, 655, DateTimeKind.Local).AddTicks(9473),
                             Order = 1,
                             Summary = "Summary 1",
                             Title = "Article 1",
-                            UpdatedAt = new DateTime(2024, 11, 25, 8, 46, 56, 813, DateTimeKind.Local).AddTicks(7871)
+                            UpdatedAt = new DateTime(2024, 12, 17, 16, 34, 55, 655, DateTimeKind.Local).AddTicks(9496)
                         },
                         new
                         {
                             ArticleId = 2,
                             Content = "Content 2",
                             CourseId = 1,
-                            CreatedAt = new DateTime(2024, 11, 25, 8, 46, 56, 813, DateTimeKind.Local).AddTicks(7873),
+                            CreatedAt = new DateTime(2024, 12, 17, 16, 34, 55, 655, DateTimeKind.Local).AddTicks(9502),
                             Order = 2,
                             Summary = "Summary 2",
                             Title = "Article 2",
-                            UpdatedAt = new DateTime(2024, 11, 25, 8, 46, 56, 813, DateTimeKind.Local).AddTicks(7874)
+                            UpdatedAt = new DateTime(2024, 12, 17, 16, 34, 55, 655, DateTimeKind.Local).AddTicks(9503)
                         });
                 });
 
@@ -288,8 +353,106 @@ namespace _3w1m.Migrations
                         {
                             ArticleProgressId = 1,
                             ArticleId = 1,
-                            ReadAt = new DateTime(2024, 11, 25, 8, 46, 56, 813, DateTimeKind.Local).AddTicks(8043),
+                            ReadAt = new DateTime(2024, 12, 17, 16, 34, 55, 655, DateTimeKind.Local).AddTicks(9900),
                             StudentId = 1
+                        });
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.Assignment", b =>
+                {
+                    b.Property<int>("AssignmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AssignmentId"));
+
+                    b.Property<bool>("CanRetry")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("CanViewScore")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("AssignmentId");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Assignments");
+
+                    b.HasData(
+                        new
+                        {
+                            AssignmentId = 1,
+                            CanRetry = false,
+                            CanViewScore = false,
+                            Content = "Content 1",
+                            CourseId = 3,
+                            CreatedAt = new DateTime(2024, 12, 17, 16, 34, 55, 655, DateTimeKind.Local).AddTicks(9665),
+                            DueDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Assignment 1",
+                            UpdatedAt = new DateTime(2024, 12, 17, 16, 34, 55, 655, DateTimeKind.Local).AddTicks(9665)
+                        });
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.AssignmentSubmission", b =>
+                {
+                    b.Property<int>("SubmissionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("SubmissionId"));
+
+                    b.Property<int>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Score")
+                        .HasColumnType("double");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("SubmissionId");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("AssignmentSubmissions");
+
+                    b.HasData(
+                        new
+                        {
+                            SubmissionId = 1,
+                            AssignmentId = 1,
+                            Score = 0.0,
+                            StartedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StudentId = 2,
+                            SubmittedAt = new DateTime(2024, 12, 17, 16, 34, 55, 656, DateTimeKind.Local).AddTicks(58)
                         });
                 });
 
@@ -343,6 +506,15 @@ namespace _3w1m.Migrations
                             Name = "Course 2",
                             StartDate = new DateOnly(2022, 1, 1),
                             TeacherId = 1
+                        },
+                        new
+                        {
+                            CourseId = 3,
+                            Code = "C003",
+                            Description = "Description 3",
+                            Name = "Course test assignment",
+                            StartDate = new DateOnly(2024, 1, 1),
+                            TeacherId = 2
                         });
                 });
 
@@ -376,10 +548,52 @@ namespace _3w1m.Migrations
                         },
                         new
                         {
-                            CourseId = 2,
+                            CourseId = 3,
                             StudentId = 2,
                             EnrolledAt = new DateOnly(2022, 2, 1),
                             EnrollmentId = 0
+                        });
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.Question", b =>
+                {
+                    b.Property<int>("QuestionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("QuestionId"));
+
+                    b.Property<int>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("QuestionId");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.ToTable("Questions");
+
+                    b.HasData(
+                        new
+                        {
+                            QuestionId = 1,
+                            AssignmentId = 1,
+                            Content = "Question 1",
+                            Type = "Multiple Choice"
+                        },
+                        new
+                        {
+                            QuestionId = 2,
+                            AssignmentId = 1,
+                            Content = "Question 2",
+                            Type = "Multiple Choice"
                         });
                 });
 
@@ -451,6 +665,56 @@ namespace _3w1m.Migrations
                             DateOfBirth = new DateOnly(2000, 1, 1),
                             Fullname = "Student 2",
                             UserId = "00000000-0000-0000-0000-000000000003"
+                        },
+                        new
+                        {
+                            StudentId = 3,
+                            DateOfBirth = new DateOnly(2000, 1, 1),
+                            Fullname = "Student 3",
+                            UserId = "00000000-0000-0000-0000-000000000007"
+                        });
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.StudentAnswer", b =>
+                {
+                    b.Property<int?>("StudentAnswerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int?>("StudentAnswerId"));
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("StudentAnswerId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("SubmissionId");
+
+                    b.ToTable("StudentAnswers");
+
+                    b.HasData(
+                        new
+                        {
+                            StudentAnswerId = 1,
+                            QuestionId = 1,
+                            SubmissionId = 1,
+                            Value = "Answer 1"
+                        },
+                        new
+                        {
+                            StudentAnswerId = 2,
+                            QuestionId = 2,
+                            SubmissionId = 1,
+                            Value = "Answer 3"
                         });
                 });
 
@@ -492,6 +756,14 @@ namespace _3w1m.Migrations
                             ContactPhone = "0987654321",
                             Fullname = "Teacher 1",
                             UserId = "00000000-0000-0000-0000-000000000001"
+                        },
+                        new
+                        {
+                            TeacherId = 2,
+                            ContactEmail = "teacher",
+                            ContactPhone = "0987654321",
+                            Fullname = "teacher",
+                            UserId = "00000000-0000-0000-0000-000000000006"
                         });
                 });
 
@@ -563,15 +835,15 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000001",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "eff4371c-2b39-4e1d-9e78-db4f4830f4cb",
+                            ConcurrencyStamp = "2d7123f1-b94b-4e5a-934d-098a582b4250",
                             Email = "test1@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST1@EXAMPLE.COM",
                             NormalizedUserName = "USER1",
-                            PasswordHash = "AQAAAAIAAYagAAAAENQcpANapISpxxJqtRWrjBbrwB2zfxfySEHrI8iTwX+4w4gaS7PLqgjr9RFNmeuf8Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHV7znbxKvLyfic7DT2782EpL5ofZv9Kne6ytpdOIeVnA0i9xReOFv1CEhL8ObNIfg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e59b2a7f-be98-4ec8-9a88-abe4b0a88f06",
+                            SecurityStamp = "be885677-fe67-4d2e-908a-53f20c08a043",
                             TwoFactorEnabled = false,
                             UserName = "user1"
                         },
@@ -579,15 +851,15 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000002",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "269491d1-7f5a-4b08-92d1-9d54f3a8369a",
+                            ConcurrencyStamp = "32cd6b90-6306-4077-a320-b5ed35a4830f",
                             Email = "test2@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST2@EXAMPLE.COM",
                             NormalizedUserName = "USER2",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMSpoTT5vT4I9kc/jZ1xAW/xq7aR9o9UdhnT0/CzlKWf+dvFXoLsO/kLe7P6oFearQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIrzrYSFTbgUUvGvIYC4uSw3m+OkfMxwfWgsT+WZwhwXpH6Jl+RV09pp7Hb98FzLZw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "42688773-8ba7-42b1-a62e-da877a03d4a3",
+                            SecurityStamp = "22c4560b-1c83-4add-b882-a52b16d3c858",
                             TwoFactorEnabled = false,
                             UserName = "user2"
                         },
@@ -595,15 +867,15 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000003",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "00f9efb3-b069-4aea-b7ba-ecc118e9c039",
+                            ConcurrencyStamp = "94b35e8b-d6b7-4902-b91e-aeb6c7401a51",
                             Email = "test3@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST3@EXAMPLE.COM",
                             NormalizedUserName = "USER3",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGXYxJfQrMWgXtTnZyZ/gJmKYEnAS9oVm+lkYz4bTpsMhJipEh2AtSXMVX5vA1o8/A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFOguG9xQAI0/TqRGYmRoRSDPxlqEtH26XS3wqQRmoLdi82LTIbOE7xDUGoRLX7YZQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6cbb6f52-8b5f-406b-81a3-4a844f7e6498",
+                            SecurityStamp = "602077eb-68ed-4cea-952c-82d99193d262",
                             TwoFactorEnabled = false,
                             UserName = "user3"
                         },
@@ -611,15 +883,15 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000004",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ef7fa9d5-c64d-4f1a-8a35-e2be58fff05c",
+                            ConcurrencyStamp = "ab9ca763-cf4a-4a4a-a0f6-39fb14a5eb9a",
                             Email = "test4@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST4@EXAMPLE.COM",
                             NormalizedUserName = "USER4",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJNVSJOT0QPfestEAI/EAQvs2terqO1bo3IY1seTMwtUGrkDB77DiGSv35qrZwxOmQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEDj5uZrJBFsEArjt2zG7QEmNCs4PO/chaFuqwCDtCrTIyKvaRXZbu6tJI0b3xHHLw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9ba01d0a-4d78-4b0c-9bae-741f5f4b8fd5",
+                            SecurityStamp = "da73649d-790f-496e-a5ba-303fc0cf0013",
                             TwoFactorEnabled = false,
                             UserName = "user4"
                         },
@@ -627,17 +899,49 @@ namespace _3w1m.Migrations
                         {
                             Id = "00000000-0000-0000-0000-000000000005",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8d4b2a65-b9a5-4a11-8c3e-3b5e3c851c78",
+                            ConcurrencyStamp = "afe1b346-0d19-4825-bc8b-4675e8f0a295",
                             Email = "admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOqVN/FMKAO04Q4gQdP2TXlQTLGt488x94r1zSq3tOicjsS1Cy3RHkVI5RSlrZ5gQA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGowss1aKbztgY6/ZKeU6WIIUDJQ4n4bFr9aCqvfctSasy+ioHzeoYmoS1m05L4hPw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7c03d9bb-aed0-4a8a-9c46-380e9fec4c13",
+                            SecurityStamp = "61ee180c-7e5f-49a8-a585-cba71b077029",
                             TwoFactorEnabled = false,
                             UserName = "admin"
+                        },
+                        new
+                        {
+                            Id = "00000000-0000-0000-0000-000000000006",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "339389ab-f000-49f6-8269-175559f89289",
+                            Email = "teacher@example.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "TEACHER@EXAMPLE.COM",
+                            NormalizedUserName = "teacher",
+                            PasswordHash = "AQAAAAIAAYagAAAAENGbnEBy5YnTzAmgl34AeVdSYCwz77392tDknR6bUVAhVG+su5xtkiFiedJUDIJYwA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "0a03e84c-6f9d-465e-8fa4-b637e5a05c1f",
+                            TwoFactorEnabled = false,
+                            UserName = "teacher"
+                        },
+                        new
+                        {
+                            Id = "00000000-0000-0000-0000-000000000007",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "3d8f0aa0-c5fb-4fde-ad3a-b378f3e0b30f",
+                            Email = "student@example.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "STUDENT@EXAMPLE.COM",
+                            NormalizedUserName = "STUDENT",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOvcsdCbXL4xxeKaDJBxSbbKS6rx8QUH7Mgtrygsn6F88k7IQr4A+xoxB0yBCfFEYg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "a5f52987-7a02-4607-9898-f92865942cbf",
+                            TwoFactorEnabled = false,
+                            UserName = "student"
                         });
                 });
 
@@ -692,6 +996,17 @@ namespace _3w1m.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("_3w1m.Models.Domain.Answer", b =>
+                {
+                    b.HasOne("_3w1m.Models.Domain.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
             modelBuilder.Entity("_3w1m.Models.Domain.Article", b =>
                 {
                     b.HasOne("_3w1m.Models.Domain.Course", "Course")
@@ -718,6 +1033,36 @@ namespace _3w1m.Migrations
                         .IsRequired();
 
                     b.Navigation("Article");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.Assignment", b =>
+                {
+                    b.HasOne("_3w1m.Models.Domain.Course", "Course")
+                        .WithMany("Assignments")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.AssignmentSubmission", b =>
+                {
+                    b.HasOne("_3w1m.Models.Domain.Assignment", "Assignment")
+                        .WithMany("Submissions")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("_3w1m.Models.Domain.Student", "Student")
+                        .WithMany("Submissions")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
 
                     b.Navigation("Student");
                 });
@@ -750,6 +1095,17 @@ namespace _3w1m.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("_3w1m.Models.Domain.Question", b =>
+                {
+                    b.HasOne("_3w1m.Models.Domain.Assignment", "Assignment")
+                        .WithMany("Questions")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
+                });
+
             modelBuilder.Entity("_3w1m.Models.Domain.RefreshToken", b =>
                 {
                     b.HasOne("_3w1m.Models.Domain.User", "User")
@@ -771,6 +1127,25 @@ namespace _3w1m.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("_3w1m.Models.Domain.StudentAnswer", b =>
+                {
+                    b.HasOne("_3w1m.Models.Domain.Question", "Question")
+                        .WithMany("StudentAnswers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("_3w1m.Models.Domain.AssignmentSubmission", "Submission")
+                        .WithMany("Answers")
+                        .HasForeignKey("SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("Submission");
+                });
+
             modelBuilder.Entity("_3w1m.Models.Domain.Teacher", b =>
                 {
                     b.HasOne("_3w1m.Models.Domain.User", "User")
@@ -786,11 +1161,32 @@ namespace _3w1m.Migrations
                     b.Navigation("ArticleProgresses");
                 });
 
+            modelBuilder.Entity("_3w1m.Models.Domain.Assignment", b =>
+                {
+                    b.Navigation("Questions");
+
+                    b.Navigation("Submissions");
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.AssignmentSubmission", b =>
+                {
+                    b.Navigation("Answers");
+                });
+
             modelBuilder.Entity("_3w1m.Models.Domain.Course", b =>
                 {
                     b.Navigation("Articles");
 
+                    b.Navigation("Assignments");
+
                     b.Navigation("Enrollments");
+                });
+
+            modelBuilder.Entity("_3w1m.Models.Domain.Question", b =>
+                {
+                    b.Navigation("Answers");
+
+                    b.Navigation("StudentAnswers");
                 });
 
             modelBuilder.Entity("_3w1m.Models.Domain.Student", b =>
@@ -798,6 +1194,8 @@ namespace _3w1m.Migrations
                     b.Navigation("ArticleProgresses");
 
                     b.Navigation("Enrollments");
+
+                    b.Navigation("Submissions");
                 });
 
             modelBuilder.Entity("_3w1m.Models.Domain.User", b =>

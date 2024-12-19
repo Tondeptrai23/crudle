@@ -1,4 +1,5 @@
 using _3w1m.Constants;
+using _3w1m.Dtos.Article;
 using _3w1m.Models.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -76,7 +77,52 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasOne(ag => ag.Student)
             .WithMany(st => st.ArticleProgresses)
             .OnDelete(DeleteBehavior.Cascade);
-            
+
+        modelBuilder.Entity<Answer>()
+            .HasOne<Question>(ans => ans.Question)
+            .WithMany(ques => ques.Answers)
+            .HasForeignKey(ans => ans.QuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Question>()
+            .HasOne<Assignment>(ques => ques.Assignment)
+            .WithMany(asgmt => asgmt.Questions)
+            .HasForeignKey(ques => ques.AssignmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Assignment>()
+            .HasOne<Course>(asgmt => asgmt.Course)
+            .WithMany(c => c.Assignments)
+            .HasForeignKey(asgmt => asgmt.CourseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasKey(asgmtSub => asgmtSub.SubmissionId);
+        
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasOne<Assignment>(asgmtSub => asgmtSub.Assignment)
+            .WithMany(asgmt => asgmt.Submissions)
+            .HasForeignKey(asgmtSub => asgmtSub.AssignmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<AssignmentSubmission>()
+            .HasOne<Student>(asgmtSub => asgmtSub.Student)
+            .WithMany(st => st.Submissions)
+            .HasForeignKey(asgmtSub => asgmtSub.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<StudentAnswer>()
+            .HasOne<Question>(stAns => stAns.Question)
+            .WithMany(ques => ques.StudentAnswers)
+            .HasForeignKey(stAns => stAns.QuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<StudentAnswer>()
+            .HasOne<AssignmentSubmission>(stAns => stAns.Submission)
+            .WithMany(asgmtSub => asgmtSub.Answers)
+            .HasForeignKey(stAns => stAns.SubmissionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         // Seed data 
         var hasher = new PasswordHasher<User>();
 
@@ -126,6 +172,24 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 NormalizedEmail = "ADMIN@EXAMPLE.COM",
                 PasswordHash = hasher.HashPassword(null, "pass"),
                 Id = UserSeeding.AdminId
+            },
+            new User
+            {
+                UserName = "teacher",
+                NormalizedUserName = "teacher",
+                Email = "teacher@example.com",
+                NormalizedEmail = "TEACHER@EXAMPLE.COM",
+                PasswordHash = hasher.HashPassword(null, "1"),
+                Id = UserSeeding.TeacherId
+            },
+            new User
+            {
+                UserName="student",
+                NormalizedUserName="STUDENT",
+                Email="student@example.com",
+                NormalizedEmail="STUDENT@EXAMPLE.COM",
+                PasswordHash=hasher.HashPassword(null, "1"),
+                Id = UserSeeding.StudentId
             }
         };
 
@@ -153,12 +217,21 @@ public class ApplicationDbContext : IdentityDbContext<User>
                ContactEmail = "example@gmail.com",
                ContactPhone = "0987654321",
                UserId = listUser[0].Id,
-           }
+           },
+           new Teacher
+           {
+                TeacherId = 2,
+                Fullname = "teacher",
+                ContactEmail = "teacher",
+                ContactPhone = "0987654321",
+                UserId = listUser[5].Id
+            }
         };
         modelBuilder.Entity<Teacher>().HasData(listTeacher);
 
         modelBuilder.Entity<IdentityUserRole<string>>().HasData(
-            new IdentityUserRole<string> { RoleId = "2", UserId = listUser[0].Id }
+            new IdentityUserRole<string> { RoleId = "2", UserId = listUser[0].Id },
+            new IdentityUserRole<string> { RoleId = "2", UserId = listUser[5].Id }
         );
 
 
@@ -177,13 +250,21 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Fullname = "Student 2",
                 DateOfBirth = new DateOnly(2000, 1, 1),
                 UserId = listUser[2].Id,
+            },
+            new Student
+            {
+                StudentId = 3,
+                Fullname = "Student 3",
+                DateOfBirth = new DateOnly(2000, 1, 1),
+                UserId = listUser[6].Id,
             }
         };
         modelBuilder.Entity<Student>().HasData(listStudent);
 
         modelBuilder.Entity<IdentityUserRole<string>>().HasData(
             new IdentityUserRole<string> { RoleId = "3", UserId = listUser[1].Id },
-            new IdentityUserRole<string> { RoleId = "3", UserId = listUser[2].Id }
+            new IdentityUserRole<string> { RoleId = "3", UserId = listUser[2].Id },
+            new IdentityUserRole<string> { RoleId = "3", UserId = listUser[6].Id }
         );
 
         var listCourse = new List<Course>()
@@ -205,6 +286,14 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 Code = "C002",
                 StartDate = new DateOnly(2022, 1, 1),
                 TeacherId = 1
+            },
+            new() {
+                CourseId = 3,
+                Name = "Course test assignment",
+                Description = "Description 3",
+                Code = "C003",
+                StartDate = new DateOnly(2024, 1, 1),
+                TeacherId = 2
             }
         };
 
@@ -218,7 +307,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
             },
             new Enrollment
             {
-                CourseId = 2,
+                CourseId = 3,
                 StudentId = 2,
                 EnrolledAt = new DateOnly(2022, 2, 1),
             }
@@ -254,6 +343,74 @@ public class ApplicationDbContext : IdentityDbContext<User>
         };
         modelBuilder.Entity<Article>().HasData(listArticle);
 
+        var listAnswer = new List<Answer>()
+        {
+            new()
+            {
+                AnswerId = 1,
+                QuestionId = 1,
+                Value = "Answer 1",
+                IsCorrect = true
+            },
+            new()
+            {
+                AnswerId = 2,
+                QuestionId = 1,
+                Value = "Answer 2",
+                IsCorrect = false
+            },
+            new()
+            {
+                AnswerId = 3,
+                QuestionId = 2,
+                Value = "Answer 3",
+                IsCorrect = true
+            },
+            new()
+            {
+                AnswerId = 4,
+                QuestionId = 2,
+                Value = "Answer 4",
+                IsCorrect = false
+            }
+        };
+
+        var listQuestion = new List<Question>()
+        {
+            new()
+            {
+                QuestionId = 1,
+                AssignmentId = 1,
+                Content = "Question 1",
+                Type = "Multiple Choice",
+            },
+            new()
+            {
+                QuestionId = 2,
+                AssignmentId = 1,
+                Content = "Question 2",
+                Type = "Multiple Choice",
+            }
+        };
+
+        var listAssignment = new List<Assignment>()
+        {
+            new()
+            {
+                AssignmentId = 1,
+                CourseId = 3,
+                Name = "Assignment 1",
+                Content = "Content 1",
+                DueDate = new DateTime(2025, 1, 1),
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+            }
+        };
+
+        modelBuilder.Entity<Answer>().HasData(listAnswer);
+        modelBuilder.Entity<Question>().HasData(listQuestion);
+        modelBuilder.Entity<Assignment>().HasData(listAssignment);
+
         modelBuilder.Entity<ArticleProgress>().HasData(
             new List<ArticleProgress>() {
                 new() {
@@ -264,17 +421,50 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 }
             }
         );
+        
+        modelBuilder.Entity<AssignmentSubmission>().HasData(
+            new List<AssignmentSubmission>() {
+                new() {
+                    SubmissionId = 1,
+                    AssignmentId = 1,
+                    StudentId = 2,
+                    SubmittedAt = DateTime.Now
+                }
+            }
+        );
+        
+        modelBuilder.Entity<StudentAnswer>().HasData(
+            new List<StudentAnswer>() {
+                new() {
+                    StudentAnswerId = 1,
+                    QuestionId = 1,
+                    SubmissionId = 1,
+                    Value = "Answer 1"
+                },
+                new() {
+                    StudentAnswerId = 2,
+                    QuestionId = 2,
+                    SubmissionId = 1,
+                    Value = "Answer 3"
+                }
+            }
+        );
     }
 
     public DbSet<Student> Students { get; set; }
     public DbSet<Course> Courses { get; set; }
-
     public DbSet<Enrollment> Enrollments { get; set; }
-
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Article> Articles { get; set; }
     public DbSet<ArticleProgress> ArticleProgresses { get; set; }
+    public DbSet<Answer> Answers { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<Assignment> Assignments { get; set; }
+    
+    public DbSet<AssignmentSubmission> AssignmentSubmissions { get; set; }
+    
+    public DbSet<StudentAnswer> StudentAnswers { get; set; }
 
     private static class UserSeeding
     {
@@ -284,5 +474,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
         public static readonly string User3Id = "00000000-0000-0000-0000-000000000003";
         public static readonly string User4Id = "00000000-0000-0000-0000-000000000004";
         public static readonly string AdminId = "00000000-0000-0000-0000-000000000005";
+        public static readonly string TeacherId = "00000000-0000-0000-0000-000000000006";
+        public static readonly string StudentId = "00000000-0000-0000-0000-000000000007";
     }
 }
