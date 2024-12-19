@@ -6,7 +6,7 @@ import { AutosizeTextarea } from "@/components/common/ui/autosized-textarea";
 import { Button } from "@/components/common/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Article, ArticleRequest } from "@/types/article";
-import ArticleContentEditor from "./ArticleContentEditor";
+import ArticleContentEditor from "@/components/articles/ArticleContentEditor";
 
 const formSchema = z.object({
   title: z.string({

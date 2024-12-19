@@ -5,6 +5,7 @@ import ArticleForm from "@/components/articles/ArticleForm";
 import useAuth from "@/hooks/useAuth";
 import { Role } from "@/types/enums";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 const ArticleUpdatePage: React.FC = () => {
   const { role } = useAuth();
@@ -20,11 +21,18 @@ const ArticleUpdatePage: React.FC = () => {
   const { toast } = useToast();
   const updateArticle = useUpdateArticle(courseId);
   const navigate = useNavigate();
-  const { data: article, isLoading } = useArticleDetail("teacher", { courseId, articleId });
+  const { data: article, isLoading, isError } = useArticleDetail("teacher", { courseId, articleId });
 
   if (isLoading) {
-    // TODO: Add skeleton loader
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (isError || !article) {
+    throw new Error("Error loading article");
   }
 
   // I don't like this code but it's working

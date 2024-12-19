@@ -3,6 +3,7 @@ import { useArticleDetail } from "@/hooks/api/useArticleApi";
 import useAuth from "@/hooks/useAuth";
 import { CalendarDays, Clock } from "lucide-react";
 import { useParams } from "react-router-dom";
+import ArticleDetailSkeleton from "@/components/articles/ArticleDetailSkeleton";
 
 const ArticleDetailPage : React.FC = () => {
   const { articleId, courseId } = useParams();
@@ -12,9 +13,12 @@ const ArticleDetailPage : React.FC = () => {
     throw new Error("Missing articleId or courseId in URL params");
   }
 
-  const { data: article, isLoading, error } = useArticleDetail(role, {courseId: courseId, articleId: articleId});
+  const { data: article, isLoading, error } = useArticleDetail(role, {
+    courseId: courseId, 
+    articleId: articleId,
+  });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <ArticleDetailSkeleton />;
 
   if (error || !article) throw new Error("Error loading article");
 

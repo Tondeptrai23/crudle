@@ -5,8 +5,8 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 
 const articleService = new ArticleService();
 const articleKeys = {
-  articles: (courseId: string) => ['courses', courseId, 'articles'],
-  detail: (courseId: string, articleId: string) => ['courses', courseId, 'articles', articleId],
+  articles: (courseId: string) => ['courses', courseId, 'articles', 'all'],
+  detail: (courseId: string, articleId: string) => ['courses', courseId, 'articles', 'detail', articleId],
 }
 
 export const useArticles = (role: string, { courseId } : { courseId: string }, data: QueryHookParams) => {
