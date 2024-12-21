@@ -83,6 +83,9 @@ public class MappingProfile : Profile
                         AnswerId = answer.AnswerId,
                         Value = answer.Value
                     }).ToList()));
+        CreateMap<Question, QuestionWithStudentAnswerDto>();
+        CreateMap<Question, QuestionWithAnswerForStudentDto>();
+
         CreateMap<QuestionDto, QuestionForStudentDto>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
                 src.Type == "Fill In Blank" 
@@ -98,5 +101,17 @@ public class MappingProfile : Profile
         CreateMap<AnswerDto, Answer>();
         CreateMap<Answer, AnswerForStudentDto>();
         CreateMap<AnswerDto, AnswerForStudentDto>();
+        CreateMap<StudentAnswer, StudentAnswerDto>();
+
+        CreateMap<AssignmentSubmission, AssignmentSubmissionRequestDto>();
+        CreateMap<AssignmentSubmission, AssignmentSubmissionDto>()
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
+        CreateMap<AssignmentSubmission, AssignmentSubmissionMinimalDto>()
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
+
+        CreateMap<AssignmentSubmissionDto, AssignmentSubmission>();
+        CreateMap<AssignmentSubmission, AssignmentSubmissionForStudentDto>();
+        CreateMap<AssignmentSubmissionDto, AssignmentSubmissionResponseDto>();
+        CreateMap<AssignmentSubmissionMinimalDto, AssignmentSubmissionResponseDto>();
     }
 }
