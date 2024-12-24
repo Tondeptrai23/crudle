@@ -23,17 +23,12 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
     public async Task<AssignmentSubmissionDto> GetDetailSubmissionForTeacherAsync(int courseId, int assignmentId,
         int submissionId, int teacherId)
     {
-        var courses = await _dbContext.Courses
-            .Include(c => c.Assignments)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId && c.TeacherId == teacherId);
-
-        if (courses == null)
+        if (!await _dbContext.Courses.AnyAsync(c=>c.CourseId == courseId)) 
         {
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var assignments = await _dbContext.Assignments.FirstOrDefaultAsync(a => a.AssignmentId == assignmentId);
-        if (assignments == null)
+        if (!await _dbContext.Assignments.AnyAsync(a => a.AssignmentId == assignmentId))
         {
             throw new ResourceNotFoundException("Assignment not found");
         }
@@ -61,24 +56,20 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
     public async Task<AssignmentSubmissionForStudentDto> GetDetailSubmissionForStudentAsync(int courseId,
         int assignmentId, int submissionId, int studentId)
     {
-        var courses = await _dbContext.Courses
-            .Include(c => c.Assignments)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId);
-
-        if (courses == null)
+        if (!await _dbContext.Courses.AnyAsync(c=>c.CourseId == courseId)) 
         {
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var assignments = await _dbContext.Assignments.FirstOrDefaultAsync(a => a.AssignmentId == assignmentId);
-        if (assignments == null)
+        if (!await _dbContext.Assignments.AnyAsync(a => a.AssignmentId == assignmentId))
         {
             throw new ResourceNotFoundException("Assignment not found");
         }
 
         var questions = _dbContext.Questions
             .Include(q => q.Answers)
-            .Include(q => q.StudentAnswers.Where(sa => sa.SubmissionId == submissionId))
+            .Include(q => 
+                q.StudentAnswers.Where(sa => sa.SubmissionId == submissionId))
             .Where(q => q.AssignmentId == assignmentId).ToList();
         var questionWithStudentAnswers = _mapper.Map<ICollection<QuestionWithAnswerForStudentDto>>(questions);
 
@@ -97,20 +88,15 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
     }
 
     public async Task<(int, IEnumerable<AssignmentSubmissionMinimalDto>)> GetSubmissionsAsync(int courseId,
-        int assignmentId,
-        int teacherId)
+        int assignmentId, int teacherId, AssignmentSubmissionCollectionQueryDto? queryDto)
     {
-        var courses = await _dbContext.Courses
-            .Include(c => c.Assignments)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId && c.TeacherId == teacherId);
-
-        if (courses == null)
+        queryDto ??= new AssignmentSubmissionCollectionQueryDto();
+        if (!await _dbContext.Courses.AnyAsync(c => c.CourseId == courseId))
         {
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var assignments = await _dbContext.Assignments.FirstOrDefaultAsync(a => a.AssignmentId == assignmentId);
-        if (assignments == null)
+        if (!await _dbContext.Assignments.AnyAsync(asgmt => asgmt.AssignmentId == assignmentId))
         {
             throw new ResourceNotFoundException("Assignment not found");
         }
@@ -118,12 +104,12 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
         var submissions = _dbContext.AssignmentSubmissions
             .Include(s => s.Answers)
             .Include(s => s.Student)
+            .Where(s => s.AssignmentId == assignmentId)
             .AsQueryable();
 
-        submissions = ApplyFilter(submissions, new AssignmentSubmissionCollectionQueryDto());
-        submissions = ApplyFilter(submissions, new AssignmentSubmissionCollectionQueryDto());
-        submissions = ApplySort(submissions, new AssignmentSubmissionCollectionQueryDto());
-        submissions = ApplyPagination(submissions, new AssignmentSubmissionCollectionQueryDto());
+        submissions = ApplyFilter(submissions, queryDto);
+        submissions = ApplySort(submissions, queryDto);
+        submissions = ApplyPagination(submissions, queryDto);
 
         var count = submissions.Count();
 
@@ -131,29 +117,27 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
     }
 
     public async Task<(int, IEnumerable<AssignmentSubmissionMinimalDto>)> GetSubmissionsHistoryAsync(int courseId,
-        int assignmentId, int studentId)
+        int assignmentId, int studentId, AssignmentSubmissionCollectionQueryDto? queryDto)
     {
-        var courses = await _dbContext.Courses
-            .Include(c => c.Assignments)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId);
-
-        if (courses == null)
+        queryDto ??= new AssignmentSubmissionCollectionQueryDto();
+        if (!await _dbContext.Courses.AnyAsync(c => c.CourseId == courseId))
         {
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var assignments = await _dbContext.Assignments.FirstOrDefaultAsync(a => a.AssignmentId == assignmentId);
-        if (assignments == null)
+        if (!await _dbContext.Assignments.AnyAsync(asgmt => asgmt.AssignmentId == assignmentId))
         {
             throw new ResourceNotFoundException("Assignment not found");
         }
 
-        var submissions = _dbContext.AssignmentSubmissions.Include(s => s.Student).Where(s => s.StudentId == studentId)
+        var submissions = _dbContext.AssignmentSubmissions
+            .Include(s => s.Student)
+            .Where(s => s.AssignmentId == assignmentId && s.StudentId == studentId)
             .AsQueryable();
 
-        submissions = ApplyFilter(submissions, new AssignmentSubmissionCollectionQueryDto());
-        submissions = ApplySort(submissions, new AssignmentSubmissionCollectionQueryDto());
-        submissions = ApplyPagination(submissions, new AssignmentSubmissionCollectionQueryDto());
+        submissions = ApplyFilter(submissions, queryDto);
+        submissions = ApplySort(submissions, queryDto);
+        submissions = ApplyPagination(submissions, queryDto);
 
         var count = submissions.Count();
 

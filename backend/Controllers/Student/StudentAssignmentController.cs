@@ -1,14 +1,10 @@
 using _3w1m.Constants;
 using _3w1m.Dtos;
-using _3w1m.Dtos.Article;
-using _3w1m.Dtos.Course;
 using _3w1m.Dtos.Assignment;
-using _3w1m.Dtos.Questions;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
 using _3w1m.Specifications;
-using _3w1m.Specifications.Interface;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -148,7 +144,8 @@ public class StudentAssignmentController : ControllerBase
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
 
         var (totalItems, submissionDtos) =
-            await _assignmentSubmissionService.GetSubmissionsHistoryAsync(courseId, assignmentId, student.StudentId);
+            await _assignmentSubmissionService.GetSubmissionsHistoryAsync(courseId, assignmentId, student.StudentId,
+                queryDto);
         return Ok(new PaginationResponseDto<IEnumerable<AssignmentSubmissionMinimalDto>>
             (
                 data: submissionDtos,

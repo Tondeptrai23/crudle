@@ -24,7 +24,8 @@ public class AssignmentController : Controller
     private readonly ICourseService _courseService;
 
     public AssignmentController(IAssignmentService assignmentService, UserManager<User> userManager,
-        ITeacherService teacherService, ICourseService courseService, IAssignmentSubmissionService assignmentSubmissionService)
+        ITeacherService teacherService, ICourseService courseService,
+        IAssignmentSubmissionService assignmentSubmissionService)
     {
         _teacherService = teacherService;
         _userManager = userManager;
@@ -178,9 +179,11 @@ public class AssignmentController : Controller
 
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
-        var (totalItems, submissions) = await _assignmentSubmissionService.GetSubmissionsAsync(courseId, assignmentId, teacher.TeacherId);
+        var (totalItems, submissions) =
+            await _assignmentSubmissionService.GetSubmissionsAsync(courseId, assignmentId, teacher.TeacherId, queryDto);
 
-        return Ok(new PaginationResponseDto<IEnumerable<AssignmentSubmissionMinimalDto>>(submissions, totalItems, queryDto.Page,
+        return Ok(new PaginationResponseDto<IEnumerable<AssignmentSubmissionMinimalDto>>(submissions, totalItems,
+            queryDto.Page,
             queryDto.Size));
     }
 
@@ -201,8 +204,10 @@ public class AssignmentController : Controller
         }
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
-        var submission = await _assignmentSubmissionService.GetDetailSubmissionForTeacherAsync(courseId, assignmentId, submissionId, teacher.TeacherId);
-       
+        var submission =
+            await _assignmentSubmissionService.GetDetailSubmissionForTeacherAsync(courseId, assignmentId, submissionId,
+                teacher.TeacherId);
+
         return Ok(new ResponseDto<AssignmentSubmissionDto>(submission));
     }
 }

@@ -2,7 +2,7 @@
 
 namespace _3w1m.Dtos.Questions;
 
-public class QuestionWithAnswerForStudentDto: QuestionWithStudentAnswerDto
+public class QuestionWithAnswerForStudentDto: QuestionForStudentDto
 {
     public ICollection<StudentAnswerDto> StudentAnswers { get; set; }
 }
