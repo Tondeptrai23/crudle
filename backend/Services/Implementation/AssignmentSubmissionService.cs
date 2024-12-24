@@ -23,7 +23,7 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
     public async Task<AssignmentSubmissionDto> GetDetailSubmissionForTeacherAsync(int courseId, int assignmentId,
         int submissionId, int teacherId)
     {
-        if (!await _dbContext.Courses.AnyAsync(c=>c.CourseId == courseId)) 
+        if (!await _dbContext.Courses.AnyAsync(c => c.CourseId == courseId))
         {
             throw new ResourceNotFoundException("Course not found");
         }
@@ -37,10 +37,11 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
             .Include(q => q.Answers)
             .Include(q => q.StudentAnswers.Where(sa => sa.SubmissionId == submissionId))
             .Where(q => q.AssignmentId == assignmentId).ToList();
+
         var questionWithStudentAnswers = _mapper.Map<ICollection<QuestionWithStudentAnswerDto>>(questions);
 
         var submission = _dbContext.AssignmentSubmissions.Include(s => s.Student).Include(s => s.Answers)
-            .FirstOrDefault(s => s.SubmissionId == submissionId);
+            .FirstOrDefault(s => s.SubmissionId == submissionId && s.AssignmentId == assignmentId);
 
         if (submission == null)
         {
@@ -56,7 +57,7 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
     public async Task<AssignmentSubmissionForStudentDto> GetDetailSubmissionForStudentAsync(int courseId,
         int assignmentId, int submissionId, int studentId)
     {
-        if (!await _dbContext.Courses.AnyAsync(c=>c.CourseId == courseId)) 
+        if (!await _dbContext.Courses.AnyAsync(c => c.CourseId == courseId))
         {
             throw new ResourceNotFoundException("Course not found");
         }
@@ -68,18 +69,21 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
 
         var questions = _dbContext.Questions
             .Include(q => q.Answers)
-            .Include(q => 
+            .Include(q =>
                 q.StudentAnswers.Where(sa => sa.SubmissionId == submissionId))
             .Where(q => q.AssignmentId == assignmentId).ToList();
         var questionWithStudentAnswers = _mapper.Map<ICollection<QuestionWithAnswerForStudentDto>>(questions);
 
-        var submission = _dbContext.AssignmentSubmissions.Include(s => s.Student).Include(s => s.Answers)
-            .FirstOrDefault(s => s.SubmissionId == submissionId && s.StudentId == studentId);
+        var submissions = _dbContext.AssignmentSubmissions.Include(s => s.Student).Include(s => s.Answers)
+            .Where(s => s.AssignmentId == assignmentId);
 
-        if (submission == null)
+        if (!await submissions.AnyAsync(s => s.SubmissionId == submissionId && s.StudentId == studentId))
         {
             throw new ResourceNotFoundException("Submission not found");
         }
+
+        var submission =
+            await submissions.FirstOrDefaultAsync(s => s.SubmissionId == submissionId && s.StudentId == studentId);
 
         var submissionDto = _mapper.Map<AssignmentSubmissionForStudentDto>(submission);
         submissionDto.Questions = questionWithStudentAnswers;
