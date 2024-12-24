@@ -93,6 +93,7 @@ public class MappingProfile : Profile
                     ? new List<AnswerForStudentDto>() 
                     : src.Answers.Select(answer => new AnswerForStudentDto
                     {
+                        QuestionId = answer.QuestionId,
                         AnswerId = answer.AnswerId,
                         Value = answer.Value
                     }).ToList()));
