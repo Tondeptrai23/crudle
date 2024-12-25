@@ -1,4 +1,3 @@
-
 export interface ArticleResponse {
   IsRead: boolean;
   ArticleId: number;
@@ -29,4 +28,4 @@ export interface ArticleRequest {
   title: string;
   summary: string;
   content: string;
-};
+}

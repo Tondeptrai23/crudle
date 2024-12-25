@@ -1,5 +1,6 @@
 import AssignmentService from '@/services/AssignmentService';
 import { AssignmentSubmitDto, CreateAssignmentDto } from '@/types/assignment';
+import { QueryHookParams } from '@/types/table';
 import {
   keepPreviousData,
   useMutation,
@@ -14,14 +15,30 @@ const assignmentKeys = {
   detail: (id: string) => ['assignments', id],
 };
 
-export const useAssignments = (courseId: number, role: string) => {
+export const useAssignments = (
+  courseId: number,
+  role: string,
+  data: QueryHookParams,
+) => {
+  let { page } = data;
+  const { pageSize, filters, sort } = data;
+  const nameFilter = filters.name as string;
+
+  const serviceData = {
+    page,
+    size: pageSize,
+    name: nameFilter,
+    orderBy: sort.key || 'dueDate',
+    orderDirection: sort.direction || 'asc',
+  };
+
   const queryFn =
     role.toLowerCase() === 'teacher'
-      ? () => assignmentService.getAssignmentsForTeacher(courseId)
-      : () => assignmentService.getAssignmentsForStudent(courseId);
+      ? () => assignmentService.getAssignmentsForTeacher(courseId, serviceData)
+      : () => assignmentService.getAssignmentsForStudent(courseId, serviceData);
 
   return useQuery({
-    queryKey: ['assignments'],
+    queryKey: ['assignments', courseId, serviceData],
     queryFn: queryFn,
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,

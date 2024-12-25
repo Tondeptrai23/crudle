@@ -9,7 +9,7 @@ import { Article } from '@/types/article';
 import { Role } from '@/types/enums';
 import { LayoutGrid, List, Package, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ArticleText from './ArticleText';
 
 type ArticlesDisplayStyle = 'card' | 'text';
@@ -22,8 +22,14 @@ const EmptyState = () => (
   </div>
 );
 
-const ArticleList = ({ courseId }: { courseId: string }) => {
+const ArticleList = () => {
   const { role } = useAuth();
+  const { courseId } = useParams();
+
+  if (!courseId) {
+    throw new Error('Course ID is required');
+  }
+
   const [displayStyle, setDisplayStyle] =
     useState<ArticlesDisplayStyle>('card');
   const [search, setSearch] = useState('');

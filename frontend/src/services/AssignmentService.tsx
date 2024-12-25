@@ -6,31 +6,82 @@ import Assignment, {
   CreateAssignmentDto,
   QuestionResponse,
 } from '@/types/assignment';
+import { ApiResponse } from '@/types/paginationApiResponse';
 import api from '@/utils/api';
 
 export default class AssignmentService {
-  async getAssignmentsForTeacher(courseId: number): Promise<Assignment[]> {
+  async getAssignmentsForTeacher(
+    courseId: number,
+    serviceData: {
+      page?: number;
+      size?: number;
+      name?: string;
+      orderBy: string;
+      orderDirection: string;
+    },
+  ): Promise<ApiResponse<Assignment>> {
     const response = await api.get(
-      `/api/Teacher/Course/${courseId}/Assignment?size=200`,
+      `/api/Teacher/Course/${courseId}/Assignment`,
+      {
+        params: {
+          Page: serviceData.page,
+          Size: serviceData.size,
+          Name: serviceData.name,
+          OrderBy: serviceData.orderBy,
+          OrderDirection: serviceData.orderDirection,
+        },
+      },
     );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
 
-    return response.data.Data.map(mapToAssignment);
+    const result = {
+      data: response.data.Data.map(mapToAssignment),
+      totalItems: response.data.TotalItems,
+      totalPages: response.data.TotalPages,
+      currentPage: response.data.CurrentPage,
+    };
+
+    return result;
   }
 
-  async getAssignmentsForStudent(courseId: number): Promise<Assignment[]> {
+  async getAssignmentsForStudent(
+    courseId: number,
+    serviceData: {
+      page?: number;
+      size?: number;
+      name?: string;
+      orderBy: string;
+      orderDirection: string;
+    },
+  ): Promise<ApiResponse<Assignment>> {
     const response = await api.get(
-      `/api/Student/Course/${courseId}/Assignment?size=200`,
+      `/api/Student/Course/${courseId}/Assignment`,
+      {
+        params: {
+          Page: serviceData.page,
+          Size: serviceData.size,
+          Name: serviceData.name,
+          OrderBy: serviceData.orderBy,
+          OrderDirection: serviceData.orderDirection,
+        },
+      },
     );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
 
-    return response.data.Data.map(mapToAssignment);
+    const result = {
+      data: response.data.Data.map(mapToAssignment),
+      totalItems: response.data.TotalItems,
+      totalPages: response.data.TotalPages,
+      currentPage: response.data.CurrentPage,
+    };
+
+    return result;
   }
 
   async getAssignment(

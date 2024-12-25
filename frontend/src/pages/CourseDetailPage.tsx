@@ -52,11 +52,7 @@ const CourseDetailPage: React.FC = () => {
 
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-4'>
         <div className='order-2 lg:order-1 lg:col-span-3'>
-          <CourseTabs
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            courseId={course.id}
-          />
+          <CourseTabs activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
 
         <div className='order-1 lg:order-2 lg:col-span-1'>

@@ -16,7 +16,6 @@ import ArticleDetailPage from './pages/ArticleDetailPage.tsx';
 import AddAssignmentPage from './pages/assignments/AddAssignmentPage.tsx';
 import AssignmentDetailPage from './pages/assignments/AssignmentDetailPage.tsx';
 import AssignmentSessionPage from './pages/assignments/AssignmentSessionPage.tsx';
-import AssignmentsPage from './pages/assignments/AssignmentsPage.tsx';
 import EditAssignmentPage from './pages/assignments/EditAssignmentPage.tsx';
 import CourseDetailPage from './pages/CourseDetailPage.tsx';
 import CoursePage from './pages/CoursePage.tsx';
@@ -102,11 +101,6 @@ const App: React.FC = () => {
                         <Route
                           path='teacher/:teacherId'
                           element={<ProfilePage />}
-                        />
-
-                        <Route
-                          path='/course/:courseId/assignment'
-                          element={<AssignmentsPage />}
                         />
 
                         <Route

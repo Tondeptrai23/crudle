@@ -55,7 +55,7 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
               <div className='h-2 w-2 rounded-full bg-primary' />
             )}
             <div
-              className={`text-xl ${
+              className={`text-lg ${
                 role === Role.Student && article.isRead
                   ? 'text-muted-foreground'
                   : 'font-semibold'
@@ -87,7 +87,7 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className='line-clamp-2 text-muted-foreground'>
+        <div className='line-clamp-2 text-sm text-muted-foreground'>
           {article.summary}
         </div>
       </CardContent>
