@@ -54,6 +54,6 @@ public class StudentController : ControllerBase
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
         var response = await _assignmentService.GetAssignmentsByStudentId(student.StudentId, year, month);
-        return Ok(new ResponseDto<IEnumerable<AssignmentDto>>(response.Item2));
+        return Ok(new ResponseDto<IEnumerable<UpcomingAssignmentDto>>(response.Item2));
     }
 }

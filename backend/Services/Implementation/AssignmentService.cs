@@ -373,10 +373,11 @@ public class AssignmentService : IAssignmentService
         return query;
     }
 
-    public async Task<(int count, IEnumerable<AssignmentDto>)> GetAssignmentsByStudentId(int studentId, int year, int month)
+    public async Task<(int count, IEnumerable<UpcomingAssignmentDto>)> GetAssignmentsByStudentId(int studentId, int year, int month)
     {
         var student = await _dbContext.Students
             .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Course)
             .FirstOrDefaultAsync(s => s.StudentId == studentId);
 
         if (student == null)
@@ -402,6 +403,6 @@ public class AssignmentService : IAssignmentService
                         a.DueDate <= lastDayOfMonth);
 
         var count = await assignments.CountAsync();
-        return (count, _mapper.Map<IEnumerable<AssignmentDto>>(await assignments.ToListAsync()));
+        return (count, _mapper.Map<IEnumerable<UpcomingAssignmentDto>>(await assignments.ToListAsync()));
     }
 }
