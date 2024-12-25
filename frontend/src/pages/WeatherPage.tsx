@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Calendar } from '@/components/common/ui/calendar';
+import EventCard from '@/components/dashboard/eventCard'; // Adjust the import path as necessary
 
 export const WeatherPage: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   return (
     <div className='flex min-h-screen flex-row gap-4'>
       <div className='w-72 rounded-md border-2 border-slate-800 text-center'>
@@ -11,9 +11,24 @@ export const WeatherPage: React.FC = () => {
       </div>
       <div className='container m-8 flex flex-col gap-4'>
         <h2 className='text-2xl font-semibold'>Upcoming events</h2>
-        <div className='flex flex-row gap-4'>
-          <div className='flex-1'>There are no upcoming events.</div>
-          <div className=''>
+        <div className='flex flex-row gap-12'>
+          <div className='grid w-full gap-2'>
+            <EventCard
+              assignmentName='Assignment 1'
+              dueTime='2024-12-20T13:36:51Z'
+              courseName='Introduction to Computer Science'
+              courseId='1'
+              assignmentId='2'
+            />
+            <EventCard
+              assignmentName='Assignment 2'
+              dueTime='2024-12-20T13:36:51Z'
+              courseName='Data Structures'
+              courseId='CS102'
+              assignmentId='2'
+            />
+          </div>
+          <div>
             <Calendar
               mode='single'
               selected={selectedDate}
@@ -55,7 +70,7 @@ export const WeatherPage: React.FC = () => {
               <td className='whitespace-nowrap px-6 py-4'>A</td>
             </tr>
           </tbody>
-        </table>{' '}
+        </table>
       </div>
     </div>
   );

@@ -17,7 +17,7 @@ export function getNavItems(): { label: string; path: string }[] {
     ];
   } else {
     return [
-      { label: 'Weather', path: '/' },
+      { label: 'Dashboard', path: '/' },
       { label: 'Course', path: '/course' },
     ];
   }
