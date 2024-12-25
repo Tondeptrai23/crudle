@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar } from '@/components/common/ui/calendar';
 import EventCard from '@/components/dashboard/eventCard'; // Adjust the import path as necessary
 import { useUpcomingAssignments } from '@/hooks/api/useStudentApi';
+import { EventCardSkeleton } from '@/components/dashboard/EventCardSkeleton';
 
 export const DashboardPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -10,8 +11,6 @@ export const DashboardPage: React.FC = () => {
     isLoading,
     error,
   } = useUpcomingAssignments(selectedDate);
-
-  console.log(assignments);
 
   return (
     <div className='flex min-h-screen flex-row gap-4'>
@@ -22,7 +21,12 @@ export const DashboardPage: React.FC = () => {
         <h2 className='text-2xl font-semibold'>Upcoming events</h2>
         <div className='flex flex-row gap-12'>
           <div className='grid w-full gap-2'>
-            {isLoading && <div>Loading...</div>}
+            {isLoading && (
+              <>
+                <EventCardSkeleton />
+                <EventCardSkeleton />
+              </>
+            )}{' '}
             {assignments?.map((assignment) => (
               <EventCard
                 assignmentName={assignment.name}
