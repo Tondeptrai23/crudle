@@ -7,6 +7,7 @@ using _3w1m.Services.Interface;
 using _3w1m.Specifications.Interface;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace _3w1m.Services.Implementation;
 
@@ -93,7 +94,7 @@ public class AssignmentService : IAssignmentService
             .Include(asgmt => asgmt.Questions)
             .ThenInclude(question => question.Answers)
             .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId
-                                      && c.CourseId == courseId);   
+                                      && c.CourseId == courseId);
         if (assignment == null)
         {
             throw new ResourceNotFoundException("Assignment not found");
@@ -126,7 +127,7 @@ public class AssignmentService : IAssignmentService
             // Update properties instead of creating new entity
             _mapper.Map(updateAssignmentRequestDto, assignment);
             assignment.UpdatedAt = DateTime.UtcNow;
-            
+
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
             return _mapper.Map<AssignmentDto>(assignment);
@@ -180,13 +181,13 @@ public class AssignmentService : IAssignmentService
         {
             throw new ResourceNotFoundException("Assignment not found");
         }
-        
+
         // Check if assignment is due
         if (assignment.DueDate < DateTime.Now)
         {
             throw new ResourceNotFoundException("Assignment is due");
         }
-        
+
         // Check if the student has already started the assignment
         if (assignment.CanRetry == false)
         {
@@ -208,7 +209,7 @@ public class AssignmentService : IAssignmentService
         var submissionEntity = (await _dbContext.AssignmentSubmissions.AddAsync(submission)).Entity;
 
         await _dbContext.SaveChangesAsync();
-        
+
         return new AssignmentStartResponseDto
         {
             SubmissionId = submissionEntity.SubmissionId,
@@ -226,7 +227,7 @@ public class AssignmentService : IAssignmentService
         {
             throw new ResourceNotFoundException("Submission not found or already submitted");
         }
-        
+
         // Verify if the assignment is still available
         var assignment = await _dbContext.Assignments
             .Include(asgmt => asgmt.Questions)
@@ -236,13 +237,13 @@ public class AssignmentService : IAssignmentService
         {
             throw new ResourceNotFoundException("Assignment not found");
         }
-        
+
         // Check if assignment is due
         if (assignment.DueDate < DateTime.Now)
         {
             throw new ResourceNotFoundException("Assignment is due");
         }
-        
+
         return new AssignmentStartResponseDto
         {
             SubmissionId = submission.SubmissionId,
@@ -251,24 +252,41 @@ public class AssignmentService : IAssignmentService
             Questions = _mapper.Map<IEnumerable<QuestionForStudentDto>>(assignment.Questions)
         };
     }
-    
-     public async Task<AssignmentSubmissionResponseDto> SubmitAssignmentAsync(int courseId, int assignmentId,
+
+    public async Task<AssignmentSubmissionResponseDto> SubmitAssignmentAsync(int courseId, int assignmentId,
         int studentId,
         AssignmentSubmissionRequestDto requestDto)
     {
-        var submission = await _dbContext.AssignmentSubmissions
-            .FirstOrDefaultAsync(s => s.SubmissionId == requestDto.SubmissionId);
-        if (submission == null)
-        {
-            throw new ResourceNotFoundException("Submission not found");
-        }
-        
         var assignment = await _dbContext.Assignments
             .Include(asgmt => asgmt.Questions)
             .ThenInclude(question => question.Answers)
             .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId
                                       && c.CourseId == courseId);
 
+
+        if (assignment == null)
+        {
+            throw new ResourceNotFoundException("Assignment not found");
+        }
+        
+        var submission = await _dbContext.AssignmentSubmissions
+            .Include(s => s.Answers)
+            .FirstOrDefaultAsync(s => s.SubmissionId == requestDto.SubmissionId && s.StudentId == studentId);
+        if (submission == null)
+        {
+            throw new ResourceNotFoundException("Submission not found");
+        }
+
+        if (!submission.Answers.IsNullOrEmpty())
+        {
+            if (!assignment.CanRetry)
+            {
+                throw new ForbiddenException("Student is only allowed to submit once");
+            }
+
+            throw new ConflictException("Start another submission to submit for this assignment again");
+        }
+        
         var score = 0;
         var studentAnswers = new List<StudentAnswer>();
         foreach (var answer in requestDto.Answers)
@@ -308,8 +326,9 @@ public class AssignmentService : IAssignmentService
                     QuestionId = answer.QuestionId,
                     Value = answer.Value
                 });
-                
-                if (questionEntity.Answers.Any(a => a.Value.Equals(answer.Value, StringComparison.OrdinalIgnoreCase)))                {
+
+                if (questionEntity.Answers.Any(a => a.Value.Equals(answer.Value, StringComparison.OrdinalIgnoreCase)))
+                {
                     score++;
                 }
             }
