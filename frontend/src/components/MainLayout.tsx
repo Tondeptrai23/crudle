@@ -38,7 +38,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       <Separator />
 
-      <main className='m-4 flex-grow'>{children}</main>
+      <main className='ml-8 mr-16 mt-4 flex-grow'>{children}</main>
     </>
   );
 };

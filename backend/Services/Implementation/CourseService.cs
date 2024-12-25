@@ -199,7 +199,7 @@ public class CourseService : ICourseService
         return Task.FromResult(_mapper.Map<TeacherDto>(teacher));
     }
 
-    public async Task<bool> CourseEnrolledUserValidationAsync(int courseId, String userId)
+    public async Task<bool> CourseEnrolledUserValidationAsync(int courseId, string userId)
     {
         var course = _context.Courses.Include(c => c.Teacher).FirstOrDefault(c => c.CourseId == courseId);
         if (course == null)
@@ -208,13 +208,13 @@ public class CourseService : ICourseService
         }
 
         var enrollments = _context.Enrollments.Include(en => en.Student);
-        var isStudentEnrolled = await enrollments.AnyAsync(en =>
+        var isStudentEnrolled = await enrollments.AnyAsync(en => 
             en.CourseId == courseId && en.Student.UserId == userId);
-
+        
         var isTeacherEnrolled = course.Teacher!.UserId == userId;
-
+        
         var isEnrolled = isStudentEnrolled || isTeacherEnrolled;
-
+        
         return isEnrolled;
     }
 

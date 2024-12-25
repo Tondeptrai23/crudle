@@ -2,6 +2,7 @@ using _3w1m.Constants;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Article;
 using _3w1m.Dtos.Course;
+using _3w1m.Dtos.Assignment;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
@@ -24,15 +25,17 @@ public class CourseController : ControllerBase
     private readonly ICourseService _courseService;
     private readonly IStudentService _studentService;
     private readonly IArticleService _articleService;
+    private readonly IAssignmentService _assignmentService;
     private readonly IMapper _mapper;
 
     public CourseController(UserManager<User> userManager, ICourseService courseService, IStudentService studentService,
-        IArticleService articleService, IMapper mapper)
+        IArticleService articleService, IAssignmentService assignmentService, IMapper mapper)
     {
         _userManager = userManager;
         _courseService = courseService;
         _studentService = studentService;
         _articleService = articleService;
+        _assignmentService = assignmentService;
         _mapper = mapper;
     }
 
@@ -114,10 +117,11 @@ public class CourseController : ControllerBase
             queryDto.Page,
             queryDto.Size));
     }
-
-    [HttpPost]
-    [Route("{courseId:int}/Article/{articleId:int}/Read")]
-    public async Task<IActionResult> MarkArticleAsReadAsync([FromRoute] int courseId, [FromRoute] int articleId)
+    
+    
+    [HttpGet]
+    [Route("{courseId:int}/Assignment")]
+    public async Task<IActionResult> GetAssignments([FromRoute] int courseId, [FromQuery] AssignmentCollectionQueryDto queryDto)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -130,9 +134,9 @@ public class CourseController : ControllerBase
             throw new ForbiddenException("This student is not enrolled in the course");
         }
 
-        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-        var updateArticleProgressDto =
-            await _articleService.MarkArticleAsReadAsync(courseId, articleId, student.StudentId);
-        return Ok(new ResponseDto<UpdateArticleProgressDto>(updateArticleProgressDto));
+        var specification = new StudentAssignmentSpecification();
+
+        var (count, assignments) = await _assignmentService.GetAssignmentsAsync(courseId, specification, queryDto);
+        return Ok(new PaginationResponseDto<IEnumerable<AssignmentDto>>(assignments, count, queryDto.Page, queryDto.Size));
     }
 }
