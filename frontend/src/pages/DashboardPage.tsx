@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Calendar } from '@/components/common/ui/calendar';
 import EventCard from '@/components/dashboard/eventCard'; // Adjust the import path as necessary
 
-export const WeatherPage: React.FC = () => {
+export const DashboardPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   return (
     <div className='flex min-h-screen flex-row gap-4'>

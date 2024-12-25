@@ -21,7 +21,7 @@ import CourseDetailPage from './pages/CourseDetailPage.tsx';
 import CoursePage from './pages/CoursePage.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
-import { WeatherPage } from './pages/WeatherPage.tsx';
+import { DashboardPage } from './pages/DashboardPage.tsx';
 import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 
@@ -74,7 +74,7 @@ const App: React.FC = () => {
                   <RequireAuth allowedRoles={[Role.User]}>
                     <MainLayout>
                       <Routes>
-                        <Route path='/' element={<WeatherPage />} />
+                        <Route path='/' element={<DashboardPage />} />
                         <Route path='/course' element={<CoursePage />} />
                         <Route
                           path='/course/:courseId'
