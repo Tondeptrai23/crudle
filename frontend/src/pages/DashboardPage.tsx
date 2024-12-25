@@ -12,6 +12,10 @@ export const DashboardPage: React.FC = () => {
     error,
   } = useUpcomingAssignments(selectedDate);
 
+  if (error) {
+    throw error;
+  }
+
   return (
     <div className='flex min-h-screen flex-row gap-4'>
       <div className='w-72 rounded-md border-2 border-slate-800 text-center'>
@@ -27,8 +31,19 @@ export const DashboardPage: React.FC = () => {
                 <EventCardSkeleton />
               </>
             )}{' '}
+            {!isLoading && assignments?.length === 0 && (
+              <div className='text-cent er flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8'>
+                <h3 className='text-lg font-semibold text-gray-900'>
+                  No upcoming assignments
+                </h3>
+                <p className='text-sm text-gray-500'>
+                  There are no assignments due this month.
+                </p>
+              </div>
+            )}
             {assignments?.map((assignment) => (
               <EventCard
+                key={assignment.assignmentId}
                 assignmentName={assignment.name}
                 dueTime={assignment.dueDate}
                 courseName={assignment.courseName}
