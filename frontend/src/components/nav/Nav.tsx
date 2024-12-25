@@ -5,8 +5,8 @@ import {
   // NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/common/ui/navigation-menu';
-import { cn } from '@/lib/utils';
 import useAuth from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
 import { Bell } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -28,16 +28,7 @@ const Nav: React.FC<NavProps> = (props) => {
     const baseClass = 'px-3 py-1 font-semibold cursor-pointer';
     const selectedClass = 'bg-blue-500 rounded-lg text-white';
 
-    const currentSegments = pathname.split('/').filter(Boolean);
-    const pathSegments = path.split('/').filter(Boolean);
-
-    const isSelected =
-      path === '/'
-        ? pathname === '/'
-        : pathSegments.length === currentSegments.length && // Must be same depth
-          pathSegments.every(
-            (segment, index) => segment === currentSegments[index],
-          );
+    const isSelected = pathname.search(path) !== -1;
 
     const classValue = `${baseClass} ${isSelected ? selectedClass : ''}`.trim();
 

@@ -23,7 +23,7 @@ const CourseDetailPage: React.FC = () => {
   const { courseId } = useParams();
   const { role } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = (searchParams.get('tab') ?? 'assignments') as
+  const activeTab = (searchParams.get('tab') ?? 'articles') as
     | 'articles'
     | 'assignments';
 

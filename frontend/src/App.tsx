@@ -57,7 +57,7 @@ const App: React.FC = () => {
                   <RequireAuth allowedRoles={[Role.Admin]}>
                     <MainLayout>
                       <Routes>
-                        <Route path='/' element={<AdminHomePage />} />
+                        <Route path='/dashboard' element={<AdminHomePage />} />
                         <Route path='/course' element={<AdminCoursePage />} />
                         <Route path='/student' element={<AdminStudentPage />} />
                         <Route path='/teacher' element={<AdminTeacherPage />} />
@@ -76,7 +76,7 @@ const App: React.FC = () => {
                   <RequireAuth allowedRoles={[Role.User]}>
                     <MainLayout>
                       <Routes>
-                        <Route path='/' element={<WeatherPage />} />
+                        <Route path='/dashboard' element={<WeatherPage />} />
                         <Route path='/course' element={<CoursePage />} />
                         <Route
                           path='/course/:courseId'
