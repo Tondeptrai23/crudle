@@ -3,7 +3,8 @@ import { Button } from '@/components/common/ui/button';
 import { Separator } from '@/components/common/ui/separator';
 import { useArticleDetail } from '@/hooks/api/useArticleApi';
 import useAuth from '@/hooks/useAuth';
-import { CalendarDays, Clock, Undo2 } from 'lucide-react';
+import { Role } from '@/types/enums';
+import { CalendarDays, Clock, Edit, Undo2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const ArticleDetailPage: React.FC = () => {
@@ -56,14 +57,28 @@ const ArticleDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <Button
-            className='self-end'
-            variant='outline'
-            onClick={() => navigate('../..?tab=articles', { relative: 'path' })}
-          >
-            <Undo2 className='mr-2 h-4 w-4' />
-            Return
-          </Button>
+          <div className='flex flex-col gap-4'>
+            {role === Role.Teacher && (
+              <Button
+                variant='default'
+                onClick={() =>
+                  navigate('../..?tab=articles', { relative: 'path' })
+                }
+              >
+                <Edit className='mr-2 h-4 w-4' />
+                Edit Article
+              </Button>
+            )}
+            <Button
+              variant='outline'
+              onClick={() =>
+                navigate('../..?tab=articles', { relative: 'path' })
+              }
+            >
+              <Undo2 className='mr-2 h-4 w-4' />
+              Return
+            </Button>
+          </div>
         </div>
 
         <Separator className='my-6' />

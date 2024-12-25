@@ -1,5 +1,6 @@
 import AssignmentService from '@/services/AssignmentService';
 import { AssignmentSubmitDto, CreateAssignmentDto } from '@/types/assignment';
+import { Role } from '@/types/enums';
 import { QueryHookParams } from '@/types/table';
 import {
   keepPreviousData,
@@ -33,7 +34,7 @@ export const useAssignments = (
   };
 
   const queryFn =
-    role.toLowerCase() === 'teacher'
+    role === Role.Teacher
       ? () => assignmentService.getAssignmentsForTeacher(courseId, serviceData)
       : () => assignmentService.getAssignmentsForStudent(courseId, serviceData);
 
@@ -53,7 +54,7 @@ export const useGetAssignment = (
   role: string,
 ) => {
   const queryFn =
-    role.toLowerCase() === 'teacher'
+    role === Role.Teacher
       ? () => assignmentService.getAssignment(courseId, assignmentId)
       : () => assignmentService.getAssignmentForStudent(courseId, assignmentId);
 

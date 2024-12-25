@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import useAuth from '@/hooks/useAuth';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getErrorMessage } from '@/lib/utils';
+import { Role } from '@/types/enums';
 import { useCustomParams } from '@/utils/helper';
 import { Package, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -96,7 +97,7 @@ const AssignmentList = () => {
             className='max-w-sm'
           />
         </div>
-        {role === 'Teacher' && (
+        {role === Role.Teacher && (
           <Button
             variant='default'
             className='inline-flex items-center gap-2'
@@ -116,7 +117,7 @@ const AssignmentList = () => {
             <AssignmentCard
               key={assignment.assignmentId}
               assignment={assignment}
-              showButton={role === 'Teacher'}
+              showButton={role === Role.Teacher}
               onDelete={() => handleDelete(assignment.assignmentId)}
               onEdit={() => handleEdit(assignment.assignmentId)}
             />

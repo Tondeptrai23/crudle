@@ -20,7 +20,7 @@ const ArticleText: React.FC<ArticleTextProps> = ({
 }: ArticleTextProps) => {
   const { role } = useAuth();
   const { toast } = useToast();
-  const isStudent = role.toLowerCase() === 'student';
+  const isStudent = role === Role.Student;
   const deleteArticle = useDeleteArticle(courseId);
   const navigate = useNavigate();
 
@@ -47,7 +47,7 @@ const ArticleText: React.FC<ArticleTextProps> = ({
       className='flex cursor-pointer items-center gap-1 rounded px-2 hover:bg-gray-100'
       onClick={handleClick}
     >
-      {role !== Role.Student && (
+      {isStudent && (
         <>
           <Button variant='ghost' size='icon' className='h-6 w-6' asChild>
             <Link to={`/course/${courseId}/article/${article.id}/edit`}>

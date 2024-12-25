@@ -1,5 +1,6 @@
 import CourseService from '@/services/CourseService';
 import { CreateCourseDTO } from '@/types/course';
+import { Role } from '@/types/enums';
 import { QueryHookParams } from '@/types/table';
 import {
   keepPreviousData,
@@ -90,7 +91,7 @@ export const useStudentCourses = () => {
 
 export const useRoleBasedCourses = (role: string) => {
   const queryFn =
-    role === 'Student'
+    role === Role.Student
       ? courseService.getCoursesByStudent
       : courseService.getCoursesByTeacher;
   return useQuery({

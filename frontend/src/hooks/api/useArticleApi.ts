@@ -1,5 +1,6 @@
 import ArticleService from '@/services/ArticleService';
 import { ArticleRequest } from '@/types/article';
+import { Role } from '@/types/enums';
 import { QueryHookParams } from '@/types/table';
 import {
   keepPreviousData,
@@ -52,7 +53,7 @@ export const useArticles = (
   };
 
   const queryFn =
-    role === 'Student'
+    role === Role.Student
       ? () => articleService.getArticlesByStudent(courseId, serviceData)
       : () => articleService.getArticlesByTeacher(courseId, serviceData);
 
@@ -81,7 +82,7 @@ export const useArticleDetail = (
   { courseId, articleId }: { courseId: string; articleId: string },
 ) => {
   const queryFn =
-    role === 'Student'
+    role === Role.Student
       ? () => articleService.getArticleDetailByStudent(courseId, articleId)
       : () => articleService.getArticleDetailByTeacher(courseId, articleId);
 

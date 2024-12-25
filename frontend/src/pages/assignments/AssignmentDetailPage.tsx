@@ -17,6 +17,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import useAuth from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/utils';
+import { Role } from '@/types/enums';
 import { useCustomParams } from '@/utils/helper';
 import {
   Calendar,
@@ -123,7 +124,7 @@ const AssignmentDetailPage = () => {
               </div>
             </div>
             <div className='flex flex-col items-end gap-2'>
-              {role === 'Teacher' && (
+              {role === Role.Teacher && (
                 <Button
                   variant='default'
                   className='bg-blue-600 hover:bg-blue-700'
@@ -192,7 +193,7 @@ const AssignmentDetailPage = () => {
           </Card>
 
           {/* Questions Section */}
-          {role === 'Teacher' ? (
+          {role === Role.Teacher ? (
             <Card className='border-2'>
               <Accordion type='single' collapsible className='w-full'>
                 <AccordionItem
