@@ -7,7 +7,7 @@ namespace _3w1m.Services.Interface;
 public interface IAssignmentService
 {
     public Task<(int count, IEnumerable<AssignmentDto>)> GetAssignmentsAsync(int courseId,
-        IAssignmentSpecification? spec ,
+        IAssignmentSpecification? spec,
         AssignmentCollectionQueryDto? assignmentCollectionQueryDto);
 
     public Task<AssignmentDto> GetAssignmentAsync(int courseId, int assignmentId,
@@ -25,8 +25,10 @@ public interface IAssignmentService
 
     public Task<AssignmentDto> UpdateAssignmentDescriptionAsync(int courseId, int assignmentId,
         UpdateAssignmentRequestDto updateAssignmentRequestDto);
-    
+
     public Task<AssignmentStartResponseDto> StartAssignmentAsync(int courseId, int assignmentId, int studentId);
-    
+
     public Task<AssignmentStartResponseDto> ResumeAssignmentAsync(int submissionId);
+
+    Task<(int count, IEnumerable<AssignmentDto>)> GetAssignmentsByStudentId(int studentId, int year, int month);
 }

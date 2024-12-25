@@ -119,19 +119,4 @@ public class StudentAssignmentController : ControllerBase
         var response = await _assignmentService.SubmitAssignmentAsync(courseId, assignmentId, student.StudentId, submitAssignmentDto);
         return Ok(new ResponseDto<AssignmentSubmissionResponseDto>(response));
     }
-
-    // [HttpGet]
-    // [Route("upcoming")]
-    // public async Task<IActionResult> GetUpcomingAssignments(int month, int year)
-    // {
-    //     var user = await _userManager.GetUserAsync(User);
-    //     if (user == null)
-    //     {
-    //         return Unauthorized();
-    //     }
-
-    //     var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-    //     var response = await _assignmentService.GetUpcomingAssignmentsAsync(student.StudentId, month, year);
-    //     return Ok(new ResponseDto<List<AssignmentForStudentDto>>(_mapper.Map<List<AssignmentForStudentDto>>(response)));
-    // }
 }
