@@ -33,7 +33,7 @@ const AssignmentList = () => {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
   const [page, setPage] = useState(1);
-  const pageSize = 2;
+  const pageSize = 10;
 
   const {
     data: assignments,

@@ -135,7 +135,9 @@ const AssignmentDetailPage = () => {
               )}
               <Button
                 variant='outline'
-                onClick={() => navigate('..', { relative: 'path' })}
+                onClick={() =>
+                  navigate('../..?tab=assignments', { relative: 'path' })
+                }
               >
                 <Undo2 className='mr-2 h-4 w-4' />
                 Return
@@ -170,14 +172,18 @@ const AssignmentDetailPage = () => {
 
                     <div className='flex justify-between text-sm text-slate-600'>
                       <div className='space-y-1'>
-                        <p>Created: {formatDate(assignment.createdAt)}</p>
+                        <p className='m-0'>
+                          Created: {formatDate(assignment.createdAt)}
+                        </p>
                         <p>Last updated: {formatDate(assignment.updatedAt)}</p>
                       </div>
-                      {assignment.canViewScore && (
-                        <Badge variant='secondary'>
-                          Scores visible to students
-                        </Badge>
-                      )}
+                      <div className='self-end'>
+                        {assignment.canViewScore && (
+                          <Badge variant='secondary'>
+                            Scores visible to students
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </AccordionContent>

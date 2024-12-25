@@ -6,8 +6,8 @@ import useAuth from '@/hooks/useAuth';
 import Course, { CourseResponse } from '@/types/course';
 import api from '@/utils/api';
 import { useQuery } from '@tanstack/react-query';
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 const mapToCourseDetail = (response: CourseResponse): Course => ({
   id: response.CourseId.toString(),
@@ -22,9 +22,17 @@ const mapToCourseDetail = (response: CourseResponse): Course => ({
 const CourseDetailPage: React.FC = () => {
   const { courseId } = useParams();
   const { role } = useAuth();
-  const [activeTab, setActiveTab] = useState<'articles' | 'assignments'>(
-    'articles',
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = (searchParams.get('tab') ?? 'assignments') as
+    | 'articles'
+    | 'assignments';
+
+  const handleTabChange = (value: string) => {
+    setSearchParams((prev) => {
+      prev.set('tab', value);
+      return prev;
+    });
+  };
 
   const {
     data: courseResponse,
@@ -52,7 +60,7 @@ const CourseDetailPage: React.FC = () => {
 
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-4'>
         <div className='order-2 lg:order-1 lg:col-span-3'>
-          <CourseTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          <CourseTabs activeTab={activeTab} setActiveTab={handleTabChange} />
         </div>
 
         <div className='order-1 lg:order-2 lg:col-span-1'>
