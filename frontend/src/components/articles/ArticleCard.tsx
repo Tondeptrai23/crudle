@@ -1,12 +1,12 @@
-import { Card, CardContent, CardHeader } from '@/components/common/ui/card';
-import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/common/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/common/ui/card';
+import { useDeleteArticle } from '@/hooks/api/useArticleApi';
+import { useToast } from '@/hooks/use-toast';
 import useAuth from '@/hooks/useAuth';
 import { Article } from '@/types/article';
 import { Role } from '@/types/enums';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useDeleteArticle } from '@/hooks/api/useArticleApi';
-import { useToast } from '@/hooks/use-toast';
 
 interface ArticleCardProps {
   article: Article;
@@ -21,7 +21,6 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
   const navigate = useNavigate();
 
   const onDelete = (e: React.MouseEvent) => {
-    console.log(article)
     e.stopPropagation();
     deleteArticle.mutate(article.id, {
       onSuccess: () => {
@@ -46,7 +45,7 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
   return (
     <Card
       key={article.id}
-      className="flex flex-col transition-all hover:shadow-md bg-primary-50 cursor-pointer"
+      className='bg-primary-50 flex cursor-pointer flex-col transition-all hover:shadow-md'
       onClick={handleClick}
     >
       <CardHeader className='py-3'>
@@ -57,36 +56,40 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
             )}
             <div
               className={`text-xl ${
-                (role === Role.Student && article.isRead) ? 'text-muted-foreground' : 'font-semibold'
+                role === Role.Student && article.isRead
+                  ? 'text-muted-foreground'
+                  : 'font-semibold'
               }`}
             >
               {article.title}
             </div>
           </div>
           {(role === Role.Teacher || role === Role.Admin) && (
-            <div className="flex gap-2" onClick={e => e.stopPropagation()}>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8"
+            <div className='flex gap-2' onClick={(e) => e.stopPropagation()}>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8'
                 onClick={handleEditClick}
               >
-                <Pencil className="h-4 w-4" />
+                <Pencil className='h-4 w-4' />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8" 
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8'
                 onClick={onDelete}
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className='h-4 w-4' />
               </Button>
             </div>
           )}
         </div>
       </CardHeader>
       <CardContent>
-        <div className='line-clamp-2 text-muted-foreground'>{article.summary}</div>
+        <div className='line-clamp-2 text-muted-foreground'>
+          {article.summary}
+        </div>
       </CardContent>
     </Card>
   );

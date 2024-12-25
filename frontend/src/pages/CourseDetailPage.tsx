@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import api from '@/utils/api';
-import { CourseResponse } from '@/types/course';
-import Course from '@/types/course';
-import useAuth from '@/hooks/useAuth';
 import PageHeader from '@/components/common/layout/PageHeader';
-import CourseTabs from '@/components/course/CourseTabs';
 import CourseInfo from '@/components/course/CourseInfo';
 import CourseInstructor from '@/components/course/CourseInstructor';
+import CourseTabs from '@/components/course/CourseTabs';
+import useAuth from '@/hooks/useAuth';
+import Course, { CourseResponse } from '@/types/course';
+import api from '@/utils/api';
+import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const mapToCourseDetail = (response: CourseResponse): Course => ({
   id: response.CourseId.toString(),
@@ -23,7 +22,9 @@ const mapToCourseDetail = (response: CourseResponse): Course => ({
 const CourseDetailPage: React.FC = () => {
   const { courseId } = useParams();
   const { role } = useAuth();
-  const [activeTab, setActiveTab] = useState<'articles' | 'assignments'>('articles');
+  const [activeTab, setActiveTab] = useState<'articles' | 'assignments'>(
+    'articles',
+  );
 
   const {
     data: courseResponse,
@@ -45,15 +46,12 @@ const CourseDetailPage: React.FC = () => {
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      <PageHeader 
-        items={[
-          { label: 'Courses', to: '/course' },
-          { label: course.name }
-        ]}
+      <PageHeader
+        items={[{ label: 'Courses', to: '/course' }, { label: course.name }]}
       />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-3 order-2 lg:order-1">
+
+      <div className='grid grid-cols-1 gap-8 lg:grid-cols-4'>
+        <div className='order-2 lg:order-1 lg:col-span-3'>
           <CourseTabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -61,7 +59,7 @@ const CourseDetailPage: React.FC = () => {
           />
         </div>
 
-        <div className="lg:col-span-1 order-1 lg:order-2">
+        <div className='order-1 lg:order-2 lg:col-span-1'>
           <CourseInfo course={course} />
           <CourseInstructor
             teacherId={course.teacherId}

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Card, CardHeader, CardContent } from '../common/ui/card';
 import { Skeleton } from '@/components/common/ui/skeleton';
+import React from 'react';
+import { Card, CardContent, CardHeader } from '../common/ui/card';
 
 const CourseSkeleton: React.FC = () => {
   return (

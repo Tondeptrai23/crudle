@@ -1,21 +1,25 @@
-import { Article, ArticleResponse } from "@/types/article";
-import { ApiResponse } from "@/types/paginationApiResponse";
-import api from "@/utils/api";
+import { Article, ArticleResponse } from '@/types/article';
+import { ApiResponse } from '@/types/paginationApiResponse';
+import api from '@/utils/api';
 
 export default class ArticleService {
-  #getArticles: (role: string, id: string, data: {
-    title?: string;
-    summary?: string;
-    content?: string;
-    createdAtFrom?: string;
-    createdAtTo?: string;
-    updatedAtFrom?: string;
-    updatedAtTo?: string;
-    page?: number;
-    size?: number;
-    orderBy?: string;
-    orderDirection?: 'asc' | 'desc';
-  }) => Promise<ApiResponse<Article>> = async (role, id, data) => {
+  #getArticles: (
+    role: string,
+    id: string,
+    data: {
+      title?: string;
+      summary?: string;
+      content?: string;
+      createdAtFrom?: string;
+      createdAtTo?: string;
+      updatedAtFrom?: string;
+      updatedAtTo?: string;
+      page?: number;
+      size?: number;
+      orderBy?: string;
+      orderDirection?: 'asc' | 'desc';
+    },
+  ) => Promise<ApiResponse<Article>> = async (role, id, data) => {
     await new Promise((resolve) => setTimeout(resolve, 200));
     if (data.page && data.page < 1) {
       data.page = 1;
@@ -30,24 +34,28 @@ export default class ArticleService {
     query += data.updatedAtFrom ? `&UpdatedAtFrom=${data.updatedAtFrom}` : '';
     query += data.updatedAtTo ? `&UpdatedAtTo=${data.updatedAtTo}` : '';
 
-    const response = await api.get(`/api/${role}/Course/${id}/Articles?${query}`);
+    const response = await api.get(
+      `/api/${role}/Course/${id}/Articles?${query}`,
+    );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
 
-    const articles: Article[] = response.data.Data.map((article: ArticleResponse) => {
-      return {
-        id: article.ArticleId,
-        title: article.Title, 
-        summary: article.Summary,
-        content: article.Content,
-        createdAt: article.CreatedAt,
-        updatedAt: article.UpdatedAt,
-        isRead: article.IsRead,
-        readAt: article.ReadAt,
-      };
-    });
+    const articles: Article[] = response.data.Data.map(
+      (article: ArticleResponse) => {
+        return {
+          id: article.ArticleId,
+          title: article.Title,
+          summary: article.Summary,
+          content: article.Content,
+          createdAt: article.CreatedAt,
+          updatedAt: article.UpdatedAt,
+          isRead: article.IsRead,
+          readAt: article.ReadAt,
+        };
+      },
+    );
 
     return {
       data: articles,
@@ -57,36 +65,48 @@ export default class ArticleService {
     };
   };
 
-  getArticlesByTeacher = async (id: string, data: {
-    title?: string;
-    summary?: string;
-    content?: string;
-    createdAt?: string;
-    updatedAt?: string;
-    page?: number;
-    size?: number;
-    orderBy?: string;
-    orderDirection?: 'asc' | 'desc';
-  }) => {
+  getArticlesByTeacher = async (
+    id: string,
+    data: {
+      title?: string;
+      summary?: string;
+      content?: string;
+      createdAt?: string;
+      updatedAt?: string;
+      page?: number;
+      size?: number;
+      orderBy?: string;
+      orderDirection?: 'asc' | 'desc';
+    },
+  ) => {
     return this.#getArticles('Teacher', id, data);
   };
 
-  getArticlesByStudent = async (id: string, data: {
-    title?: string;
-    summary?: string;
-    content?: string;
-    createdAt?: string;
-    updatedAt?: string;
-    page?: number;
-    size?: number;
-    orderBy?: string;
-    orderDirection?: 'asc' | 'desc';
-  }) => {
+  getArticlesByStudent = async (
+    id: string,
+    data: {
+      title?: string;
+      summary?: string;
+      content?: string;
+      createdAt?: string;
+      updatedAt?: string;
+      page?: number;
+      size?: number;
+      orderBy?: string;
+      orderDirection?: 'asc' | 'desc';
+    },
+  ) => {
     return this.#getArticles('Student', id, data);
   };
 
-  #getArticleDetail: (role: string, courseId: string, articleId: string) => Promise<Article> = async (role, courseId, articleId) => {
-    const response = await api.get(`/api/${role}/course/${courseId}/article/${articleId}`);
+  #getArticleDetail: (
+    role: string,
+    courseId: string,
+    articleId: string,
+  ) => Promise<Article> = async (role, courseId, articleId) => {
+    const response = await api.get(
+      `/api/${role}/course/${courseId}/article/${articleId}`,
+    );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
@@ -115,7 +135,9 @@ export default class ArticleService {
   };
 
   readArticle = async (courseId: string, articleId: string) => {
-    const response = await api.post(`/api/student/course/${courseId}/article/${articleId}/read`);
+    const response = await api.post(
+      `/api/student/course/${courseId}/article/${articleId}/read`,
+    );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
@@ -124,11 +146,14 @@ export default class ArticleService {
     return response.data.Data;
   };
 
-  createArticle = async (courseId: string, data: {
-    title: string;
-    summary: string;
-    content: string;
-  }) => {
+  createArticle = async (
+    courseId: string,
+    data: {
+      title: string;
+      summary: string;
+      content: string;
+    },
+  ) => {
     const response = await api.post(`/api/teacher/course/${courseId}/article`, {
       title: data.title,
       summary: data.summary,
@@ -142,16 +167,23 @@ export default class ArticleService {
     return response.data.Data;
   };
 
-  updateArticle = async (courseId: string, articleId: string, data: {
-    title: string;
-    summary: string;
-    content: string;
-  }) => {
-    const response = await api.put(`/api/teacher/course/${courseId}/article/${articleId}`, {
-      title: data.title,
-      summary: data.summary,
-      content: data.content,
-    });
+  updateArticle = async (
+    courseId: string,
+    articleId: string,
+    data: {
+      title: string;
+      summary: string;
+      content: string;
+    },
+  ) => {
+    const response = await api.put(
+      `/api/teacher/course/${courseId}/article/${articleId}`,
+      {
+        title: data.title,
+        summary: data.summary,
+        content: data.content,
+      },
+    );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
@@ -161,7 +193,9 @@ export default class ArticleService {
   };
 
   deleteArticle = async (courseId: string, articleId: string) => {
-    const response = await api.delete(`/api/teacher/course/${courseId}/article/${articleId}`);
+    const response = await api.delete(
+      `/api/teacher/course/${courseId}/article/${articleId}`,
+    );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);

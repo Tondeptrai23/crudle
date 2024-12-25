@@ -1,15 +1,30 @@
-import ArticleService from "@/services/ArticleService";
-import { ArticleRequest } from "@/types/article";
-import { QueryHookParams } from "@/types/table";
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import ArticleService from '@/services/ArticleService';
+import { ArticleRequest } from '@/types/article';
+import { QueryHookParams } from '@/types/table';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 const articleService = new ArticleService();
 const articleKeys = {
   articles: (courseId: string) => ['courses', courseId, 'articles', 'all'],
-  detail: (courseId: string, articleId: string) => ['courses', courseId, 'articles', 'detail', articleId],
-}
+  detail: (courseId: string, articleId: string) => [
+    'courses',
+    courseId,
+    'articles',
+    'detail',
+    articleId,
+  ],
+};
 
-export const useArticles = (role: string, { courseId } : { courseId: string }, data: QueryHookParams) => {
+export const useArticles = (
+  role: string,
+  { courseId }: { courseId: string },
+  data: QueryHookParams,
+) => {
   let { page } = data;
   const { pageSize, filters, sort } = data;
   const titleFilter = filters.title as string;
@@ -36,9 +51,10 @@ export const useArticles = (role: string, { courseId } : { courseId: string }, d
     orderDirection: sort.direction || 'asc',
   };
 
-  const queryFn = role === 'Student'
-    ? () => articleService.getArticlesByStudent(courseId, serviceData)
-    : () => articleService.getArticlesByTeacher(courseId, serviceData);
+  const queryFn =
+    role === 'Student'
+      ? () => articleService.getArticlesByStudent(courseId, serviceData)
+      : () => articleService.getArticlesByTeacher(courseId, serviceData);
 
   return useQuery({
     queryKey: [
@@ -50,7 +66,7 @@ export const useArticles = (role: string, { courseId } : { courseId: string }, d
       contentFilter,
       createdAtFilter,
       updatedAtFilter,
-      sort
+      sort,
     ],
     queryFn: queryFn,
     staleTime: 5 * 60 * 1000,
@@ -58,12 +74,16 @@ export const useArticles = (role: string, { courseId } : { courseId: string }, d
     refetchOnWindowFocus: false,
     retry: false,
   });
-}
+};
 
-export const useArticleDetail = (role: string, { courseId, articleId } : { courseId: string, articleId: string }) => {
-  const queryFn = role === 'Student'
-    ? () => articleService.getArticleDetailByStudent(courseId, articleId)
-    : () => articleService.getArticleDetailByTeacher(courseId, articleId);
+export const useArticleDetail = (
+  role: string,
+  { courseId, articleId }: { courseId: string; articleId: string },
+) => {
+  const queryFn =
+    role === 'Student'
+      ? () => articleService.getArticleDetailByStudent(courseId, articleId)
+      : () => articleService.getArticleDetailByTeacher(courseId, articleId);
 
   return useQuery({
     queryKey: articleKeys.detail(courseId, articleId),
@@ -73,7 +93,7 @@ export const useArticleDetail = (role: string, { courseId, articleId } : { cours
     refetchOnWindowFocus: false,
     retry: false,
   });
-}
+};
 
 export const useReadArticle = (courseId: string) => {
   const queryClient = useQueryClient();
@@ -83,7 +103,9 @@ export const useReadArticle = (courseId: string) => {
       await articleService.readArticle(courseId, articleId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: articleKeys.articles(courseId) });
+      queryClient.invalidateQueries({
+        queryKey: articleKeys.articles(courseId),
+      });
     },
   });
 };
@@ -96,23 +118,33 @@ export const useCreateArticle = (courseId: string) => {
       await articleService.createArticle(courseId, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: articleKeys.articles(courseId) });
-    }
+      queryClient.invalidateQueries({
+        queryKey: articleKeys.articles(courseId),
+      });
+    },
   });
-}
+};
 
 export const useUpdateArticle = (courseId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ articleId, data }: { articleId: string, data: ArticleRequest }) => {
+    mutationFn: async ({
+      articleId,
+      data,
+    }: {
+      articleId: string;
+      data: ArticleRequest;
+    }) => {
       await articleService.updateArticle(courseId, articleId, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: articleKeys.articles(courseId) });
-    }
+      queryClient.invalidateQueries({
+        queryKey: articleKeys.articles(courseId),
+      });
+    },
   });
-}
+};
 
 export const useDeleteArticle = (courseId: string) => {
   const queryClient = useQueryClient();
@@ -122,7 +154,9 @@ export const useDeleteArticle = (courseId: string) => {
       await articleService.deleteArticle(courseId, articleId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: articleKeys.articles(courseId) });
-    }
+      queryClient.invalidateQueries({
+        queryKey: articleKeys.articles(courseId),
+      });
+    },
   });
-}
+};
