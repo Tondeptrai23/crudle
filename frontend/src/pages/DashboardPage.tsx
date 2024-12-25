@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import { Calendar } from '@/components/common/ui/calendar';
 import EventCard from '@/components/dashboard/eventCard'; // Adjust the import path as necessary
+import { useUpcomingAssignments } from '@/hooks/api/useStudentApi';
 
 export const DashboardPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const {
+    data: assignments,
+    isLoading,
+    error,
+  } = useUpcomingAssignments(selectedDate);
+
+  console.log(assignments);
+
   return (
     <div className='flex min-h-screen flex-row gap-4'>
       <div className='w-72 rounded-md border-2 border-slate-800 text-center'>
@@ -13,20 +22,16 @@ export const DashboardPage: React.FC = () => {
         <h2 className='text-2xl font-semibold'>Upcoming events</h2>
         <div className='flex flex-row gap-12'>
           <div className='grid w-full gap-2'>
-            <EventCard
-              assignmentName='Assignment 1'
-              dueTime='2024-12-20T13:36:51Z'
-              courseName='Introduction to Computer Science'
-              courseId='1'
-              assignmentId='2'
-            />
-            <EventCard
-              assignmentName='Assignment 2'
-              dueTime='2024-12-20T13:36:51Z'
-              courseName='Data Structures'
-              courseId='CS102'
-              assignmentId='2'
-            />
+            {isLoading && <div>Loading...</div>}
+            {assignments?.map((assignment) => (
+              <EventCard
+                assignmentName={assignment.name}
+                dueTime={assignment.dueDate}
+                courseName={assignment.courseName}
+                courseId={assignment.courseId}
+                assignmentId={assignment.assignmentId}
+              />
+            ))}
           </div>
           <div>
             <Calendar
@@ -45,13 +50,13 @@ export const DashboardPage: React.FC = () => {
                 scope='col'
                 className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
               >
-                Course ID
+                Assignment ID
               </th>
               <th
                 scope='col'
                 className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
               >
-                Course Name
+                Assignment Name
               </th>
               <th
                 scope='col'

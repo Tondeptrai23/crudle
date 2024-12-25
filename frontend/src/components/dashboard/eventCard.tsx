@@ -11,10 +11,10 @@ import {
 
 interface EventCardProps {
   assignmentName: string;
-  dueTime: string;
+  dueTime: Date;
   courseName: string;
-  courseId: string;
-  assignmentId: string;
+  courseId: number;
+  assignmentId: number;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -41,7 +41,7 @@ const EventCard: React.FC<EventCardProps> = ({
               <Calendar className='h-4 w-4' />
               <span className='font-medium'>
                 Due Date:{' '}
-                {new Date(dueTime).toLocaleString('en-US', {
+                {dueTime.toLocaleString('en-US', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',

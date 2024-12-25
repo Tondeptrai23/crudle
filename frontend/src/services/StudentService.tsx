@@ -1,3 +1,4 @@
+import Assignment, { UpcomingAssignment } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Student, {
   CreateStudentDTO,
@@ -116,4 +117,32 @@ export default class StudentService {
       userId: response.data.Data.UserId,
     };
   };
+
+  getUpcomingAssignments: (date: Date) => Promise<UpcomingAssignment[]> =
+    async (date: Date) => {
+      try {
+        const query = `month=${date.getMonth()}&year=${date.getFullYear()}`;
+        const response = await api.get(
+          `api/student/assignment/upcoming?${query}`,
+        );
+
+        if (!response.data.Success) {
+          throw new Error(response.data.Message);
+        }
+        return response.data.Data.map((assignment: any) => {
+          return {
+            assignmentId: assignment.AssignmentId,
+            name: assignment.Name,
+            dueDate: new Date(assignment.DueDate),
+            courseId: assignment.CourseId,
+            courseName: assignment.CourseName,
+          };
+        });
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Error(`Failed to fetch assignments: ${error.message}`);
+        }
+        throw error;
+      }
+    };
 }
