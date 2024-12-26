@@ -70,7 +70,7 @@ const AssignmentList = () => {
   };
 
   const handleEdit = (assignmentId: number) => {
-    navigate(`${assignmentId}/edit`);
+    navigate(`assignment/${assignmentId}/edit`);
   };
 
   if (isLoading) {
@@ -101,7 +101,7 @@ const AssignmentList = () => {
           <Button
             variant='default'
             className='inline-flex items-center gap-2'
-            onClick={() => navigate('./add')}
+            onClick={() => navigate('./assignment/add')}
           >
             <Plus className='h-4 w-4' />
             Add Assignment

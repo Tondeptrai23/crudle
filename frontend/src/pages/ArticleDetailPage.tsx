@@ -61,9 +61,7 @@ const ArticleDetailPage: React.FC = () => {
             {role === Role.Teacher && (
               <Button
                 variant='default'
-                onClick={() =>
-                  navigate('../..?tab=articles', { relative: 'path' })
-                }
+                onClick={() => navigate(`./edit`, { relative: 'path' })}
               >
                 <Edit className='mr-2 h-4 w-4' />
                 Edit Article
