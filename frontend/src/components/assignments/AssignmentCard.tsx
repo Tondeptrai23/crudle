@@ -5,10 +5,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/common/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import Assignment from '@/types/assignment';
 import { Clock, Edit, MoreVertical, Trash } from 'lucide-react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '../common/ui/skeleton';
 
 type AssignmentCardProps = {
   assignment: Assignment;
@@ -24,17 +25,26 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
   onDelete,
 }) => {
   const navigate = useNavigate();
+  const isDueOver = useMemo(() => {
+    if (!assignment.dueDate) return false;
+    return new Date(assignment.dueDate) < new Date();
+  }, [assignment.dueDate]);
 
   return (
-    <Card className='flex flex-row items-center justify-between p-4'>
-      <div
-        className='cursor-pointer'
-        onClick={() => {
-          navigate(`./${assignment.assignmentId}`);
-        }}
-      >
+    <Card
+      className='flex cursor-pointer flex-row items-center justify-between p-4 hover:shadow-md'
+      onClick={() => {
+        navigate(`./assignment/${assignment.assignmentId}`);
+      }}
+    >
+      <div>
         <h2 className='mb-2 text-sm font-semibold'>{assignment.name}</h2>
-        <span className='flex w-full items-center gap-2 text-[10px] text-gray-500'>
+        <span
+          className={cn(
+            'flex w-full items-center gap-2 text-[10px]',
+            isDueOver ? 'text-red-500' : 'text-gray-500',
+          )}
+        >
           <Clock className='inline-block h-4 w-4' />
           {assignment.dueDate
             ? new Date(assignment.dueDate).toLocaleDateString('en-US', {
@@ -49,20 +59,29 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
       </div>
       {showButton && (
         <DropdownMenu modal={false}>
-          <DropdownMenuTrigger className='cursor-pointer focus:outline-none'>
+          <DropdownMenuTrigger
+            className='cursor-pointer focus:outline-none'
+            onClick={(e) => e.stopPropagation()}
+          >
             <MoreVertical className='h-5 w-5 text-gray-500' />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem
               className='flex cursor-pointer items-center gap-2'
-              onClick={onEdit}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
             >
               <Edit className='h-4 w-4' />
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
               className='flex cursor-pointer items-center gap-2 text-red-600'
-              onClick={onDelete}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.();
+              }}
             >
               <Trash className='h-4 w-4' />
               Delete
@@ -73,15 +92,4 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
     </Card>
   );
 };
-
-export const AssignmentCardSkeleton = () => (
-  <Card className='flex flex-row items-center justify-between p-4'>
-    <div className='w-full space-y-3'>
-      <Skeleton className='h-4 w-48' />
-      <Skeleton className='h-3 w-32' />
-    </div>
-    <Skeleton className='h-8 w-8 rounded-full' />
-  </Card>
-);
-
 export default AssignmentCard;

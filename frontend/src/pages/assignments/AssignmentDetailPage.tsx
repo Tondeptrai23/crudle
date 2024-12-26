@@ -17,6 +17,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import useAuth from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/utils';
+import { Role } from '@/types/enums';
 import { useCustomParams } from '@/utils/helper';
 import {
   Calendar,
@@ -123,7 +124,7 @@ const AssignmentDetailPage = () => {
               </div>
             </div>
             <div className='flex flex-col items-end gap-2'>
-              {role === 'Teacher' && (
+              {role === Role.Teacher && (
                 <Button
                   variant='default'
                   className='bg-blue-600 hover:bg-blue-700'
@@ -135,7 +136,9 @@ const AssignmentDetailPage = () => {
               )}
               <Button
                 variant='outline'
-                onClick={() => navigate('..', { relative: 'path' })}
+                onClick={() =>
+                  navigate('../..?tab=assignments', { relative: 'path' })
+                }
               >
                 <Undo2 className='mr-2 h-4 w-4' />
                 Return
@@ -170,14 +173,18 @@ const AssignmentDetailPage = () => {
 
                     <div className='flex justify-between text-sm text-slate-600'>
                       <div className='space-y-1'>
-                        <p>Created: {formatDate(assignment.createdAt)}</p>
+                        <p className='m-0'>
+                          Created: {formatDate(assignment.createdAt)}
+                        </p>
                         <p>Last updated: {formatDate(assignment.updatedAt)}</p>
                       </div>
-                      {assignment.canViewScore && (
-                        <Badge variant='secondary'>
-                          Scores visible to students
-                        </Badge>
-                      )}
+                      <div className='self-end'>
+                        {assignment.canViewScore && (
+                          <Badge variant='secondary'>
+                            Scores visible to students
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </AccordionContent>
@@ -186,7 +193,7 @@ const AssignmentDetailPage = () => {
           </Card>
 
           {/* Questions Section */}
-          {role === 'Teacher' ? (
+          {role === Role.Teacher ? (
             <Card className='border-2'>
               <Accordion type='single' collapsible className='w-full'>
                 <AccordionItem

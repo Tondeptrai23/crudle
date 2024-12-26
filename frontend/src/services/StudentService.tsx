@@ -111,7 +111,6 @@ export default class StudentService {
       id: response.data.Data.StudentId,
       fullname: response.data.Data.Fullname,
       email: response.data.Data.Email,
-      role: 'Student',
       dob: response.data.Data.DateOfBirth,
       userId: response.data.Data.UserId,
     };

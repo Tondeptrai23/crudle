@@ -25,6 +25,7 @@ import {
   CreateQuestionDto,
   QuestionType,
 } from '@/types/assignment';
+import { generateUniqueId } from '@/utils/helper';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -128,7 +129,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
 
   const handleAddQuestion = (type: QuestionType = 'Multiple Choice') => {
     const newQuestion: CreateQuestionDto = {
-      questionId: questions.length + 1,
+      questionId: generateUniqueId(),
       content: '',
       isNew: true,
       type,

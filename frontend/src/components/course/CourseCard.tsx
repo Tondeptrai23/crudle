@@ -1,14 +1,14 @@
+import Course from '@/types/course';
+import { Book } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Book } from 'lucide-react';
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from '../common/ui/card';
-import Course from '@/types/course';
 
 interface TeacherInfoProps {
   teacherId: string;

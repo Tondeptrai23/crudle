@@ -19,7 +19,7 @@ const Logo: React.FC<LogoProps> = (props) => {
       onClick={() => navigate('/')}
     >
       <Book className='h-8 w-8' />
-      <p>Logo</p>
+      <p>Crudle</p>
     </button>
   );
 };

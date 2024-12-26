@@ -32,7 +32,7 @@ const AddAssignmentPage = () => {
           type: 'questions',
         }}
         onSave={handleSave}
-        onCancel={() => navigate('..', { relative: 'path' })}
+        onCancel={() => navigate('../..?tab=assignments', { relative: 'path' })}
       />
     </div>
   );

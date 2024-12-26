@@ -61,7 +61,7 @@ export default class CourseService {
       throw new Error(response.data.Message);
     }
 
-    let courses: Course[] = response.data.Data.map((course: CourseResponse) => {
+    const courses: Course[] = response.data.Data.map((course: CourseResponse) => {
       return {
         id: course.CourseId,
         name: course.Name,
