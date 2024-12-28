@@ -76,8 +76,29 @@ const App: React.FC = () => {
               path='/*'
               element={
                 <ErrorBoundary>
-                  <RequireAuth allowedRoles={[Role.User]}>
-                    <MainLayout>
+                  <MainLayout>
+                    <RequireAuth allowedRoles={[Role.Teacher]}>
+                      <Routes>
+                        <Route
+                          path='/course/:courseId/assignment/:assignmentId/edit'
+                          element={<EditAssignmentPage />}
+                        />
+                        <Route
+                          path='/course/:courseId/assignment/add'
+                          element={<AddAssignmentPage />}
+                        />
+                        <Route
+                          path='/course/:courseId/article/:articleId/edit'
+                          element={<ArticleUpdatePage />}
+                        />
+                        <Route
+                          path='/course/:courseId/article/new'
+                          element={<ArticleCreatePage />}
+                        />
+                      </Routes>
+                    </RequireAuth>
+
+                    <RequireAuth allowedRoles={[Role.User]}>
                       <Routes>
                         <Route path='/dashboard' element={<WeatherPage />} />
                         <Route path='/course' element={<CoursePage />} />
@@ -86,16 +107,8 @@ const App: React.FC = () => {
                           element={<CourseDetailPage />}
                         />
                         <Route
-                          path='/course/:courseId/article/new'
-                          element={<ArticleCreatePage />}
-                        />
-                        <Route
                           path='/course/:courseId/article/:articleId'
                           element={<ArticleDetailPage />}
-                        />
-                        <Route
-                          path='/course/:courseId/article/:articleId/edit'
-                          element={<ArticleUpdatePage />}
                         />
                         <Route
                           path='student/:studentId'
@@ -105,33 +118,20 @@ const App: React.FC = () => {
                           path='teacher/:teacherId'
                           element={<ProfilePage />}
                         />
-
-                        <Route
-                          path='/course/:courseId/assignment/add'
-                          element={<AddAssignmentPage />}
-                        />
-
                         <Route
                           path='/course/:courseId/assignment/:assignmentId'
                           element={<AssignmentDetailPage />}
                         />
-
-                        <Route
-                          path='/course/:courseId/assignment/:assignmentId/edit'
-                          element={<EditAssignmentPage />}
-                        />
-
                         <Route
                           path='/course/:courseId/assignment/:assignmentId/session/:submissionId'
                           element={<AssignmentSessionPage />}
                         />
-
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path='/settings' element={<div>Settings</div>} />
                         <Route path='*' element={<div>Not Found</div>} />
                       </Routes>
-                    </MainLayout>
-                  </RequireAuth>
+                    </RequireAuth>
+                  </MainLayout>
                 </ErrorBoundary>
               }
             />
