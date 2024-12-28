@@ -99,10 +99,15 @@ export const useStudentCourses = () => {
 export const useRoleBasedCourses = (role: string) => {
   const queryFn =
     role === Role.Student
-      ? courseService.getCoursesByStudent
-      : courseService.getCoursesByTeacher;
+      ? () => courseService.getCoursesByStudent()
+      : () => courseService.getCoursesByTeacher();
+
   return useQuery({
-    queryKey: ['courses'],
-    queryFn,
+    queryKey: ['courses', role],
+    queryFn: queryFn,
+    retry: true,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: true,
   });
 };

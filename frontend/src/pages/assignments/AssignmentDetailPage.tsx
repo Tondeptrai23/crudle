@@ -10,6 +10,7 @@ import { Button } from '@/components/common/ui/button';
 import { Card } from '@/components/common/ui/card';
 import LoadingButton from '@/components/common/ui/LoadingButton';
 import { Skeleton } from '@/components/common/ui/skeleton';
+import Sidebar from '@/components/nav/Sidebar';
 import {
   useGetAssignment,
   useStartAssignment,
@@ -47,9 +48,7 @@ const AssignmentDetailPage = () => {
   if (isLoading) {
     return (
       <div className='flex min-h-screen flex-row gap-4'>
-        <div className='w-72 rounded-md border-2 border-slate-800 text-center'>
-          Sidebar
-        </div>
+        <Sidebar />
         <div className='container m-4'>
           <AssignmentDetailSkeleton />
         </div>
@@ -93,9 +92,7 @@ const AssignmentDetailPage = () => {
 
   return (
     <div className='flex min-h-screen flex-row gap-4'>
-      <div className='w-72 rounded-md border-2 border-slate-800 text-center'>
-        Sidebar
-      </div>
+      <Sidebar />
 
       <div className='container m-4'>
         {/* Header Section */}

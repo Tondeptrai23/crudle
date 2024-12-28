@@ -10,11 +10,21 @@ import { mapToStudent } from './StudentService';
 export default class CourseService {
   async getCoursesByStudent(): Promise<Course[]> {
     const response = await api.get('/api/Student/Course');
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
     return response.data.Data.map(mapToCourse);
   }
 
   async getCoursesByTeacher(): Promise<Course[]> {
     const response = await api.get('/api/Teacher/Course');
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
     return response.data.Data.map(mapToCourse);
   }
 

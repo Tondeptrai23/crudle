@@ -1,6 +1,7 @@
 import ArticleDetailSkeleton from '@/components/articles/ArticleDetailSkeleton';
 import { Button } from '@/components/common/ui/button';
 import { Separator } from '@/components/common/ui/separator';
+import Sidebar from '@/components/nav/Sidebar';
 import { useArticleDetail } from '@/hooks/api/useArticleApi';
 import useAuth from '@/hooks/useAuth';
 import { Role } from '@/types/enums';
@@ -30,8 +31,10 @@ const ArticleDetailPage: React.FC = () => {
   if (error || !article) throw new Error('Error loading article');
 
   return (
-    <div className='container mx-auto p-6'>
-      <div className='mx-auto max-w-4xl'>
+    <div className='flex min-h-screen flex-row gap-4'>
+      <Sidebar />
+
+      <div className='container m-4'>
         <div className='flex items-center justify-between'>
           <div className='space-y-4'>
             <h1 className='scroll-m-20 text-4xl font-bold tracking-tight'>
