@@ -18,7 +18,7 @@ const LoadingSkeleton = () => (
 
 const Sidebar = () => {
   const { role } = useAuth();
-  const { data: items, isLoading, error } = useRoleBasedCourses(role);
+  const { data: items, isLoading, error, isError } = useRoleBasedCourses(role);
   const { courseId } = useParams();
   const [selectedId, setSelectedId] = useState<string>(courseId ?? '');
   const navigate = useNavigate();
@@ -28,14 +28,14 @@ const Sidebar = () => {
     navigate(`/course/${id}`);
   };
 
-  if (error || !items) {
+  if (isError) {
     throw error || new Error('Error loading courses');
   }
 
   return (
     <div className='-ml-4 w-72 rounded-md border border-gray-200 bg-white'>
       <nav className='space-y-2 p-4'>
-        {isLoading ? (
+        {isLoading || !items ? (
           <LoadingSkeleton />
         ) : (
           items.map((item) => (

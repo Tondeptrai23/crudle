@@ -25,15 +25,11 @@ const CourseDetailPage: React.FC = () => {
     });
   };
 
-  const {
-    data: course,
-    isLoading,
-    error,
-  } = useCourseDetail(role, courseId ?? '');
+  const { data: course } = useCourseDetail(role, courseId ?? '');
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading course</div>;
-  if (!course) return <div>No course found</div>;
+  if (!course) {
+    return null;
+  }
 
   return (
     <div className='flex min-h-screen flex-row gap-4'>

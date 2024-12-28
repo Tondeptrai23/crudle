@@ -39,6 +39,9 @@ const queryClient = new QueryClient({
         }
         return failureCount < 3;
       },
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
     },
   },
 });
