@@ -1,4 +1,4 @@
-import ErrorPage from '@/pages/ErrorPage';
+import ErrorPage from '@/pages/common/ErrorPage';
 import { Component, ErrorInfo } from 'react';
 
 interface Props {
