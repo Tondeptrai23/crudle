@@ -55,6 +55,13 @@ export const useCourses = (data: QueryHookParams) => {
   });
 };
 
+export const useCourseDetail = (role: string, id: string) => {
+  return useQuery({
+    queryKey: courseKeys.detail(id),
+    queryFn: () => courseService.getCourse(role, id),
+  });
+};
+
 export const useCreateCourse = () => {
   const queryClient = useQueryClient();
 

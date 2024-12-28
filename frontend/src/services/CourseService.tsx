@@ -5,16 +5,17 @@ import Course, {
 } from '@/types/course';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import api from '@/utils/api';
+import { mapToStudent } from './StudentService';
 
 export default class CourseService {
-  async getCoursesByStudent(): Promise<CourseResponse[]> {
+  async getCoursesByStudent(): Promise<Course[]> {
     const response = await api.get('/api/Student/Course');
-    return response.data.Data;
+    return response.data.Data.map(mapToCourse);
   }
 
-  async getCoursesByTeacher(): Promise<CourseResponse[]> {
+  async getCoursesByTeacher(): Promise<Course[]> {
     const response = await api.get('/api/Teacher/Course');
-    return response.data.Data;
+    return response.data.Data.map(mapToCourse);
   }
 
   getCoursesByAdmin: (data: {
@@ -61,17 +62,19 @@ export default class CourseService {
       throw new Error(response.data.Message);
     }
 
-    const courses: Course[] = response.data.Data.map((course: CourseResponse) => {
-      return {
-        id: course.CourseId,
-        name: course.Name,
-        code: course.Code,
-        description: course.Description,
-        startDate: course.StartDate,
-        teacherName: course.Teacher?.Fullname ?? '',
-        teacherId: course.Teacher?.TeacherId ?? '',
-      };
-    });
+    const courses: Course[] = response.data.Data.map(
+      (course: CourseResponse) => {
+        return {
+          id: course.CourseId,
+          name: course.Name,
+          code: course.Code,
+          description: course.Description,
+          startDate: course.StartDate,
+          teacherName: course.Teacher?.Fullname ?? '',
+          teacherId: course.Teacher?.TeacherId ?? '',
+        };
+      },
+    );
 
     return {
       data: courses,
@@ -79,6 +82,19 @@ export default class CourseService {
       totalPages: response.data.TotalPages,
       currentPage: response.data.CurrentPage,
     };
+  };
+
+  getCourse: (role: string, id: string) => Promise<Course> = async (
+    role: string,
+    id: string,
+  ) => {
+    const response = await api.get(`/api/${role}/Course/${id}`);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return mapToCourse(response.data.Data);
   };
 
   createCourse = async (data: CreateCourseDTO) => {
@@ -111,4 +127,5 @@ export const mapToCourse = (response: CourseResponse) => ({
   startDate: response.StartDate,
   teacherId: response.Teacher?.TeacherId.toString(),
   teacherName: response.Teacher?.Fullname,
+  students: response.Students?.map(mapToStudent) ?? [],
 });
