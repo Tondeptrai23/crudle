@@ -1,9 +1,11 @@
 import PageHeader from '@/components/common/layout/PageHeader';
 import CourseInfo from '@/components/course/CourseInfo';
 import CourseInstructor from '@/components/course/CourseInstructor';
+import CourseStudents from '@/components/course/CourseStudents';
 import CourseTabs from '@/components/course/CourseTabs';
 import { useCourseDetail } from '@/hooks/api/useCourseApi';
 import useAuth from '@/hooks/useAuth';
+import { Role } from '@/types/enums';
 import React from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
@@ -49,6 +51,9 @@ const CourseDetailPage: React.FC = () => {
             teacherId={course.teacherId}
             teacherName={course.teacherName}
           />
+          {role === Role.Teacher && (
+            <CourseStudents students={course.students ?? []} />
+          )}
         </div>
       </div>
     </div>
