@@ -6,9 +6,10 @@ export default interface Student {
   email: string;
 }
 
-export interface StudentCollectionResponse {
+export interface StudentResponse {
   StudentId: string;
   Fullname: string;
+  Email: string;
   DateOfBirth: string;
   UserId: string;
 }

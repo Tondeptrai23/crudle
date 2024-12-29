@@ -55,6 +55,13 @@ export const useCourses = (data: QueryHookParams) => {
   });
 };
 
+export const useCourseDetail = (role: string, id: string) => {
+  return useQuery({
+    queryKey: courseKeys.detail(id),
+    queryFn: () => courseService.getCourse(role, id),
+  });
+};
+
 export const useCreateCourse = () => {
   const queryClient = useQueryClient();
 
@@ -92,10 +99,13 @@ export const useStudentCourses = () => {
 export const useRoleBasedCourses = (role: string) => {
   const queryFn =
     role === Role.Student
-      ? courseService.getCoursesByStudent
-      : courseService.getCoursesByTeacher;
+      ? async () => courseService.getCoursesByStudent()
+      : async () => courseService.getCoursesByTeacher();
+
   return useQuery({
-    queryKey: ['courses'],
-    queryFn,
+    queryKey: ['courses', role],
+    queryFn: queryFn,
+    retry: 3,
+    staleTime: 5 * 60 * 1000,
   });
 };

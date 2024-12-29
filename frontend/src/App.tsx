@@ -12,18 +12,18 @@ import AdminCoursePage from './pages/admin/AdminCoursePage.tsx';
 import AdminHomePage from './pages/admin/AdminHomePage.tsx';
 import AdminStudentPage from './pages/admin/AdminStudentPage.tsx';
 import AdminTeacherPage from './pages/admin/AdminTeacherPage.tsx';
-import ArticleDetailPage from './pages/ArticleDetailPage.tsx';
+import ArticleCreatePage from './pages/articles/ArticleCreatePage.tsx';
+import ArticleDetailPage from './pages/articles/ArticleDetailPage.tsx';
+import ArticleUpdatePage from './pages/articles/ArticleUpdatePage.tsx';
 import AddAssignmentPage from './pages/assignments/AddAssignmentPage.tsx';
 import AssignmentDetailPage from './pages/assignments/AssignmentDetailPage.tsx';
 import AssignmentSessionPage from './pages/assignments/AssignmentSessionPage.tsx';
 import EditAssignmentPage from './pages/assignments/EditAssignmentPage.tsx';
-import CourseDetailPage from './pages/CourseDetailPage.tsx';
-import CoursePage from './pages/CoursePage.tsx';
-import { LoginPage } from './pages/LoginPage.tsx';
-import ProfilePage from './pages/ProfilePage.tsx';
-import ArticleCreatePage from './pages/teachers/ArticleCreatePage.tsx';
-import ArticleUpdatePage from './pages/teachers/ArticleUpdatePage.tsx';
-import { WeatherPage } from './pages/WeatherPage.tsx';
+import { LoginPage } from './pages/common/LoginPage.tsx';
+import ProfilePage from './pages/common/ProfilePage.tsx';
+import { WeatherPage } from './pages/common/WeatherPage.tsx';
+import CourseDetailPage from './pages/course/CourseDetailPage.tsx';
+import CoursePage from './pages/course/CoursePage.tsx';
 import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 
@@ -39,6 +39,9 @@ const queryClient = new QueryClient({
         }
         return failureCount < 3;
       },
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
     },
   },
 });
@@ -73,8 +76,29 @@ const App: React.FC = () => {
               path='/*'
               element={
                 <ErrorBoundary>
-                  <RequireAuth allowedRoles={[Role.User]}>
-                    <MainLayout>
+                  <MainLayout>
+                    <RequireAuth allowedRoles={[Role.Teacher]}>
+                      <Routes>
+                        <Route
+                          path='/course/:courseId/assignment/:assignmentId/edit'
+                          element={<EditAssignmentPage />}
+                        />
+                        <Route
+                          path='/course/:courseId/assignment/add'
+                          element={<AddAssignmentPage />}
+                        />
+                        <Route
+                          path='/course/:courseId/article/:articleId/edit'
+                          element={<ArticleUpdatePage />}
+                        />
+                        <Route
+                          path='/course/:courseId/article/new'
+                          element={<ArticleCreatePage />}
+                        />
+                      </Routes>
+                    </RequireAuth>
+
+                    <RequireAuth allowedRoles={[Role.User]}>
                       <Routes>
                         <Route path='/dashboard' element={<WeatherPage />} />
                         <Route path='/course' element={<CoursePage />} />
@@ -83,16 +107,8 @@ const App: React.FC = () => {
                           element={<CourseDetailPage />}
                         />
                         <Route
-                          path='/course/:courseId/article/new'
-                          element={<ArticleCreatePage />}
-                        />
-                        <Route
                           path='/course/:courseId/article/:articleId'
                           element={<ArticleDetailPage />}
-                        />
-                        <Route
-                          path='/course/:courseId/article/:articleId/edit'
-                          element={<ArticleUpdatePage />}
                         />
                         <Route
                           path='student/:studentId'
@@ -102,33 +118,20 @@ const App: React.FC = () => {
                           path='teacher/:teacherId'
                           element={<ProfilePage />}
                         />
-
-                        <Route
-                          path='/course/:courseId/assignment/add'
-                          element={<AddAssignmentPage />}
-                        />
-
                         <Route
                           path='/course/:courseId/assignment/:assignmentId'
                           element={<AssignmentDetailPage />}
                         />
-
-                        <Route
-                          path='/course/:courseId/assignment/:assignmentId/edit'
-                          element={<EditAssignmentPage />}
-                        />
-
                         <Route
                           path='/course/:courseId/assignment/:assignmentId/session/:submissionId'
                           element={<AssignmentSessionPage />}
                         />
-
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path='/settings' element={<div>Settings</div>} />
                         <Route path='*' element={<div>Not Found</div>} />
                       </Routes>
-                    </MainLayout>
-                  </RequireAuth>
+                    </RequireAuth>
+                  </MainLayout>
                 </ErrorBoundary>
               }
             />

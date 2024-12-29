@@ -27,7 +27,7 @@ export function getDefaultPath(): string {
   const role = getRole();
 
   if (role === Role.Admin) {
-    return '/admin';
+    return '/admin/dashboard';
   } else {
     return '/dashboard';
   }

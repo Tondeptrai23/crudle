@@ -1,3 +1,4 @@
+import Student, { StudentResponse } from './student';
 import { TeacherResponse } from './teacher';
 
 export interface CourseResponse {
@@ -7,6 +8,7 @@ export interface CourseResponse {
   Code: string;
   StartDate: string;
   Teacher: TeacherResponse;
+  Students?: StudentResponse[];
 }
 
 export default interface Course {
@@ -17,6 +19,7 @@ export default interface Course {
   code: string;
   teacherName: string;
   teacherId: string;
+  students?: Student[];
 }
 
 export interface CreateCourseDTO {
