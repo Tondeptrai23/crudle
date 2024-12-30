@@ -98,11 +98,7 @@ export const useStudentCourses = () => {
 
 export const useRoleBasedCourses = (
   role: string,
-  {
-    enabled = true,
-  }: {
-    enabled: boolean;
-  },
+  options?: { enabled?: boolean } 
 ) => {
   const queryFn =
     role === Role.Student
@@ -114,6 +110,6 @@ export const useRoleBasedCourses = (
     queryFn: queryFn,
     retry: 3,
     staleTime: 5 * 60 * 1000,
-    enabled,
+    enabled: options?.enabled ?? true, 
   });
 };
