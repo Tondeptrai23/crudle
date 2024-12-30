@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Calendar } from '@/components/common/ui/calendar';
-import EventCard from '@/components/dashboard/eventCard'; // Adjust the import path as necessary
+import EventCard from '@/components/dashboard/eventCard';
 import { useUpcomingAssignments } from '@/hooks/api/useStudentApi';
 import { EventCardSkeleton } from '@/components/dashboard/EventCardSkeleton';
+import Sidebar from '@/components/nav/Sidebar';
 
 export const DashboardPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -18,9 +19,7 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className='flex min-h-screen flex-row gap-4'>
-      <div className='w-72 rounded-md border-2 border-slate-800 text-center'>
-        Sidebar
-      </div>
+      <Sidebar />
       <div className='container m-8 flex flex-col gap-4'>
         <h2 className='text-2xl font-semibold'>Upcoming events</h2>
         <div className='flex flex-row gap-12'>
