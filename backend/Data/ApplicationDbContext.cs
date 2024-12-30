@@ -163,6 +163,9 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder.Entity<StudentAnswerExam>()
+            .HasKey(stAnsExam => stAnsExam.StudentAnswerId);
+        
+        modelBuilder.Entity<StudentAnswerExam>()
             .HasOne<ExamQuestion>(stAnsExam => stAnsExam.ExamQuestion)
             .WithMany(examQues => examQues.StudentAnswers)
             .HasForeignKey(stAnsExam => stAnsExam.ExamQuestionId)
