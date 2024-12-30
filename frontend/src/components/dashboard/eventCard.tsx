@@ -53,7 +53,7 @@ const EventCard: React.FC<EventCardProps> = ({
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className='pt-0'>
             <div className='mt-4 flex items-center gap-2'>
               <div className='text-lg font-medium'>Course:</div>
               <Link
