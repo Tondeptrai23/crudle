@@ -2,7 +2,7 @@
 
 public class StudentAnswerExam
 {
-    public int? StudentAnswerId { get; set; }
+    public int StudentAnswerId { get; set; }
     
     public int ExamQuestionId { get; set; }
     

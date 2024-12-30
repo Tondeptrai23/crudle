@@ -17,6 +17,7 @@ public static class AppServicesConfigExtension
         services.AddScoped<IQuestionService, QuestionService>();
         services.AddScoped<IAssignmentService, AssignmentService>();
         services.AddScoped<IAssignmentSubmissionService, AssignmentSubmissionService>();
+        services.AddScoped<IExamService, ExamService>();
         services.AddSingleton(new JwtSettings().ReadFromEnvironment());
 
         return services;

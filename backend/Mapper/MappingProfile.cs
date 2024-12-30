@@ -1,9 +1,11 @@
+using _3w1m.Constants;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Answers;
 using _3w1m.Dtos.Article;
-using _3w1m.Dtos.Article;
 using _3w1m.Dtos.Assignment;
 using _3w1m.Dtos.Course;
+using _3w1m.Dtos.Exam;
+using _3w1m.Dtos.Exam.Student;
 using _3w1m.Dtos.Questions;
 using _3w1m.Dtos.Student;
 using _3w1m.Dtos.Teacher;
@@ -45,7 +47,7 @@ public class MappingProfile : Profile
         CreateMap<Article, ArticleDto>()
             .ForMember(dest => dest.ReadAt,
                 opt =>
-                        opt.MapFrom(scr => scr.ArticleProgresses.Any() ? scr.ArticleProgresses.First().ReadAt : null));
+                    opt.MapFrom(scr => scr.ArticleProgresses.Any() ? scr.ArticleProgresses.First().ReadAt : null));
         CreateMap<ArticleDto, StudentArticleResponseDto>()
             .ForMember(dest => dest.IsRead,
                 opt => opt.MapFrom(src => src.ReadAt != null));
@@ -70,14 +72,14 @@ public class MappingProfile : Profile
         CreateMap<UpdateAssignmentRequestDto, Assignment>();
         CreateMap<Assignment, AssignmentForStudentDto>();
         CreateMap<AssignmentDto, AssignmentForStudentDto>();
- 
+
         CreateMap<CreateQuestionRequestDto, Question>();
         CreateMap<Question, QuestionDto>();
         CreateMap<QuestionDto, Question>();
         CreateMap<Question, QuestionForStudentDto>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
-                src.Type == "Fill In Blank" 
-                    ? new List<AnswerForStudentDto>() 
+                src.Type.Equals(QuestionType.FillInBlank, StringComparison.OrdinalIgnoreCase)
+                    ? new List<AnswerForStudentDto>()
                     : src.Answers.Select(answer => new AnswerForStudentDto
                     {
                         QuestionId = answer.QuestionId,
@@ -89,8 +91,8 @@ public class MappingProfile : Profile
 
         CreateMap<QuestionDto, QuestionForStudentDto>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
-                src.Type == "Fill In Blank" 
-                    ? new List<AnswerForStudentDto>() 
+                src.Type.Equals(QuestionType.FillInBlank, StringComparison.OrdinalIgnoreCase)
+                    ? new List<AnswerForStudentDto>()
                     : src.Answers.Select(answer => new AnswerForStudentDto
                     {
                         QuestionId = answer.QuestionId,
@@ -115,5 +117,52 @@ public class MappingProfile : Profile
         CreateMap<AssignmentSubmission, AssignmentSubmissionForStudentDto>();
         CreateMap<AssignmentSubmissionDto, AssignmentSubmissionResponseDto>();
         CreateMap<AssignmentSubmissionMinimalDto, AssignmentSubmissionResponseDto>();
+
+        CreateMap<Exam, ExamDto>()
+            .ForMember(dest => dest.NumberOfSubmissions, opt => opt.MapFrom(src => src.Submissions.Count));
+        CreateMap<ExamDto, Exam>();
+        CreateMap<Exam, ExamMinimalDto>();
+        CreateMap<ExamMinimalDto, Exam>();
+        CreateMap<CreateExamRequestDto, Exam>();
+        CreateMap<UpdateExamRequestDto, Exam>()
+            .ForAllMembers(opt =>
+                opt.Condition((_, _, srcMember) => srcMember != null));
+        CreateMap<UpdateMinimalExamRequestDto, Exam>()
+            .ForAllMembers(opt =>
+                opt.Condition((_, _, srcMember) => srcMember != null));
+
+        CreateMap<ExamQuestion, ExamQuestionDto>();
+        CreateMap<ExamQuestionDto, ExamQuestion>();
+        CreateMap<ExamQuestion, ExamQuestionForStudentDto>()
+            .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src =>
+                src.Type.Equals(QuestionType.FillInBlank, StringComparison.OrdinalIgnoreCase)
+                    ? new List<ExamAnswerForStudentDto>()
+                    : src.ExamAnswers.Select(answer =>
+                        new ExamAnswerForStudentDto
+                        {
+                            AnswerId = answer.AnswerId,
+                            ExamQuestionId = answer.ExamQuestionId,
+                            Value = answer.Value
+                        }
+                    ).ToList()
+            ));
+        CreateMap<ExamQuestionDto, ExamQuestionForStudentDto>()
+            .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src =>
+                src.Type.Equals(QuestionType.FillInBlank, StringComparison.OrdinalIgnoreCase)
+                    ? new List<ExamAnswerForStudentDto>()
+                    : src.ExamAnswers.Select(answer =>
+                        new ExamAnswerForStudentDto
+                        {
+                            AnswerId = answer.AnswerId,
+                            ExamQuestionId = answer.ExamQuestionId,
+                            Value = answer.Value
+                        }
+                    ).ToList()
+            ));
+
+        CreateMap<ExamAnswer, ExamAnswerDto>();
+        CreateMap<ExamAnswerDto, ExamAnswer>();
+        CreateMap<ExamAnswer, ExamAnswerForStudentDto>();
+        CreateMap<ExamAnswerDto, ExamAnswerForStudentDto>();
     }
 }
