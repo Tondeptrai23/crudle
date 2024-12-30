@@ -77,26 +77,40 @@ const App: React.FC = () => {
               element={
                 <ErrorBoundary>
                   <MainLayout>
-                    <RequireAuth allowedRoles={[Role.Teacher]}>
-                      <Routes>
-                        <Route
-                          path='/course/:courseId/assignment/:assignmentId/edit'
-                          element={<EditAssignmentPage />}
-                        />
-                        <Route
-                          path='/course/:courseId/assignment/add'
-                          element={<AddAssignmentPage />}
-                        />
-                        <Route
-                          path='/course/:courseId/article/:articleId/edit'
-                          element={<ArticleUpdatePage />}
-                        />
-                        <Route
-                          path='/course/:courseId/article/new'
-                          element={<ArticleCreatePage />}
-                        />
-                      </Routes>
-                    </RequireAuth>
+                    <Routes>
+                      <Route
+                        path='/course/:courseId/assignment/:assignmentId/edit'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <EditAssignmentPage />
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path='/course/:courseId/add-assignment'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <AddAssignmentPage />
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path='/course/:courseId/article/:articleId/edit'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <ArticleUpdatePage />
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path='/course/:courseId/add-article'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <ArticleCreatePage />
+                          </RequireAuth>
+                        }
+                      />
+                    </Routes>
 
                     <RequireAuth allowedRoles={[Role.User]}>
                       <Routes>
@@ -128,7 +142,6 @@ const App: React.FC = () => {
                         />
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path='/settings' element={<div>Settings</div>} />
-                        <Route path='*' element={<div>Not Found</div>} />
                       </Routes>
                     </RequireAuth>
                   </MainLayout>
