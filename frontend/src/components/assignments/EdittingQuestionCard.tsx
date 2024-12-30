@@ -3,6 +3,7 @@ import { Button } from '@/components/common/ui/button';
 import { Card } from '@/components/common/ui/card';
 import { Input } from '@/components/common/ui/input';
 import { CreateQuestionDto } from '@/types/assignment';
+import { generateUniqueId } from '@/utils/helper.ts';
 import { useState } from 'react';
 import { Label } from '../common/ui/label.tsx';
 import EditingAnswerCard from './EditingAnswerCard.tsx';
@@ -142,7 +143,7 @@ const EditingQuestionCard = ({
           onClick={() => {
             const newAnswers = [
               ...answers,
-              { answerId: answers.length, value: '', isCorrect: false },
+              { answerId: generateUniqueId(), value: '', isCorrect: false },
             ];
             setAnswers(newAnswers);
           }}

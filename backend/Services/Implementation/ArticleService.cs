@@ -61,7 +61,7 @@ public class ArticleService : IArticleService
 
         var article = await spec.Apply(_dbContext.Articles)
             .Where(ar => ar.CourseId == courseId && ar.ArticleId == articleId)
-            .FirstOrDefaultAsync(); 
+            .FirstOrDefaultAsync();
 
         if (article == null)
         {
@@ -256,14 +256,14 @@ public class ArticleService : IArticleService
             query = query.Where(x => x.Content.Contains(queryDto.Content));
         }
 
-        if (queryDto.CreatedAt != default)
+        if (queryDto is { CreatedAtFrom: not null, CreatedAtTo: not null })
         {
-            query = query.Where(x => x.CreatedAt == queryDto.CreatedAt);
+            query = query.Where(x => x.CreatedAt >= queryDto.CreatedAtFrom && x.CreatedAt <= queryDto.CreatedAtTo);
         }
 
-        if (queryDto.UpdatedAt != default)
+        if (queryDto is { UpdatedAtFrom: not null, CreatedAtTo: not null})
         {
-            query = query.Where(x => x.UpdatedAt == queryDto.UpdatedAt);
+            query = query.Where(x => x.UpdatedAt == queryDto.UpdatedAtFrom && x.UpdatedAt == queryDto.UpdatedAtTo);
         }
 
         return query;
@@ -295,6 +295,9 @@ public class ArticleService : IArticleService
             "content" => orderDirection == "asc"
                 ? query.OrderBy(ar => ar.Content)
                 : query.OrderByDescending(ar => ar.Content),
+            "order" => orderDirection == "asc"
+                ? query.OrderBy(ar => ar.Order)
+                : query.OrderByDescending(ar => ar.Order),
             "createdat" => orderDirection == "asc"
                 ? query.OrderBy(ar => ar.CreatedAt)
                 : query.OrderByDescending(ar => ar.CreatedAt),

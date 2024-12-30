@@ -10,6 +10,7 @@ import { Button } from '@/components/common/ui/button';
 import { Card } from '@/components/common/ui/card';
 import LoadingButton from '@/components/common/ui/LoadingButton';
 import { Skeleton } from '@/components/common/ui/skeleton';
+import CourseLayout from '@/components/course/CourseLayout';
 import {
   useGetAssignment,
   useStartAssignment,
@@ -17,6 +18,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import useAuth from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/utils';
+import { Role } from '@/types/enums';
 import { useCustomParams } from '@/utils/helper';
 import {
   Calendar,
@@ -45,14 +47,9 @@ const AssignmentDetailPage = () => {
 
   if (isLoading) {
     return (
-      <div className='flex min-h-screen flex-row gap-4'>
-        <div className='w-72 rounded-md border-2 border-slate-800 text-center'>
-          Sidebar
-        </div>
-        <div className='container m-4'>
-          <AssignmentDetailSkeleton />
-        </div>
-      </div>
+      <CourseLayout>
+        <AssignmentDetailSkeleton />
+      </CourseLayout>
     );
   }
 
@@ -91,88 +88,85 @@ const AssignmentDetailPage = () => {
   };
 
   return (
-    <div className='flex min-h-screen flex-row gap-4'>
-      <div className='w-72 rounded-md border-2 border-slate-800 text-center'>
-        Sidebar
-      </div>
-
-      <div className='container m-4'>
-        {/* Header Section */}
-        <div className='mb-8'>
-          <div className='flex items-center justify-between'>
-            <div className='space-y-2'>
-              <h1 className='text-3xl font-bold tracking-tight'>
-                {assignment.name}
-              </h1>
-              <div className='mt-2 flex items-center gap-2 sm:flex-col sm:items-start'>
-                {assignment.dueDate && (
-                  <Badge
-                    variant='secondary'
-                    className='flex items-center gap-2'
-                  >
-                    <Calendar className='h-4 w-4' />
-                    Due: {formatDate(assignment.dueDate)}
-                  </Badge>
-                )}
-                <Badge variant='outline' className='flex items-center gap-2'>
-                  <Clock className='h-4 w-4' />
-                  {assignment.canRetry
-                    ? 'Multiple attempts allowed'
-                    : 'Single attempt only'}
+    <CourseLayout lastHeaderItem={assignment.name}>
+      {/* Header Section */}
+      <div className='mb-8'>
+        <div className='flex items-center justify-between'>
+          <div className='space-y-2'>
+            <h1 className='text-3xl font-bold tracking-tight'>
+              {assignment.name}
+            </h1>
+            <div className='mt-2 flex items-center gap-2 sm:flex-col sm:items-start'>
+              {assignment.dueDate && (
+                <Badge variant='secondary' className='flex items-center gap-2'>
+                  <Calendar className='h-4 w-4' />
+                  Due: {formatDate(assignment.dueDate)}
                 </Badge>
-              </div>
-            </div>
-            <div className='flex flex-col items-end gap-2'>
-              {role === 'Teacher' && (
-                <Button
-                  variant='default'
-                  className='bg-blue-600 hover:bg-blue-700'
-                  onClick={() => navigate(`./edit`)}
-                >
-                  <Edit className='mr-2 h-4 w-4' />
-                  Edit Assignment
-                </Button>
               )}
-              <Button
-                variant='outline'
-                onClick={() => navigate('..', { relative: 'path' })}
-              >
-                <Undo2 className='mr-2 h-4 w-4' />
-                Return
-              </Button>
+              <Badge variant='outline' className='flex items-center gap-2'>
+                <Clock className='h-4 w-4' />
+                {assignment.canRetry
+                  ? 'Multiple attempts allowed'
+                  : 'Single attempt only'}
+              </Badge>
             </div>
           </div>
-        </div>
-
-        <div className='space-y-4'>
-          {/* Main Content */}
-          <Card className='border-2'>
-            <Accordion
-              type='single'
-              collapsible
-              className='w-full'
-              defaultValue='assignment-details'
+          <div className='flex flex-col items-end gap-2'>
+            {role === Role.Teacher && (
+              <Button
+                variant='default'
+                className='bg-blue-600 hover:bg-blue-700'
+                onClick={() => navigate(`./edit`)}
+              >
+                <Edit className='mr-2 h-4 w-4' />
+                Edit Assignment
+              </Button>
+            )}
+            <Button
+              variant='outline'
+              onClick={() =>
+                navigate('../..?tab=assignments', { relative: 'path' })
+              }
             >
-              <AccordionItem value='assignment-details' className='border-none'>
-                <AccordionTrigger className='px-6 py-4 hover:no-underline'>
-                  <div className='flex items-center gap-2'>
-                    <FileText className='h-5 w-5 text-blue-600' />
-                    <p className='text-base'>Assignment Details</p>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className='px-6 pb-4'>
-                  <div className='prose max-w-none space-y-6'>
-                    <div className='rounded-lg bg-slate-100 p-6'>
-                      <div className='whitespace-pre-wrap'>
-                        {assignment.content}
-                      </div>
-                    </div>
+              <Undo2 className='mr-2 h-4 w-4' />
+              Return
+            </Button>
+          </div>
+        </div>
+      </div>
 
-                    <div className='flex justify-between text-sm text-slate-600'>
-                      <div className='space-y-1'>
-                        <p>Created: {formatDate(assignment.createdAt)}</p>
-                        <p>Last updated: {formatDate(assignment.updatedAt)}</p>
-                      </div>
+      <div className='space-y-4'>
+        {/* Main Content */}
+        <Card className='border-2'>
+          <Accordion
+            type='single'
+            collapsible
+            className='w-full'
+            defaultValue='assignment-details'
+          >
+            <AccordionItem value='assignment-details' className='border-none'>
+              <AccordionTrigger className='px-6 py-4 hover:no-underline'>
+                <div className='flex items-center gap-2'>
+                  <FileText className='h-5 w-5 text-blue-600' />
+                  <p className='text-base'>Assignment Details</p>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className='px-6 pb-4'>
+                <div className='prose max-w-none space-y-6'>
+                  <div className='rounded-lg bg-slate-100 p-6'>
+                    <div className='whitespace-pre-wrap'>
+                      {assignment.content}
+                    </div>
+                  </div>
+
+                  <div className='flex justify-between text-sm text-slate-600'>
+                    <div className='space-y-1'>
+                      <p className='m-0'>
+                        Created: {formatDate(assignment.createdAt)}
+                      </p>
+                      <p>Last updated: {formatDate(assignment.updatedAt)}</p>
+                    </div>
+                    <div className='self-end'>
                       {assignment.canViewScore && (
                         <Badge variant='secondary'>
                           Scores visible to students
@@ -180,58 +174,55 @@ const AssignmentDetailPage = () => {
                       )}
                     </div>
                   </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </Card>
+
+        {/* Questions Section */}
+        {role === Role.Teacher ? (
+          <Card className='border-2'>
+            <Accordion type='single' collapsible className='w-full'>
+              <AccordionItem value='questions-section' className='border-none'>
+                <AccordionTrigger className='px-6 py-4 hover:no-underline'>
+                  <div className='flex items-center gap-2'>
+                    <FileQuestion className='h-5 w-5 text-blue-600' />
+                    <p className='text-base'>Questions Section</p>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className='px-6 pb-4'>
+                  <div className='space-y-4'>
+                    {assignment.questions.map((question, index) => (
+                      <QuestionCard
+                        key={question.questionId}
+                        showButton={false}
+                        question={question}
+                        index={index}
+                        onDelete={() => {}}
+                        onQuestionChange={() => {}}
+                      />
+                    ))}
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
           </Card>
-
-          {/* Questions Section */}
-          {role === 'Teacher' ? (
-            <Card className='border-2'>
-              <Accordion type='single' collapsible className='w-full'>
-                <AccordionItem
-                  value='questions-section'
-                  className='border-none'
-                >
-                  <AccordionTrigger className='px-6 py-4 hover:no-underline'>
-                    <div className='flex items-center gap-2'>
-                      <FileQuestion className='h-5 w-5 text-blue-600' />
-                      <p className='text-base'>Questions Section</p>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className='px-6 pb-4'>
-                    <div className='space-y-4'>
-                      {assignment.questions.map((question, index) => (
-                        <QuestionCard
-                          key={question.questionId}
-                          showButton={false}
-                          question={question}
-                          index={index}
-                          onDelete={() => {}}
-                          onQuestionChange={() => {}}
-                        />
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </Card>
-          ) : (
-            <div className='flex items-center justify-center'>
-              <LoadingButton
-                size='lg'
-                className='bg-blue-500 hover:bg-blue-700'
-                onClick={handleStartAssignment}
-                isLoading={isStarting}
-              >
-                <Send className='mr-2 h-5 w-5' />
-                {isStarting ? 'Starting...' : 'Start Assignment'}
-              </LoadingButton>
-            </div>
-          )}
-        </div>
+        ) : (
+          <div className='flex items-center justify-center'>
+            <LoadingButton
+              size='lg'
+              className='bg-blue-500 hover:bg-blue-700'
+              onClick={handleStartAssignment}
+              isLoading={isStarting}
+            >
+              <Send className='mr-2 h-5 w-5' />
+              {isStarting ? 'Starting...' : 'Start Assignment'}
+            </LoadingButton>
+          </div>
+        )}
       </div>
-    </div>
+    </CourseLayout>
   );
 };
 

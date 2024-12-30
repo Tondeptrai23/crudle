@@ -2,7 +2,7 @@ import Assignment, { UpcomingAssignment } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Student, {
   CreateStudentDTO,
-  StudentCollectionResponse,
+  StudentResponse,
   UpdateStudentDTO,
 } from '@/types/student';
 import api from '@/utils/api';
@@ -52,19 +52,8 @@ export default class StudentService {
       throw new Error(response.data.Message);
     }
 
-    const students: Student[] = response.data.Data.map(
-      (student: StudentCollectionResponse) => {
-        return {
-          id: student.StudentId,
-          fullname: student.Fullname,
-          dob: student.DateOfBirth,
-          userId: student.UserId,
-        };
-      },
-    );
-
     return {
-      data: students,
+      data: response.data.Data.map(mapToStudent),
       totalItems: response.data.TotalItems,
       totalPages: response.data.TotalPages,
       currentPage: response.data.CurrentPage,
@@ -108,14 +97,7 @@ export default class StudentService {
       throw new Error(response.data.Message);
     }
 
-    return {
-      id: response.data.Data.StudentId,
-      fullname: response.data.Data.Fullname,
-      email: response.data.Data.Email,
-      role: 'Student',
-      dob: response.data.Data.DateOfBirth,
-      userId: response.data.Data.UserId,
-    };
+    return mapToStudent(response.data.Data);
   };
 
   getUpcomingAssignments: (date: Date) => Promise<UpcomingAssignment[]> =
@@ -146,3 +128,11 @@ export default class StudentService {
       }
     };
 }
+
+export const mapToStudent = (response: StudentResponse): Student => ({
+  id: response.StudentId,
+  fullname: response.Fullname,
+  email: response.Email,
+  dob: response.DateOfBirth,
+  userId: response.UserId,
+});

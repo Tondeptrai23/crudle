@@ -40,3 +40,9 @@ export const useCustomParams = () => {
 
   return customParams;
 };
+
+export const generateUniqueId = (): number => {
+  return parseInt(
+    Date.now().toString() + Math.floor(Math.random() * 1000).toString(),
+  );
+};

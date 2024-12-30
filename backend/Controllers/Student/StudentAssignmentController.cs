@@ -1,14 +1,10 @@
 using _3w1m.Constants;
 using _3w1m.Dtos;
-using _3w1m.Dtos.Article;
-using _3w1m.Dtos.Course;
 using _3w1m.Dtos.Assignment;
-using _3w1m.Dtos.Questions;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
 using _3w1m.Specifications;
-using _3w1m.Specifications.Interface;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -27,16 +23,20 @@ public class StudentAssignmentController : ControllerBase
     private readonly IStudentService _studentService;
     private readonly IArticleService _articleService;
     private readonly IAssignmentService _assignmentService;
+    private readonly IAssignmentSubmissionService _assignmentSubmissionService;
     private readonly IMapper _mapper;
 
-    public StudentAssignmentController(UserManager<User> userManager, ICourseService courseService, IStudentService studentService,
-        IArticleService articleService, IAssignmentService assignmentService, IMapper mapper)
+    public StudentAssignmentController(UserManager<User> userManager, ICourseService courseService,
+        IStudentService studentService,
+        IArticleService articleService, IAssignmentService assignmentService,
+        IAssignmentSubmissionService assignmentSubmissionService, IMapper mapper)
     {
         _userManager = userManager;
         _courseService = courseService;
         _studentService = studentService;
         _articleService = articleService;
         _assignmentService = assignmentService;
+        _assignmentSubmissionService = assignmentSubmissionService;
         _mapper = mapper;
     }
 
@@ -83,7 +83,8 @@ public class StudentAssignmentController : ControllerBase
 
     [HttpGet]
     [Route("{assignmentId:int}/Resume/{submissionId:int}")]
-    public async Task<IActionResult> ResumeAssignment([FromRoute] int courseId, [FromRoute] int assignmentId, [FromRoute] int submissionId)
+    public async Task<IActionResult> ResumeAssignment([FromRoute] int courseId, [FromRoute] int assignmentId,
+        [FromRoute] int submissionId)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -102,7 +103,8 @@ public class StudentAssignmentController : ControllerBase
 
     [HttpPost]
     [Route("{assignmentId:int}/Submit")]
-    public async Task<IActionResult> SubmitAssignment([FromRoute] int courseId, [FromRoute] int assignmentId, [FromBody] AssignmentSubmissionRequestDto submitAssignmentDto)
+    public async Task<IActionResult> SubmitAssignment([FromRoute] int courseId, [FromRoute] int assignmentId,
+        [FromBody] AssignmentSubmissionRequestDto submitAssignmentDto)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -116,7 +118,66 @@ public class StudentAssignmentController : ControllerBase
         }
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-        var response = await _assignmentService.SubmitAssignmentAsync(courseId, assignmentId, student.StudentId, submitAssignmentDto);
+        var response =
+            await _assignmentService.SubmitAssignmentAsync(courseId, assignmentId, student.StudentId,
+                submitAssignmentDto);
         return Ok(new ResponseDto<AssignmentSubmissionResponseDto>(response));
+    }
+
+
+    [HttpGet]
+    [Route("{assignmentId:int}/Submissions")]
+    public async Task<IActionResult> GetSubmissionsHistory([FromRoute] int courseId, [FromRoute] int assignmentId,
+        [FromQuery] AssignmentSubmissionCollectionQueryDto queryDto)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This student is not enrolled in this course.");
+        }
+
+        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
+
+        var (totalItems, submissionDtos) =
+            await _assignmentSubmissionService.GetSubmissionsHistoryAsync(courseId, assignmentId, student.StudentId,
+                queryDto);
+        return Ok(new PaginationResponseDto<IEnumerable<AssignmentSubmissionMinimalDto>>
+            (
+                data: submissionDtos,
+                totalItems: totalItems,
+                page: queryDto.Page,
+                size: queryDto.Size)
+        );
+    }
+
+    [HttpGet]
+    [Route("{assignmentId:int}/Submissions/{submissionId:int}")]
+    public async Task<IActionResult> GetDetailSubmission([FromRoute] int courseId, [FromRoute] int assignmentId,
+        [FromRoute] int submissionId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id))
+        {
+            throw new ForbiddenException("This student is not enrolled in this course.");
+        }
+
+        var student = await _studentService.GetStudentByUserIdAsync(user.Id);
+
+
+        var submission =
+            await _assignmentSubmissionService.GetDetailSubmissionForStudentAsync(courseId, assignmentId,
+                submissionId, student.StudentId);
+
+        return Ok(new ResponseDto<AssignmentSubmissionForStudentDto>(submission));
     }
 }

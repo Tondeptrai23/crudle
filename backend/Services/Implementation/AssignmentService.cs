@@ -7,6 +7,7 @@ using _3w1m.Services.Interface;
 using _3w1m.Specifications.Interface;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace _3w1m.Services.Implementation;
 
@@ -253,6 +254,7 @@ public class AssignmentService : IAssignmentService
     }
 
     public async Task<AssignmentSubmissionResponseDto> SubmitAssignmentAsync(int courseId, int assignmentId,
+<<<<<<< HEAD
        int studentId,
        AssignmentSubmissionRequestDto requestDto)
     {
@@ -263,12 +265,41 @@ public class AssignmentService : IAssignmentService
             throw new ResourceNotFoundException("Submission not found");
         }
 
+=======
+        int studentId,
+        AssignmentSubmissionRequestDto requestDto)
+    {
+>>>>>>> main
         var assignment = await _dbContext.Assignments
             .Include(asgmt => asgmt.Questions)
             .ThenInclude(question => question.Answers)
             .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId
                                       && c.CourseId == courseId);
 
+
+        if (assignment == null)
+        {
+            throw new ResourceNotFoundException("Assignment not found");
+        }
+        
+        var submission = await _dbContext.AssignmentSubmissions
+            .Include(s => s.Answers)
+            .FirstOrDefaultAsync(s => s.SubmissionId == requestDto.SubmissionId && s.StudentId == studentId);
+        if (submission == null)
+        {
+            throw new ResourceNotFoundException("Submission not found");
+        }
+
+        if (!submission.Answers.IsNullOrEmpty())
+        {
+            if (!assignment.CanRetry)
+            {
+                throw new ForbiddenException("Student is only allowed to submit once");
+            }
+
+            throw new ConflictException("Start another submission to submit for this assignment again");
+        }
+        
         var score = 0;
         var studentAnswers = new List<StudentAnswer>();
         foreach (var answer in requestDto.Answers)

@@ -4,6 +4,7 @@ import {
   AlertTitle,
 } from '@/components/common/ui/alert';
 import { Button } from '@/components/common/ui/button';
+import { getDefaultPath } from '@/components/nav/config';
 import {
   ForbiddenError,
   NotFoundError,
@@ -18,7 +19,7 @@ interface ErrorPageProps {
 }
 
 const ErrorPage: React.FC<ErrorPageProps> = ({ error }) => {
-  const goHome = () => (window.location.href = '/');
+  const goHome = () => (window.location.href = getDefaultPath());
 
   const getErrorDetails = () => {
     switch (error?.name) {

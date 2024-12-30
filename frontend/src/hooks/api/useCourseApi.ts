@@ -1,5 +1,6 @@
 import CourseService from '@/services/CourseService';
 import { CreateCourseDTO } from '@/types/course';
+import { Role } from '@/types/enums';
 import { QueryHookParams } from '@/types/table';
 import {
   keepPreviousData,
@@ -13,6 +14,7 @@ const courseService = new CourseService();
 const courseKeys = {
   lists: () => ['courses'],
   detail: (id: string) => ['courses', id],
+  articles: (courseId: string) => ['courses', courseId, 'articles'],
 };
 
 export const useCourses = (data: QueryHookParams) => {
@@ -53,6 +55,13 @@ export const useCourses = (data: QueryHookParams) => {
   });
 };
 
+export const useCourseDetail = (role: string, id: string) => {
+  return useQuery({
+    queryKey: courseKeys.detail(id),
+    queryFn: () => courseService.getCourse(role, id),
+  });
+};
+
 export const useCreateCourse = () => {
   const queryClient = useQueryClient();
 
@@ -89,11 +98,14 @@ export const useStudentCourses = () => {
 
 export const useRoleBasedCourses = (role: string) => {
   const queryFn =
-    role === 'Student'
-      ? courseService.getCoursesByStudent
-      : courseService.getCoursesByTeacher;
+    role === Role.Student
+      ? async () => courseService.getCoursesByStudent()
+      : async () => courseService.getCoursesByTeacher();
+
   return useQuery({
-    queryKey: ['courses'],
-    queryFn,
+    queryKey: ['courses', role],
+    queryFn: queryFn,
+    retry: 3,
+    staleTime: 5 * 60 * 1000,
   });
 };

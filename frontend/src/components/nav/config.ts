@@ -10,14 +10,18 @@ export function getNavItems(): { label: string; path: string }[] {
 
   if (role === Role.Admin) {
     return [
-      { label: 'Home', path: '/admin' },
+      { label: 'Home', path: '/admin/dashboard' },
       { label: 'Course', path: '/admin/course' },
       { label: 'Teacher', path: '/admin/teacher' },
       { label: 'Student', path: '/admin/student' },
     ];
   } else {
     return [
+<<<<<<< HEAD
       { label: 'Dashboard', path: '/' },
+=======
+      { label: 'Dashboard', path: '/dashboard' },
+>>>>>>> main
       { label: 'Course', path: '/course' },
     ];
   }
@@ -27,8 +31,8 @@ export function getDefaultPath(): string {
   const role = getRole();
 
   if (role === Role.Admin) {
-    return '/admin';
+    return '/admin/dashboard';
   } else {
-    return '/';
+    return '/dashboard';
   }
 }

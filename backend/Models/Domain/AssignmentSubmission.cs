@@ -7,7 +7,7 @@ public class AssignmentSubmission
     public DateTime StartedAt { get; set; }
     public DateTime SubmittedAt { get; set; }
     
-    public double Score { get; set; }
+    public double? Score { get; set; }
     
     public int AssignmentId { get; set; }
 

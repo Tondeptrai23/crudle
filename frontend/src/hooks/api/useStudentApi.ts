@@ -84,10 +84,9 @@ export const useUpdateStudent = () => {
 };
 
 export const useStudentDetail = (id: string) => {
-  console.log(id);
   return useQuery({
     queryKey: ['studentDetail', id],
-    queryFn: () => StudentService.getStudentById(id),
+    queryFn: () => studentService.getStudentById(id),
     staleTime: 5 * 60 * 1000,
     retry: false,
     refetchOnWindowFocus: false,

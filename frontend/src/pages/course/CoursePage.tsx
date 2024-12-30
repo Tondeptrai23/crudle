@@ -1,11 +1,11 @@
-import React from 'react';
-import { useRoleBasedCourses } from '@/hooks/api/useCourseApi';
 import { CourseCard } from '@/components/course/CourseCard';
 import CourseSkeleton from '@/components/course/CourseSkeleton';
-import { mapToCourse } from '@/services/CourseService';
+import { useRoleBasedCourses } from '@/hooks/api/useCourseApi';
+import useAuth from '@/hooks/useAuth';
+import React from 'react';
 
 const CoursePage: React.FC = () => {
-  const role = sessionStorage.getItem('role');
+  const { role } = useAuth();
   const {
     data: courses,
     isLoading: isLoading,
@@ -30,9 +30,7 @@ const CoursePage: React.FC = () => {
         Courses
       </h1>
       <div className='grid w-full gap-6'>
-        {courses?.map((course) => (
-          <CourseCard key={course.CourseId} {...mapToCourse(course)} />
-        ))}
+        {courses?.map((course) => <CourseCard key={course.id} {...course} />)}
         {!courses?.length && (
           <p className='col-span-full text-center text-red-500'>
             No courses available
