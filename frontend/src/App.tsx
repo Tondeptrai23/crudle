@@ -19,19 +19,11 @@ import AddAssignmentPage from './pages/assignments/AddAssignmentPage.tsx';
 import AssignmentDetailPage from './pages/assignments/AssignmentDetailPage.tsx';
 import AssignmentSessionPage from './pages/assignments/AssignmentSessionPage.tsx';
 import EditAssignmentPage from './pages/assignments/EditAssignmentPage.tsx';
-<<<<<<< HEAD
-import CourseDetailPage from './pages/CourseDetailPage.tsx';
-import CoursePage from './pages/CoursePage.tsx';
-import { LoginPage } from './pages/LoginPage.tsx';
-import ProfilePage from './pages/ProfilePage.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
-=======
 import { LoginPage } from './pages/common/LoginPage.tsx';
 import ProfilePage from './pages/common/ProfilePage.tsx';
-import { WeatherPage } from './pages/common/WeatherPage.tsx';
 import CourseDetailPage from './pages/course/CourseDetailPage.tsx';
 import CoursePage from './pages/course/CoursePage.tsx';
->>>>>>> main
 import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 
@@ -87,9 +79,6 @@ const App: React.FC = () => {
                   <MainLayout>
                     <RequireAuth allowedRoles={[Role.Teacher]}>
                       <Routes>
-<<<<<<< HEAD
-                        <Route path='/' element={<DashboardPage />} />
-=======
                         <Route
                           path='/course/:courseId/assignment/:assignmentId/edit'
                           element={<EditAssignmentPage />}
@@ -111,8 +100,7 @@ const App: React.FC = () => {
 
                     <RequireAuth allowedRoles={[Role.User]}>
                       <Routes>
-                        <Route path='/dashboard' element={<WeatherPage />} />
->>>>>>> main
+                        <Route path='/dashboard' element={<DashboardPage />} />
                         <Route path='/course' element={<CoursePage />} />
                         <Route
                           path='/course/:courseId'
