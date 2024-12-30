@@ -31,4 +31,7 @@ public interface IAssignmentService
     public Task<AssignmentStartResponseDto> ResumeAssignmentAsync(int submissionId);
 
     Task<(int count, IEnumerable<UpcomingAssignmentDto>)> GetAssignmentsByStudentId(int studentId, int year, int month);
+
+    Task<(int count, IEnumerable<UpcomingAssignmentDto>)> GetAssignmentsByTeacherId(int teacherId, int year, int month);
+
 }

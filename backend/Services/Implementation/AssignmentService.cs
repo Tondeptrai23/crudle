@@ -410,7 +410,26 @@ public class AssignmentService : IAssignmentService
             throw new ResourceNotFoundException("Course not found");
         }
 
-        // Get first and last day of the month
+        var firstDayOfMonth = new DateTime(year, month, 1);
+        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+        var assignments = _dbContext.Assignments
+            .Include(a => a.Course)
+            .Where(a => courses.Contains(a.CourseId) &&
+                        a.DueDate >= firstDayOfMonth &&
+                        a.DueDate <= lastDayOfMonth);
+
+        var count = await assignments.CountAsync();
+        return (count, _mapper.Map<IEnumerable<UpcomingAssignmentDto>>(await assignments.ToListAsync()));
+    }
+
+    public async Task<(int count, IEnumerable<UpcomingAssignmentDto>)> GetAssignmentsByTeacherId(int teacherId, int year, int month)
+    {
+        var courses = await _dbContext.Courses
+                        .Where(c => c.TeacherId == teacherId)
+                        .Select(c => c.CourseId)
+                        .ToListAsync();
+
         var firstDayOfMonth = new DateTime(year, month, 1);
         var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
