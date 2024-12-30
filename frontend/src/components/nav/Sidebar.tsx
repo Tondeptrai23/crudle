@@ -18,7 +18,7 @@ const LoadingSkeleton = () => (
 
 const Sidebar = () => {
   const { role } = useAuth();
-  const { data: items, isLoading, error, isError } = useRoleBasedCourses(role);
+  const { data: items, isLoading, error, isError } = useRoleBasedCourses(role, { enabled: true });
   const { courseId } = useParams();
   const [selectedId, setSelectedId] = useState<string>(courseId ?? '');
   const navigate = useNavigate();

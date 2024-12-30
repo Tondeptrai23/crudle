@@ -13,7 +13,7 @@ const AddAssignmentPage = () => {
   const handleSave = async (formData: CreateAssignmentDto) => {
     await createAssignment.mutateAsync(formData);
 
-    navigate(`/course/${courseId}/assignment`);
+    navigate(`/course/${courseId}`);
   };
 
   return (
