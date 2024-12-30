@@ -1,3 +1,4 @@
+import { UpcomingAssignment } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Teacher, {
   CreateTeacherDTO,
@@ -92,22 +93,50 @@ export default class TeacherService {
       throw new Error(response.data.Message);
     }
   };
-  
-  getTeacherById: (id: string) => Promise<Teacher> = async (id) => {  
+
+  getTeacherById: (id: string) => Promise<Teacher> = async (id) => {
     await new Promise((resolve) => setTimeout(resolve, 200));
     const response = await api.get(`/api/teacher/${id}`);
-  
+
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
-  
+
     const teacher: Teacher = {
       id: response.data.Data.TeacherId,
       fullname: response.data.Data.Fullname,
       contactEmail: response.data.Data.ContactEmail,
       contactPhone: response.data.Data.ContactPhone,
     };
-  
+
     return teacher;
-  }
+  };
+
+  getUpcomingAssignments: (date: Date) => Promise<UpcomingAssignment[]> =
+    async (date: Date) => {
+      try {
+        const query = `month=${date.getMonth()}&year=${date.getFullYear()}`;
+        const response = await api.get(
+          `api/teacher/assignment/upcoming?${query}`,
+        );
+
+        if (!response.data.Success) {
+          throw new Error(response.data.Message);
+        }
+        return response.data.Data.map((assignment: any) => {
+          return {
+            assignmentId: assignment.AssignmentId,
+            name: assignment.Name,
+            dueDate: new Date(assignment.DueDate),
+            courseId: assignment.CourseId,
+            courseName: assignment.CourseName,
+          };
+        });
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Error(`Failed to fetch assignments: ${error.message}`);
+        }
+        throw error;
+      }
+    };
 }

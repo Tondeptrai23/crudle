@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Calendar } from '@/components/common/ui/calendar';
 import EventCard from '@/components/dashboard/eventCard';
-import { useUpcomingAssignments } from '@/hooks/api/useStudentApi';
 import { EventCardSkeleton } from '@/components/dashboard/EventCardSkeleton';
 import Sidebar from '@/components/nav/Sidebar';
+import { useUpcomingAssignments } from '@/hooks/api/useTeacherApi';
 
 export const TeacherDashboardPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -39,7 +39,7 @@ export const TeacherDashboardPage: React.FC = () => {
                 <EventCardSkeleton />
               </>
             )}
-            {/* {!isLoading && filteredAssignments?.length === 0 && (
+            {!isLoading && filteredAssignments?.length === 0 && (
               <div className='flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 text-center'>
                 <h3 className='text-lg font-semibold text-gray-900'>
                   No assignments due on {selectedDate.toDateString()}
@@ -48,7 +48,7 @@ export const TeacherDashboardPage: React.FC = () => {
                   Select another date to view assignments
                 </p>
               </div>
-            )} */}
+            )}
             {filteredAssignments?.map((assignment) => (
               <EventCard
                 key={assignment.assignmentId}

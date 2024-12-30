@@ -1,4 +1,5 @@
 import TeacherService from '@/services/TeacherService';
+import { UpcomingAssignment } from '@/types/assignment';
 import { QueryHookParams } from '@/types/table';
 import { CreateTeacherDTO, UpdateTeacherDTO } from '@/types/teacher';
 import {
@@ -75,6 +76,15 @@ export const useUpdateTeacher = () => {
       await teacherService.updateTeacher(id, data);
       queryClient.invalidateQueries({ queryKey: teacherKeys.lists() });
       queryClient.invalidateQueries({ queryKey: teacherKeys.detail(id) });
+    },
+  });
+};
+
+export const useUpcomingAssignments = (date: Date) => {
+  return useQuery<UpcomingAssignment[], Error>({
+    queryKey: ['upcomingAssignments', date],
+    queryFn: async () => {
+      return await teacherService.getUpcomingAssignments(date);
     },
   });
 };
