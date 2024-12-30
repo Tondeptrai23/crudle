@@ -13,6 +13,15 @@ export const DashboardPage: React.FC = () => {
     error,
   } = useUpcomingAssignments(selectedDate);
 
+  const eventDates =
+    assignments?.map((assignment) => new Date(assignment.dueDate)) ?? [];
+
+  const filteredAssignments = assignments?.filter(
+    (assignment) =>
+      new Date(assignment.dueDate).toDateString() ===
+      selectedDate.toDateString(),
+  );
+
   if (error) {
     throw error;
   }
@@ -29,18 +38,18 @@ export const DashboardPage: React.FC = () => {
                 <EventCardSkeleton />
                 <EventCardSkeleton />
               </>
-            )}{' '}
-            {!isLoading && assignments?.length === 0 && (
-              <div className='text-cent er flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8'>
+            )}
+            {!isLoading && filteredAssignments?.length === 0 && (
+              <div className='flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 text-center'>
                 <h3 className='text-lg font-semibold text-gray-900'>
-                  No upcoming assignments
+                  No assignments due on {selectedDate.toDateString()}
                 </h3>
                 <p className='text-sm text-gray-500'>
-                  There are no assignments due this month.
+                  Select another date to view assignments
                 </p>
               </div>
             )}
-            {assignments?.map((assignment) => (
+            {filteredAssignments?.map((assignment) => (
               <EventCard
                 key={assignment.assignmentId}
                 assignmentName={assignment.name}
@@ -57,6 +66,25 @@ export const DashboardPage: React.FC = () => {
               selected={selectedDate}
               onSelect={setSelectedDate}
               className='rounded-md border'
+              modifiers={{ hasEvent: eventDates }}
+              modifiersStyles={{
+                hasEvent: {
+                  fontWeight: 'bold',
+                },
+              }}
+              components={{
+                DayContent: ({ date }) => (
+                  <div className='relative flex flex-col items-center pb-2'>
+                    <span className=''>{date.getDate()}</span>{' '}
+                    {eventDates.some(
+                      (eventDate) =>
+                        eventDate.toDateString() === date.toDateString(),
+                    ) && (
+                      <div className='absolute bottom-0 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-primary' />
+                    )}
+                  </div>
+                ),
+              }}
             />
           </div>
         </div>
