@@ -7,6 +7,11 @@ import Sidebar from '@/components/nav/Sidebar';
 
 export const StudentDashboardPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date || new Date());
+  };
+
   const {
     data: assignments,
     isLoading,
@@ -64,7 +69,7 @@ export const StudentDashboardPage: React.FC = () => {
             <Calendar
               mode='single'
               selected={selectedDate}
-              onSelect={setSelectedDate}
+              onSelect={handleDateSelect}
               className='rounded-md border'
               modifiers={{ hasEvent: eventDates }}
               modifiersStyles={{
@@ -88,40 +93,7 @@ export const StudentDashboardPage: React.FC = () => {
             />
           </div>
         </div>
-        <h2 className='text-2xl font-semibold'>Results</h2>
-        <table className='min-w-full divide-y divide-gray-200'>
-          <thead className='bg-gray-50'>
-            <tr>
-              <th
-                scope='col'
-                className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
-              >
-                Assignment ID
-              </th>
-              <th
-                scope='col'
-                className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
-              >
-                Assignment Name
-              </th>
-              <th
-                scope='col'
-                className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500'
-              >
-                Grade
-              </th>
-            </tr>
-          </thead>
-          <tbody className='divide-y divide-gray-200 bg-white'>
-            <tr>
-              <td className='whitespace-nowrap px-6 py-4'>CS101</td>
-              <td className='whitespace-nowrap px-6 py-4'>
-                Introduction to Computer Science
-              </td>
-              <td className='whitespace-nowrap px-6 py-4'>A</td>
-            </tr>
-          </tbody>
-        </table>
+        <h2 className='text-2xl font-semibold'>Unread articles</h2>
       </div>
     </div>
   );
