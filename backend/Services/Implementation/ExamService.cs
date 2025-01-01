@@ -85,6 +85,7 @@ public class ExamService : IExamService
         var exam = _mapper.Map<Exam>(createExamRequestDto);
 
         exam.CourseId = courseId;
+        exam.EndDate = createExamRequestDto.StartDate.AddMinutes(createExamRequestDto.Duration);
         exam.CreatedAt = DateTime.Now;
         exam.UpdatedAt = DateTime.Now;
 
@@ -122,15 +123,12 @@ public class ExamService : IExamService
             exam.StartDate = updateExamRequestDto.StartDate.Value;
         }
 
-        if (updateExamRequestDto.EndDate != null)
-        {
-            exam.EndDate = updateExamRequestDto.EndDate.Value;
-        }
-
         if (updateExamRequestDto.Duration != null)
         {
             exam.Duration = updateExamRequestDto.Duration.Value;
         }
+
+        exam.EndDate = exam.StartDate.AddMinutes(exam.Duration);
 
         if (updateExamRequestDto.ExamQuestions != null)
         {
@@ -205,6 +203,8 @@ public class ExamService : IExamService
 
         _mapper.Map(updateMinimalExamRequestDto, exam);
         exam.CourseId = courseId;
+        exam.UpdatedAt = DateTime.Now;
+        exam.EndDate = exam.StartDate.AddMinutes(exam.Duration);
 
         _context.Update(exam);
         await _context.SaveChangesAsync();
