@@ -79,8 +79,7 @@ public class TeacherExamController : Controller
     }
 
     [HttpPost]
-    [Route("{examId:int}")]
-    public async Task<IActionResult> CreateExamAsync([FromRoute] int courseId, [FromRoute] int examId,
+    public async Task<IActionResult> CreateExamAsync([FromRoute] int courseId,
         [FromBody] CreateExamRequestDto createExamRequestDto)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -96,10 +95,10 @@ public class TeacherExamController : Controller
             throw new ForbiddenException("You are not enrolled in this course");
         }
 
-        var exam = await _examService.CreateExamAsync(courseId, teacher.TeacherId, examId, createExamRequestDto);
+        var exam = await _examService.CreateExamAsync(courseId, teacher.TeacherId, createExamRequestDto);
         return Ok(new ResponseDto<ExamDto>(exam));
     }
-    
+
     [HttpPut]
     [Route("{examId:int}")]
     public async Task<IActionResult> UpdateExamAsync([FromRoute] int courseId, [FromRoute] int examId,
@@ -121,7 +120,7 @@ public class TeacherExamController : Controller
         var exam = await _examService.UpdateExamAsync(courseId, teacher.TeacherId, examId, updateExamRequestDto);
         return Ok(new ResponseDto<ExamDto>(exam));
     }
-    
+
     [HttpPatch]
     [Route("{examId:int}")]
     public async Task<IActionResult> UpdatePartiallyExamAsync([FromRoute] int courseId, [FromRoute] int examId,
@@ -140,7 +139,29 @@ public class TeacherExamController : Controller
             throw new ForbiddenException("You are not enrolled in this course");
         }
 
-        var exam = await _examService.UpdatePartiallyExamAsync(courseId, teacher.TeacherId, examId, updateMinimalExamRequestDto);
+        var exam = await _examService.UpdatePartiallyExamAsync(courseId, teacher.TeacherId, examId,
+            updateMinimalExamRequestDto);
         return Ok(new ResponseDto<ExamMinimalDto>(exam));
+    }
+
+    [HttpDelete]
+    [Route("{examId:int}")]
+    public async Task<IActionResult> DeleteExamAsync([FromRoute] int courseId, [FromRoute] int examId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
+
+        if (await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id) == false)
+        {
+            throw new ForbiddenException("You are not enrolled in this course");
+        }
+
+        var isDeleted = await _examService.DeleteExamAsync(courseId, examId, teacher.TeacherId);
+        return Ok(new GeneralDeleteResponseDto { Success = isDeleted });
     }
 }

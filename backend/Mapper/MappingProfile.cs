@@ -123,7 +123,8 @@ public class MappingProfile : Profile
         CreateMap<ExamDto, Exam>();
         CreateMap<Exam, ExamMinimalDto>();
         CreateMap<ExamMinimalDto, Exam>();
-        CreateMap<CreateExamRequestDto, Exam>();
+        CreateMap<CreateExamRequestDto, Exam>()
+            .ForMember(dest => dest.ExamQuestions, opt => opt.MapFrom(src => src.Questions));
         CreateMap<UpdateExamRequestDto, Exam>()
             .ForAllMembers(opt =>
                 opt.Condition((_, _, srcMember) => srcMember != null));
@@ -164,5 +165,8 @@ public class MappingProfile : Profile
         CreateMap<ExamAnswerDto, ExamAnswer>();
         CreateMap<ExamAnswer, ExamAnswerForStudentDto>();
         CreateMap<ExamAnswerDto, ExamAnswerForStudentDto>();
+
+        CreateMap<CreateExamQuestionRequestDto, ExamQuestion>();
+        CreateMap<CreateExamAnswerRequestDto, ExamAnswer>();
     }
 }

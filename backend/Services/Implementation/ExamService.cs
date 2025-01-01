@@ -1,4 +1,5 @@
-﻿using _3w1m.Data;
+﻿using System.Diagnostics;
+using _3w1m.Data;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Course;
 using _3w1m.Dtos.Exam;
@@ -8,6 +9,7 @@ using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace _3w1m.Services.Implementation;
 
@@ -67,7 +69,7 @@ public class ExamService : IExamService
         throw new NotImplementedException();
     }
 
-    public async Task<ExamDto> CreateExamAsync(int courseId, int teacherId, int examId,
+    public async Task<ExamDto> CreateExamAsync(int courseId, int teacherId,
         CreateExamRequestDto createExamRequestDto)
     {
         if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
@@ -75,9 +77,16 @@ public class ExamService : IExamService
             throw new ResourceNotFoundException("Course not found");
         }
 
+        if (await _context.Exams.AnyAsync(e => e.ExamId == createExamRequestDto.ExamId))
+        {
+            throw new ConflictException("Exam with this id already exists");
+        }
+
         var exam = _mapper.Map<Exam>(createExamRequestDto);
-        exam.ExamId = examId;
+
         exam.CourseId = courseId;
+        exam.CreatedAt = DateTime.Now;
+        exam.UpdatedAt = DateTime.Now;
 
         await _context.Exams.AddAsync(exam);
         await _context.SaveChangesAsync();
@@ -94,6 +103,8 @@ public class ExamService : IExamService
         }
 
         var exam = await _context.Exams
+            .Include(e => e.ExamQuestions)
+            .ThenInclude(eq => eq.ExamAnswers)
             .FirstOrDefaultAsync(e => e.CourseId == courseId && e.ExamId == examId);
 
         if (exam == null)
@@ -101,11 +112,76 @@ public class ExamService : IExamService
             throw new ResourceNotFoundException("Exam not found");
         }
 
-        _mapper.Map(updateExamRequestDto, exam );
-        
-        exam.CourseId = courseId;
-        exam.UpdatedAt = DateTime.Now;
-        
+        if (updateExamRequestDto.Name != null)
+        {
+            exam.Name = updateExamRequestDto.Name;
+        }
+
+        if (updateExamRequestDto.StartDate != null)
+        {
+            exam.StartDate = updateExamRequestDto.StartDate.Value;
+        }
+
+        if (updateExamRequestDto.EndDate != null)
+        {
+            exam.EndDate = updateExamRequestDto.EndDate.Value;
+        }
+
+        if (updateExamRequestDto.Duration != null)
+        {
+            exam.Duration = updateExamRequestDto.Duration.Value;
+        }
+
+        if (updateExamRequestDto.ExamQuestions != null)
+        {
+            foreach (var questionDto in updateExamRequestDto.ExamQuestions)
+            {
+                if (exam.ExamQuestions.Any(q => q.ExamQuestionId == questionDto.ExamQuestionId))
+                {
+                    // Update actions 
+                    var question = exam.ExamQuestions.First(q => q.ExamQuestionId == questionDto.ExamQuestionId);
+                    question.Content = questionDto.Content;
+                    question.Type = questionDto.Type;
+                    if (!questionDto.ExamAnswers.IsNullOrEmpty())
+                    {
+                        // Handle add new or update existing answers
+                        foreach (var answerDto in questionDto.ExamAnswers)
+                        {
+                            if (question.ExamAnswers.Any(a => a.AnswerId == answerDto.AnswerId))
+                            {
+                                var answer = question.ExamAnswers.First(a => a.AnswerId == answerDto.AnswerId);
+                                answer.Value = answerDto.Value;
+                                answer.IsCorrect = answerDto.IsCorrect;
+                            }
+                            else
+                            {
+                                question.ExamAnswers.Add(new ExamAnswer
+                                {
+                                    Value = answerDto.Value,
+                                    IsCorrect = answerDto.IsCorrect
+                                });
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var newQuestion = new ExamQuestion
+                    {
+                        ExamId = examId,
+                        Content = questionDto.Content,
+                        Type = questionDto.Type,
+                        ExamAnswers = questionDto.ExamAnswers.Select(a => new ExamAnswer
+                        {
+                            Value = a.Value,
+                            IsCorrect = a.IsCorrect
+                        }).ToList()
+                    };
+                    exam.ExamQuestions.Add(newQuestion);
+                }
+            }
+        }
+
         await _context.SaveChangesAsync();
 
         return _mapper.Map<ExamDto>(exam);
@@ -127,7 +203,7 @@ public class ExamService : IExamService
             throw new ResourceNotFoundException("Exam not found");
         }
 
-        exam = _mapper.Map<Exam>(updateMinimalExamRequestDto);
+        _mapper.Map(updateMinimalExamRequestDto, exam);
         exam.CourseId = courseId;
 
         _context.Update(exam);
@@ -136,9 +212,23 @@ public class ExamService : IExamService
         return _mapper.Map<ExamDto>(exam);
     }
 
-    public Task<GeneralDeleteResponseDto> DeleteExamAsync(int courseId, int examId, int teacherId)
+    public async Task<bool> DeleteExamAsync(int courseId, int examId, int teacherId)
     {
-        throw new NotImplementedException();
+        if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
+        {
+            throw new ResourceNotFoundException("Course not found");
+        }
+
+        var exam = await _context.Exams
+            .FirstOrDefaultAsync(e => e.CourseId == courseId && e.ExamId == examId);
+
+        if (exam == null)
+        {
+            throw new ResourceNotFoundException("Exam not found");
+        }
+
+        _context.Exams.Remove(exam);
+        return await _context.SaveChangesAsync() > 0;
     }
 
     private IQueryable<Exam> ApplyFilter(IQueryable<Exam> query, ExamQueryCollectionDto queryDto)

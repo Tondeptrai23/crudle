@@ -11,11 +11,11 @@ public interface IExamService
 
     Task<ExamDto> GetDetailExamForTeacherAsync(int courseId, int examId, int teacherId);
     Task<ExamDto> GetDetailExamForStudentAsync(int courseId, int examId, int studentId);
-    Task<ExamDto> CreateExamAsync(int courseId, int teacherId, int examId, CreateExamRequestDto createExamRequestDto);
+    Task<ExamDto> CreateExamAsync(int courseId, int teacherId, CreateExamRequestDto createExamRequestDto);
     Task<ExamDto> UpdateExamAsync(int courseId, int teacherId, int examId, UpdateExamRequestDto updateExamRequestDto);
 
     Task<ExamMinimalDto> UpdatePartiallyExamAsync(int courseId, int teacherI, int examId,
         UpdateMinimalExamRequestDto updateMinimalExamRequestDto);
 
-    Task<GeneralDeleteResponseDto> DeleteExamAsync(int courseId, int examId, int teacherId);
+    Task<bool> DeleteExamAsync(int courseId, int examId, int teacherId);
 }
