@@ -100,3 +100,11 @@ export interface AssignmentStartDto {
   startedAt: Date;
   questions: Question[];
 }
+
+export interface UpcomingAssignment {
+  assignmentId: number;
+  name: string;
+  dueDate: Date;
+  courseId: number;
+  courseName: string;
+}

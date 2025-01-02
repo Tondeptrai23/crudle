@@ -70,6 +70,8 @@ public class MappingProfile : Profile
         CreateMap<UpdateAssignmentRequestDto, Assignment>();
         CreateMap<Assignment, AssignmentForStudentDto>();
         CreateMap<AssignmentDto, AssignmentForStudentDto>();
+        CreateMap<Assignment, UpcomingAssignmentDto>()
+            .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name));
  
         CreateMap<CreateQuestionRequestDto, Question>();
         CreateMap<Question, QuestionDto>();

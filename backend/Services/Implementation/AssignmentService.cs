@@ -268,7 +268,7 @@ public class AssignmentService : IAssignmentService
         {
             throw new ResourceNotFoundException("Assignment not found");
         }
-        
+
         var submission = await _dbContext.AssignmentSubmissions
             .Include(s => s.Answers)
             .FirstOrDefaultAsync(s => s.SubmissionId == requestDto.SubmissionId && s.StudentId == studentId);
@@ -286,7 +286,7 @@ public class AssignmentService : IAssignmentService
 
             throw new ConflictException("Start another submission to submit for this assignment again");
         }
-        
+
         var score = 0;
         var studentAnswers = new List<StudentAnswer>();
         foreach (var answer in requestDto.Answers)
@@ -389,5 +389,57 @@ public class AssignmentService : IAssignmentService
         }
 
         return query;
+    }
+
+    public async Task<(int count, IEnumerable<UpcomingAssignmentDto>)> GetAssignmentsByStudentId(int studentId, int year, int month)
+    {
+        var student = await _dbContext.Students
+            .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Course)
+            .FirstOrDefaultAsync(s => s.StudentId == studentId);
+
+        if (student == null)
+        {
+            throw new ResourceNotFoundException("Student not found");
+        }
+
+        var courses = student.Enrollments.Select(e => e.CourseId);
+
+        if (courses == null)
+        {
+            throw new ResourceNotFoundException("Course not found");
+        }
+
+        var firstDayOfMonth = new DateTime(year, month, 1);
+        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+        var assignments = _dbContext.Assignments
+            .Include(a => a.Course)
+            .Where(a => courses.Contains(a.CourseId) &&
+                        a.DueDate >= firstDayOfMonth &&
+                        a.DueDate <= lastDayOfMonth);
+
+        var count = await assignments.CountAsync();
+        return (count, _mapper.Map<IEnumerable<UpcomingAssignmentDto>>(await assignments.ToListAsync()));
+    }
+
+    public async Task<(int count, IEnumerable<UpcomingAssignmentDto>)> GetAssignmentsByTeacherId(int teacherId, int year, int month)
+    {
+        var courses = await _dbContext.Courses
+                        .Where(c => c.TeacherId == teacherId)
+                        .Select(c => c.CourseId)
+                        .ToListAsync();
+
+        var firstDayOfMonth = new DateTime(year, month, 1);
+        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+        var assignments = _dbContext.Assignments
+            .Include(a => a.Course)
+            .Where(a => courses.Contains(a.CourseId) &&
+                        a.DueDate >= firstDayOfMonth &&
+                        a.DueDate <= lastDayOfMonth);
+
+        var count = await assignments.CountAsync();
+        return (count, _mapper.Map<IEnumerable<UpcomingAssignmentDto>>(await assignments.ToListAsync()));
     }
 }

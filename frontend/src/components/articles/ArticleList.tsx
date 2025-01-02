@@ -88,7 +88,7 @@ const ArticleList = () => {
         <div className='flex items-center gap-4'>
           {role === Role.Teacher && (
             <Link
-              to={`/course/${courseId}/article/new`}
+              to={`/course/${courseId}/add-article`}
               className='inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground hover:bg-primary/90'
             >
               <Plus className='h-4 w-4' />

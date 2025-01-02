@@ -1,5 +1,3 @@
-import { Link, useParams } from 'react-router-dom';
-import { User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/common/ui/avatar';
 import {
   Card,
@@ -8,32 +6,36 @@ import {
   CardTitle,
 } from '@/components/common/ui/card';
 import { Skeleton } from '@/components/common/ui/skeleton';
-import { useProfileData } from '@/hooks/api/useProfileApi';
-import { useRoleBasedCourses } from '@/hooks/api/useCourseApi';
-import { ProfileSkeleton } from '@/components/user/ProfileSkeleton';
 import ProfileDetail from '@/components/user/ProfileDetail';
+import { ProfileSkeleton } from '@/components/user/ProfileSkeleton';
+import { useRoleBasedCourses } from '@/hooks/api/useCourseApi';
+import { useProfileData } from '@/hooks/api/useProfileApi';
 import { Role } from '@/types/enums';
+import { User } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
 
 const ProfilePage = () => {
   const { studentId, teacherId } = useParams();
   const id = studentId ?? teacherId;
-  const role = studentId
-    ? Role.Student
-    : teacherId
-      ? Role.Teacher
-      : sessionStorage.getItem('role');
+
+  const role =
+    (studentId
+      ? Role.Student
+      : teacherId
+        ? Role.Teacher
+        : sessionStorage.getItem('role')) ?? '';
   const selfViewed = !studentId && !teacherId;
 
   const {
     data: profileData,
     isLoading: isProfileLoading,
     error: error,
-  } = useProfileData(id, role);
+  } = useProfileData(id ?? '', role);
 
-  const shouldLoadCourses = !id;
-  const { data: coursesData, isLoading: isCoursesLoading } = shouldLoadCourses
-    ? useRoleBasedCourses(role)
-    : { data: [], isLoading: false };
+  const { data: coursesData, isLoading: isCoursesLoading } =
+    useRoleBasedCourses(role, {
+      enabled: !id,
+    });
 
   if (isProfileLoading) {
     return <ProfileSkeleton />;
@@ -76,15 +78,15 @@ const ProfilePage = () => {
                 ) : coursesData?.length ? (
                   <ul className='space-y-2'>
                     {coursesData.map((course) => (
-                      <li key={course.CourseId}>
-                        <Link to={`/course/${course.CourseId}`}>
+                      <li key={course.id}>
+                        <Link to={`/course/${course.id}`}>
                           <div className='rounded-lg border p-4 transition-colors hover:bg-gray-100'>
                             <div>
                               <h3 className='text-lg font-semibold'>
-                                {course.Name}
+                                {course.name}
                               </h3>
                               <p className='text-sm text-muted-foreground'>
-                                {course.Description}
+                                {course.description}
                               </p>
                             </div>
                           </div>

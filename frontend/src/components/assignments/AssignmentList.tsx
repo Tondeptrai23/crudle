@@ -101,7 +101,7 @@ const AssignmentList = () => {
           <Button
             variant='default'
             className='inline-flex items-center gap-2'
-            onClick={() => navigate('./assignment/add')}
+            onClick={() => navigate('./add-assignment')}
           >
             <Plus className='h-4 w-4' />
             Add Assignment
