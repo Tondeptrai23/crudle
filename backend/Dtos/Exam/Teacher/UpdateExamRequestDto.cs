@@ -1,4 +1,4 @@
-﻿namespace _3w1m.Dtos.Exam.Student;
+﻿namespace _3w1m.Dtos.Exam.Teacher;
 
 public class UpdateExamRequestDto
 {

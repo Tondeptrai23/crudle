@@ -6,6 +6,9 @@ using _3w1m.Dtos.Assignment;
 using _3w1m.Dtos.Course;
 using _3w1m.Dtos.Exam;
 using _3w1m.Dtos.Exam.Student;
+using _3w1m.Dtos.Exam.Teacher;
+using _3w1m.Dtos.ExamSubmission;
+using _3w1m.Dtos.ExamSubmission.Student;
 using _3w1m.Dtos.Questions;
 using _3w1m.Dtos.Student;
 using _3w1m.Dtos.Teacher;
@@ -168,5 +171,20 @@ public class MappingProfile : Profile
 
         CreateMap<CreateExamQuestionRequestDto, ExamQuestion>();
         CreateMap<CreateExamAnswerRequestDto, ExamAnswer>();
+
+        CreateMap<ExamSubmission, ExamSubmissionDto>()
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Exam.ExamQuestions));
+        CreateMap<ExamSubmissionDto, ExamSubmission>();
+        CreateMap<ExamSubmission, ExamSubmissionResponseDto>()
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
+        CreateMap<ExamSubmissionRequestDto, ExamSubmission>();
+        CreateMap<ExamSubmission, ExamSubmissionRequestDto>()
+            .ForAllMembers(opt => opt.Condition(
+                (_, _, srcMember) => srcMember != null));
+        CreateMap<ExamSubmission, ExamStartResponseDto>()
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Exam.ExamQuestions));
+        
+        CreateMap<ExamStudentAnswerRequestDto, StudentAnswerExam>()
+            .ForMember(dest => dest.ExamQuestionId, opt => opt.MapFrom(src => src.ExamQuestionId));
     }
 }
