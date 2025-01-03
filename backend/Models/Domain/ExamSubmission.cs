@@ -5,7 +5,7 @@ public class ExamSubmission
     public int SubmissionId { get; set; }
     
     public DateTime StartedAt { get; set; }
-    public DateTime SubmittedAt { get; set; }
+    public DateTime? SubmittedAt { get; set; }
     
     public int? Score { get; set; }
     
