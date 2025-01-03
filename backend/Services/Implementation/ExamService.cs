@@ -1,9 +1,13 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices.Marshalling;
 using _3w1m.Data;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Course;
 using _3w1m.Dtos.Exam;
 using _3w1m.Dtos.Exam.Student;
+using _3w1m.Dtos.Exam.Teacher;
+using _3w1m.Dtos.ExamSubmission;
+using _3w1m.Dtos.ExamSubmission.Student;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
@@ -229,6 +233,94 @@ public class ExamService : IExamService
 
         _context.Exams.Remove(exam);
         return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<ExamStartResponseDto> StartExamAsync(int courseId, int examId, int studentId)
+    {
+        if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
+        {
+            throw new ResourceNotFoundException("Course not found");
+        }
+
+        var exam = await _context.Exams.FirstOrDefaultAsync(e => e.ExamId == examId && e.CourseId == courseId);
+        if (exam == null)
+        {
+            throw new ResourceNotFoundException("Exam not found");
+        }
+        
+        if (exam.EndDate < DateTime.Now)
+        {
+            throw new ForbiddenException("Exam has already ended");
+        }
+
+        if (await _context.ExamSubmissions.AnyAsync(es => es.StudentId == studentId && es.ExamId == examId && es.SubmittedAt != null))
+        {
+            throw new ForbiddenException("Student has already submitted the exam");
+        }
+        
+        var examSubmission = new ExamSubmission
+        {
+            StudentId = studentId,
+            ExamId = examId,
+            StartedAt = DateTime.Now
+        };
+
+        await _context.ExamSubmissions.AddAsync(examSubmission);
+        await _context.SaveChangesAsync();
+
+        examSubmission = await _context.ExamSubmissions
+            .Include(es => es.Exam)
+            .ThenInclude(e => e.ExamQuestions)
+            .ThenInclude(eq => eq.ExamAnswers)
+            .FirstOrDefaultAsync(es => es.SubmissionId == examSubmission.SubmissionId);
+        
+        return _mapper.Map<ExamStartResponseDto>(examSubmission);
+    }
+
+    public async Task<ExamSubmissionResponseDto> SubmitExamAsync(int courseId, int examId, int studentId,
+        ExamSubmissionRequestDto examSubmissionRequestDto)
+    {
+        if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
+        {
+            throw new ResourceNotFoundException("Course not found");
+        }
+
+        var exam = await _context.Exams
+            .Include(e => e.ExamQuestions)
+            .ThenInclude(eq => eq.ExamAnswers)
+            .FirstOrDefaultAsync(e => e.ExamId == examId && e.CourseId == courseId);
+
+        if (exam == null)
+        {
+            throw new ResourceNotFoundException("Exam not found");
+        }
+        
+        if (exam.EndDate < DateTime.Now)
+        {
+            throw new ForbiddenException("Exam has already ended");
+        }
+
+        var examSubmission = await _context.ExamSubmissions
+            .Include(es => es.StudentAnswers)
+            .FirstOrDefaultAsync(es => es.SubmissionId == examSubmissionRequestDto.ExamSubmissionId);
+
+        if (examSubmission == null)
+        {
+            throw new ResourceNotFoundException("Exam submission not found");
+        }
+
+        _mapper.Map(examSubmissionRequestDto, examSubmission);
+
+        examSubmission.SubmittedAt = DateTime.Now;
+        var answers = examSubmission.StudentAnswers.Select(sa => sa.Value);
+        var correctAnswers = exam.ExamQuestions.SelectMany(eq => eq.ExamAnswers)
+            .Where(ea => ea.IsCorrect).Select(ea => ea.Value);
+
+        examSubmission.Score = answers.Count(correctAnswers.Contains);
+
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<ExamSubmissionResponseDto>(examSubmission);
     }
 
     private IQueryable<Exam> ApplyFilter(IQueryable<Exam> query, ExamQueryCollectionDto queryDto)

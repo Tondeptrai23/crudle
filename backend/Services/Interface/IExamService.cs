@@ -1,6 +1,9 @@
 ﻿using _3w1m.Dtos;
 using _3w1m.Dtos.Exam;
 using _3w1m.Dtos.Exam.Student;
+using _3w1m.Dtos.Exam.Teacher;
+using _3w1m.Dtos.ExamSubmission;
+using _3w1m.Dtos.ExamSubmission.Student;
 
 namespace _3w1m.Services.Interface;
 
@@ -18,4 +21,7 @@ public interface IExamService
         UpdateMinimalExamRequestDto updateMinimalExamRequestDto);
 
     Task<bool> DeleteExamAsync(int courseId, int examId, int teacherId);
+    
+    Task<ExamStartResponseDto> StartExamAsync(int courseId, int examId, int studentId);
+    Task<ExamSubmissionResponseDto> SubmitExamAsync(int courseId, int examId, int studentId, ExamSubmissionRequestDto examSubmissionRequestDto);
 }

@@ -2,6 +2,7 @@
 using _3w1m.Dtos;
 using _3w1m.Dtos.Exam;
 using _3w1m.Dtos.Exam.Student;
+using _3w1m.Dtos.Exam.Teacher;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
