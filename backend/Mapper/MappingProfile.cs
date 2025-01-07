@@ -183,8 +183,28 @@ public class MappingProfile : Profile
                 (_, _, srcMember) => srcMember != null));
         CreateMap<ExamSubmission, ExamStartResponseDto>()
             .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Exam.ExamQuestions));
-        
+
         CreateMap<ExamStudentAnswerRequestDto, StudentAnswerExam>()
             .ForMember(dest => dest.ExamQuestionId, opt => opt.MapFrom(src => src.ExamQuestionId));
+
+        CreateMap<Exam, ExamStudentResponseDto>()
+            .ForMember(dest => dest.ExamQuestions, opt => opt.MapFrom(src => src.ExamQuestions));
+
+        CreateMap<StudentAnswerExam, ExamStudentAnswerDto>();
+        CreateMap<ExamStudentAnswerDto, StudentAnswerExam>()
+            .ForAllMembers(opt => opt.Condition(
+                (_, _, srcMember) => srcMember != null));
+        CreateMap<StudentAnswerExam, ExamQuestionWithAnswer>()
+            .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src => src.ExamSubmission.StudentAnswers));
+
+        CreateMap<ExamSubmission, ExamSubmissionMinimalDto>()
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
+        
+        CreateMap<ExamSubmission, ExamSubmissionForStudentDto>()
+            .ForMember(dest => dest.ExamQuestions, opt => opt.MapFrom(src => src.Exam.ExamQuestions));
+        CreateMap<ExamQuestion, ExamQuestionWithAnswerForStudent>()
+            .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src => src.ExamAnswers));
+        CreateMap<ExamAnswer, ExamStudentAnswerDto>();
+        CreateMap<ExamStudentAnswerDto, ExamAnswer>();
     }
 }

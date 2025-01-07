@@ -13,7 +13,7 @@ public interface IExamService
         GetExamsAsync(int courseId, int teacherId, ExamQueryCollectionDto queryDto);
 
     Task<ExamDto> GetDetailExamForTeacherAsync(int courseId, int examId, int teacherId);
-    Task<ExamDto> GetDetailExamForStudentAsync(int courseId, int examId, int studentId);
+    Task<ExamStudentResponseDto> GetDetailExamForStudentAsync(int courseId, int examId, int studentId);
     Task<ExamDto> CreateExamAsync(int courseId, int teacherId, CreateExamRequestDto createExamRequestDto);
     Task<ExamDto> UpdateExamAsync(int courseId, int teacherId, int examId, UpdateExamRequestDto updateExamRequestDto);
 
@@ -24,4 +24,5 @@ public interface IExamService
     
     Task<ExamStartResponseDto> StartExamAsync(int courseId, int examId, int studentId);
     Task<ExamSubmissionResponseDto> SubmitExamAsync(int courseId, int examId, int studentId, ExamSubmissionRequestDto examSubmissionRequestDto);
+    
 }

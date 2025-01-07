@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices.Marshalling;
+using _3w1m.Constants;
 using _3w1m.Data;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Course;
@@ -68,9 +69,24 @@ public class ExamService : IExamService
         return _mapper.Map<ExamDto>(exam);
     }
 
-    public Task<ExamDto> GetDetailExamForStudentAsync(int courseId, int examId, int studentId)
+    public async Task<ExamStudentResponseDto> GetDetailExamForStudentAsync(int courseId, int examId, int studentId)
     {
-        throw new NotImplementedException();
+        if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
+        {
+            throw new ResourceNotFoundException("Course not found");
+        }
+        
+        var exam = await _context.Exams
+            .Include(e => e.ExamQuestions)
+            .ThenInclude(eq => eq.ExamAnswers)
+            .FirstOrDefaultAsync(e => e.CourseId == courseId && e.ExamId == examId);
+ 
+        if (exam == null)
+        {
+            throw new ResourceNotFoundException("Exam not found");
+        }
+        
+        return _mapper.Map<ExamStudentResponseDto>(exam);
     }
 
     public async Task<ExamDto> CreateExamAsync(int courseId, int teacherId,
@@ -302,6 +318,7 @@ public class ExamService : IExamService
 
         var examSubmission = await _context.ExamSubmissions
             .Include(es => es.StudentAnswers)
+            .ThenInclude(sa => sa.ExamQuestion)
             .FirstOrDefaultAsync(es => es.SubmissionId == examSubmissionRequestDto.ExamSubmissionId);
 
         if (examSubmission == null)
@@ -316,7 +333,7 @@ public class ExamService : IExamService
         var correctAnswers = exam.ExamQuestions.SelectMany(eq => eq.ExamAnswers)
             .Where(ea => ea.IsCorrect).Select(ea => ea.Value);
 
-        examSubmission.Score = answers.Count(correctAnswers.Contains);
+        examSubmission.Score = answers.Count(a => correctAnswers.Contains(a, StringComparer.OrdinalIgnoreCase));
 
         await _context.SaveChangesAsync();
 
