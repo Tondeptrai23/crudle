@@ -7,9 +7,9 @@ namespace _3w1m.Services.Interface;
 public interface IExamSubmissionService
 {
     
-    Task<(int , ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsAsync(int courseId, int examId, ExamSubmissionQueryCollection queryCollection);
+    Task<(int , ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsAsync(int courseId, int examId, ExamSubmissionQueryCollectionDto queryCollectionDto);
     Task<ExamSubmissionDto> GetDetailExamSubmissionTeacherAsync(int courseId, int examId, int studentId, int examSubmissionId);
     
-    Task<(int , ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsHistoryAsync(int courseId, int examId, int studentId, ExamSubmissionQueryCollection queryCollection);
+    Task<(int , ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsHistoryAsync(int courseId, int examId, int studentId, ExamSubmissionQueryCollectionDto queryCollectionDto);
     Task<ExamSubmissionForStudentDto> GetDetailExamSubmissionStudentAsync(int courseId, int examId, int studentId, int examSubmissionId);
 }

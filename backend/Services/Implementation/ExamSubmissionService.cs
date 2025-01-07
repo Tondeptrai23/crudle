@@ -21,7 +21,7 @@ public class ExamSubmissionService: IExamSubmissionService
         _mapper = mapper;
     }
 
-    public async Task<(int , ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsAsync(int courseId, int examId, ExamSubmissionQueryCollection queryCollection)
+    public async Task<(int , ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsAsync(int courseId, int examId, ExamSubmissionQueryCollectionDto queryCollectionDto)
     {
         if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
         {
@@ -37,9 +37,9 @@ public class ExamSubmissionService: IExamSubmissionService
             .Include(es => es.Student)
             .Where(es => es.ExamId == examId);
         
-        query = ApplyFilter(query, queryCollection);
-        query = ApplyOrder(query, queryCollection);
-        query = ApplyPagination(query, queryCollection);
+        query = ApplyFilter(query, queryCollectionDto);
+        query = ApplyOrder(query, queryCollectionDto);
+        query = ApplyPagination(query, queryCollectionDto);
         
         var examSubmissions = await query.ToListAsync();
         var examSubmissionDtos = _mapper.Map<ICollection<ExamSubmissionMinimalDto>>(examSubmissions);
@@ -75,7 +75,7 @@ public class ExamSubmissionService: IExamSubmissionService
     }
 
     public async Task<(int, ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsHistoryAsync(int courseId, int examId, int studentId,
-        ExamSubmissionQueryCollection queryCollection)
+        ExamSubmissionQueryCollectionDto queryCollectionDto)
     {
         if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
         {
@@ -90,9 +90,9 @@ public class ExamSubmissionService: IExamSubmissionService
         var examSubmission = _context.ExamSubmissions
             .Where(es => es.StudentId == studentId && es.ExamId == examId);
             
-        examSubmission = ApplyFilter(examSubmission, queryCollection);
-        examSubmission = ApplyOrder(examSubmission, queryCollection);
-        examSubmission = ApplyPagination(examSubmission, queryCollection);
+        examSubmission = ApplyFilter(examSubmission, queryCollectionDto);
+        examSubmission = ApplyOrder(examSubmission, queryCollectionDto);
+        examSubmission = ApplyPagination(examSubmission, queryCollectionDto);
         
         var examSubmissionDtos = _mapper.Map<ICollection<ExamSubmissionMinimalDto>>(examSubmission);
         return (await examSubmission.CountAsync(), examSubmissionDtos);
@@ -126,7 +126,7 @@ public class ExamSubmissionService: IExamSubmissionService
     }
 
 
-    private IQueryable<ExamSubmission> ApplyFilter(IQueryable<ExamSubmission> query, ExamSubmissionQueryCollection queryDto)
+    private IQueryable<ExamSubmission> ApplyFilter(IQueryable<ExamSubmission> query, ExamSubmissionQueryCollectionDto queryDto)
     {
         if (queryDto is { StartedFrom: not null, StartedTo: not null })
         {
@@ -147,7 +147,7 @@ public class ExamSubmissionService: IExamSubmissionService
         return query;
     }
 
-    private static IQueryable<ExamSubmission> ApplyOrder(IQueryable<ExamSubmission> query, ExamSubmissionQueryCollection queryDto)
+    private static IQueryable<ExamSubmission> ApplyOrder(IQueryable<ExamSubmission> query, ExamSubmissionQueryCollectionDto queryDto)
     {
         var orderBy = queryDto.OrderBy?.ToLower();
         var orderDirection = queryDto.OrderDirection?.ToLower();
@@ -168,7 +168,7 @@ public class ExamSubmissionService: IExamSubmissionService
         return query;
     }
 
-    private IQueryable<ExamSubmission> ApplyPagination(IQueryable<ExamSubmission> query, ExamSubmissionQueryCollection queryDto)
+    private IQueryable<ExamSubmission> ApplyPagination(IQueryable<ExamSubmission> query, ExamSubmissionQueryCollectionDto queryDto)
     {
         return query.Skip((queryDto.Page - 1) * queryDto.Size)
             .Take(queryDto.Size);

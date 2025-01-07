@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace _3w1m.Controllers.Teacher;
 
-[Route("api/Teacher/{courseId:int}/Exams")]
+[Route("api/Teacher/{courseId:int}/Exam")]
 [ApiController]
 [Authorize(Roles = CourseRoles.Teacher)]
 [Tags("Teacher Exam")]
@@ -22,15 +22,17 @@ public class TeacherExamController : Controller
     private readonly IExamService _examService;
     private readonly ITeacherService _teacherService;
     private readonly ICourseService _courseService;
+    private readonly IExamSubmissionService _examSubmission;
     private readonly UserManager<User> _userManager;
 
     public TeacherExamController(IExamService examService, ITeacherService teacherService, ICourseService courseService,
-        UserManager<User> userManager)
+        UserManager<User> userManager, IExamSubmissionService examSubmission)
     {
         _examService = examService;
         _teacherService = teacherService;
         _courseService = courseService;
         _userManager = userManager;
+        _examSubmission = examSubmission;
     }
 
     [HttpGet]
@@ -164,5 +166,53 @@ public class TeacherExamController : Controller
 
         var isDeleted = await _examService.DeleteExamAsync(courseId, examId, teacher.TeacherId);
         return Ok(new GeneralDeleteResponseDto { Success = isDeleted });
+    }
+    
+    [HttpGet]
+    [Route("{examId:int}/Submission")]
+    public async Task<IActionResult> GetExamSubmissionsAsync([FromRoute] int courseId, [FromRoute] int examId,
+        [FromQuery] ExamSubmissionQueryCollectionDto queryCollectionDto)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
+
+        if (await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id) == false)
+        {
+            throw new ForbiddenException("You are not enrolled in this course");
+        }
+
+        var (total, examSubmissions) = await _examSubmission.GetExamSubmissionsAsync(courseId, examId, queryCollectionDto);
+        return Ok(new PaginationResponseDto<IEnumerable<ExamSubmissionMinimalDto>>(
+            examSubmissions,
+            total,
+            queryCollectionDto.Page,
+            queryCollectionDto.Size));
+    }
+    
+    [HttpGet]
+    [Route("{examId:int}/Submission/{examSubmissionId:int}")]
+    public async Task<IActionResult> GetDetailExamSubmissionAsync([FromRoute] int courseId, [FromRoute] int examId,
+        [FromRoute] int examSubmissionId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
+
+        if (await _courseService.CourseEnrolledUserValidationAsync(courseId, user.Id) == false)
+        {
+            throw new ForbiddenException("You are not enrolled in this course");
+        }
+
+        var examSubmission = await _examSubmission.GetDetailExamSubmissionTeacherAsync(courseId, examId, teacher.TeacherId, examSubmissionId);
+        return Ok(new ResponseDto<ExamSubmissionDto>(examSubmission));
     }
 }
