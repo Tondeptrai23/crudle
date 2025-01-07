@@ -2,6 +2,7 @@
 
 public class ExamMinimalDto
 {
+    public int ExamId { get; set; }
     public string Name { get; set; }   
     
     public string Content { get; set; }

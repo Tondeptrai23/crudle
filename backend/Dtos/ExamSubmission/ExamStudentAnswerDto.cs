@@ -2,7 +2,6 @@
 
 public class ExamStudentAnswerDto
 {
-    public int AnswerId { get; set; }
-    public int ExamQuestionId { get; set; }
+    public int StudentAnswerId { get; set; }
     public string Value { get; set; }
 }
