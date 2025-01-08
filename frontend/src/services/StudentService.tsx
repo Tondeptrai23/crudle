@@ -2,6 +2,7 @@ import Assignment, { UpcomingAssignment } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Student, {
   CreateStudentDTO,
+  mapToStudent,
   StudentResponse,
   UpdateStudentDTO,
 } from '@/types/student';
@@ -129,10 +130,3 @@ export default class StudentService {
     };
 }
 
-export const mapToStudent = (response: StudentResponse): Student => ({
-  id: response.StudentId,
-  fullname: response.Fullname,
-  email: response.Email,
-  dob: response.DateOfBirth,
-  userId: response.UserId,
-});

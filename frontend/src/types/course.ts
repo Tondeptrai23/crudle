@@ -1,4 +1,4 @@
-import Student, { StudentResponse } from './student';
+import Student, { mapToStudent, StudentResponse } from './student';
 import { TeacherResponse } from './teacher';
 
 export interface CourseResponse {
@@ -34,3 +34,14 @@ export interface UpdateCourseDTO {
   description: string;
   teacherId: string | null;
 }
+
+export const mapToCourse = (response: CourseResponse) => ({
+  id: response.CourseId.toString(),
+  name: response.Name,
+  description: response.Description,
+  code: response.Code,
+  startDate: response.StartDate,
+  teacherId: response.Teacher?.TeacherId.toString(),
+  teacherName: response.Teacher?.Fullname,
+  students: response.Students?.map(mapToStudent) ?? [],
+});

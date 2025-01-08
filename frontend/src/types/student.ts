@@ -25,3 +25,11 @@ export interface UpdateStudentDTO {
   fullname?: string;
   dob?: string;
 }
+
+export const mapToStudent = (response: StudentResponse): Student => ({
+  id: response.StudentId,
+  fullname: response.Fullname,
+  email: response.Email,
+  dob: response.DateOfBirth,
+  userId: response.UserId,
+});
