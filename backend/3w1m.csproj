@@ -6,6 +6,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>_3w1m</RootNamespace>
         <NoWarn>NU1605</NoWarn>
+        
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,12 +25,20 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+        <PackageReference Include="Moq" Version="4.20.72" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Migrations\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework">
+        <HintPath>..\..\..\..\..\..\..\home\phanttien\.nuget\packages\mstest.testframework\3.6.1\lib\net8.0\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
