@@ -8,6 +8,10 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper.Configuration.Conventions;
+using Azure;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 [TestClass]
 public class StudentControllerTests
@@ -103,5 +107,43 @@ public class StudentControllerTests
         var response = okResult.Value as ResponseDto<StudentDto>;
         Assert.IsNotNull(response);
         Assert.AreEqual(updatedStudent, response.Data);
+    }
+    [TestMethod]
+    public async Task GetStudentsAsync_ReturnsNotFoundResult()
+    {
+        // Arrange
+        var request = new StudentCollectionQueryDto();
+        _studentServiceMock.Setup(service => service.GetStudentsAsync(request))
+            .ReturnsAsync((0, null));
+    
+        // Act
+        var result = await _controller.GetStudentsAsync(request);
+    
+        // Assert
+        var notFoundResult = result as OkObjectResult;
+        Assert.IsNotNull(notFoundResult);
+        var data = notFoundResult.Value as PaginationResponseDto<IEnumerable<StudentDto>>;
+        
+        Assert.IsNull(data.Data);
+    }
+    
+    
+    [TestMethod]
+    public async Task GetStudentByIdAsync_ReturnsNotFoundResult()
+    {
+        // Arrange
+        int studentId = 1;
+        _studentServiceMock.Setup(service => service.GetStudentByIdAsync(studentId))
+            .ReturnsAsync((StudentDetailDto)null);
+    
+        // Act
+        var result = await _controller.GetStudentByIdAsync(studentId);
+    
+        // Assert
+        var notFoundResult = result as OkObjectResult;
+        Assert.IsNotNull(notFoundResult);
+        var data = notFoundResult.Value as ResponseDto<StudentDetailDto>;
+        
+        Assert.IsNull(data.Data);
     }
 }
