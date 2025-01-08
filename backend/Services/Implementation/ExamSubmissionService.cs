@@ -74,7 +74,7 @@ public class ExamSubmissionService: IExamSubmissionService
         return examSubmissionDto;
     }
 
-    public async Task<(int, ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsHistoryAsync(int courseId, int examId, int studentId,
+    public async Task<(int, ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsHistoryAsync(int courseId, int studentId,
         ExamSubmissionQueryCollectionDto queryCollectionDto)
     {
         if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
@@ -82,13 +82,8 @@ public class ExamSubmissionService: IExamSubmissionService
             throw new ResourceNotFoundException("Course not found");
         }
         
-        if (!await _context.Exams.AnyAsync(e => e.ExamId == examId))
-        {
-            throw new ResourceNotFoundException("Exam not found");
-        }
-        
         var examSubmission = _context.ExamSubmissions
-            .Where(es => es.StudentId == studentId && es.ExamId == examId);
+            .Where(es => es.StudentId == studentId);
             
         examSubmission = ApplyFilter(examSubmission, queryCollectionDto);
         examSubmission = ApplyOrder(examSubmission, queryCollectionDto);
@@ -98,7 +93,7 @@ public class ExamSubmissionService: IExamSubmissionService
         return (await examSubmission.CountAsync(), examSubmissionDtos);
     }
 
-    public async Task<ExamSubmissionForStudentDto> GetDetailExamSubmissionStudentAsync(int courseId, int examId, int studentId, int examSubmissionId)
+    public async Task<ExamSubmissionDto> GetDetailExamSubmissionStudentAsync(int courseId, int examId, int studentId, int examSubmissionId)
     {
         if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
         {
@@ -111,9 +106,11 @@ public class ExamSubmissionService: IExamSubmissionService
         }
         
         var examSubmission = await _context.ExamSubmissions
+            .Include(es => es.Exam)
             .Include(es => es.Student)
             .Include(es => es.StudentAnswers)
             .ThenInclude(sq => sq.ExamQuestion)
+            .ThenInclude(eq => eq.ExamAnswers)
             .FirstOrDefaultAsync(es => es.ExamId == examId && es.StudentId == studentId && es.SubmissionId == examSubmissionId);
 
         if (examSubmission == null)
@@ -121,7 +118,12 @@ public class ExamSubmissionService: IExamSubmissionService
             throw new ResourceNotFoundException("Exam submission not found");
         }
         
-        var examSubmissionDto = _mapper.Map<ExamSubmissionForStudentDto>(examSubmission);
+        if (examSubmission.SubmittedAt == null)
+        {
+            throw new ForbiddenException("Exam submission not submitted yet");
+        }
+        
+        var examSubmissionDto = _mapper.Map<ExamSubmissionDto>(examSubmission);
         return examSubmissionDto;
     }
 

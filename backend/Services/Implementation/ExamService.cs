@@ -1,9 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices.Marshalling;
-using _3w1m.Constants;
-using _3w1m.Data;
-using _3w1m.Dtos;
-using _3w1m.Dtos.Course;
+﻿using _3w1m.Data;
 using _3w1m.Dtos.Exam;
 using _3w1m.Dtos.Exam.Student;
 using _3w1m.Dtos.Exam.Teacher;
@@ -160,10 +155,10 @@ public class ExamService : IExamService
                     var question = exam.ExamQuestions.First(q => q.ExamQuestionId == questionDto.ExamQuestionId);
                     question.Content = questionDto.Content;
                     question.Type = questionDto.Type;
-                    if (!questionDto.ExamAnswers.IsNullOrEmpty())
+                    if (!questionDto.Answers.IsNullOrEmpty())
                     {
                         // Handle add new or update existing answers
-                        foreach (var answerDto in questionDto.ExamAnswers)
+                        foreach (var answerDto in questionDto.Answers)
                         {
                             if (question.ExamAnswers.Any(a => a.AnswerId == answerDto.AnswerId))
                             {
@@ -189,7 +184,7 @@ public class ExamService : IExamService
                         ExamId = examId,
                         Content = questionDto.Content,
                         Type = questionDto.Type,
-                        ExamAnswers = questionDto.ExamAnswers.Select(a => new ExamAnswer
+                        ExamAnswers = questionDto.Answers.Select(a => new ExamAnswer
                         {
                             Value = a.Value,
                             IsCorrect = a.IsCorrect
@@ -258,7 +253,7 @@ public class ExamService : IExamService
             throw new ResourceNotFoundException("Course not found");
         }
 
-        var exam = await _context.Exams.FirstOrDefaultAsync(e => e.ExamId == examId && e.CourseId == courseId);
+        var exam = await _context.Exams.FirstOrDefaultAsync(e => e.ExamId == examId && e.CourseId == courseId );
         if (exam == null)
         {
             throw new ResourceNotFoundException("Exam not found");
