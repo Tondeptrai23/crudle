@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+namespace TestBackend.Controllers.AdminTests;
 [TestClass]
-public class TeacherControllerTests
+public class AdminTeacherControllerTests
 {
     private Mock<ITeacherService> _teacherServiceMock;
     private TeacherController _controller;

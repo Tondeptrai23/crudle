@@ -12,7 +12,7 @@ using Moq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TestBackend.Controllers.StudentControllerTests;
+namespace TestBackend.Controllers.UserTests;
 
 [TestClass]
 public class StudentControllerTests

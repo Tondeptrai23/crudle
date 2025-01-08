@@ -13,8 +13,9 @@ using Azure;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
+namespace TestBackend.Controllers.AdminTests;
 [TestClass]
-public class StudentControllerTests
+public class AdminStudentControllerTests
 {
     private Mock<IStudentService> _studentServiceMock;
     private Mock<IMapper> _mapperMock;
