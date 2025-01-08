@@ -54,7 +54,7 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
         return submissionDto;
     }
 
-    public async Task<AssignmentSubmissionForStudentDto> GetDetailSubmissionForStudentAsync(int courseId,
+    public async Task<AssignmentSubmissionDto> GetDetailSubmissionForStudentAsync(int courseId,
         int assignmentId, int submissionId, int studentId)
     {
         if (!await _dbContext.Courses.AnyAsync(c => c.CourseId == courseId))
@@ -72,9 +72,12 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
             .Include(q =>
                 q.StudentAnswers.Where(sa => sa.SubmissionId == submissionId))
             .Where(q => q.AssignmentId == assignmentId).ToList();
-        var questionWithStudentAnswers = _mapper.Map<ICollection<QuestionWithAnswerForStudentDto>>(questions);
+        var questionWithStudentAnswers = _mapper.Map<ICollection<QuestionWithStudentAnswerDto>>(questions);
 
-        var submissions = _dbContext.AssignmentSubmissions.Include(s => s.Student).Include(s => s.Answers)
+        var submissions = _dbContext.AssignmentSubmissions
+            .Include(s => s.Student)
+            .Include(s => s.Assignment)
+            .Include(s => s.Answers)
             .Where(s => s.AssignmentId == assignmentId);
 
         if (!await submissions.AnyAsync(s => s.SubmissionId == submissionId && s.StudentId == studentId))
@@ -85,8 +88,8 @@ public class AssignmentSubmissionService : IAssignmentSubmissionService
         var submission =
             await submissions.FirstOrDefaultAsync(s => s.SubmissionId == submissionId && s.StudentId == studentId);
 
-        var submissionDto = _mapper.Map<AssignmentSubmissionForStudentDto>(submission);
-        submissionDto.Questions = questionWithStudentAnswers;
+        var submissionDto = _mapper.Map<AssignmentSubmissionDto>(submission);
+        submissionDto.QuestionWithStudentAnswer = questionWithStudentAnswers;
 
         return submissionDto;
     }

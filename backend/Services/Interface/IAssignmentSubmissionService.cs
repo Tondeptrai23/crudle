@@ -33,7 +33,7 @@ public interface IAssignmentSubmissionService
     /// <param name="submissionId">The unique identifier of the Submission</param>
     /// <param name="studentId">The unique identifier of the teacher</param>
     /// <returns>The dto contain details of the detail of a submission</returns>
-    Task<AssignmentSubmissionForStudentDto> GetDetailSubmissionForStudentAsync(int courseId, int assignmentId,
+    Task<AssignmentSubmissionDto> GetDetailSubmissionForStudentAsync(int courseId, int assignmentId,
         int submissionId,
         int studentId);
 
