@@ -7,5 +7,6 @@ public class ExamSubmissionMinimalDto
     public string StudentName { get; set; }
     public DateTime StartedAt { get; set; }
     public DateTime? SubmittedAt { get; set; }
+    public DateTime ExamDueDate { get; set; }
     public int Score { get; set; }
 }

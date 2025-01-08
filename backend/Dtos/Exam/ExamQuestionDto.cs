@@ -8,5 +8,5 @@ public class ExamQuestionDto
     public int ExamId { get; set; }
     public string Content { get; set; }
     public string Type { get; set; }
-    public ICollection<ExamAnswerDto> ExamAnswers { get; set; }
+    public ICollection<ExamAnswerDto> Answers { get; set; }
 }

@@ -2,5 +2,5 @@
 
 public class ExamSubmissionDto: ExamSubmissionMinimalDto
 {
-    public List<ExamQuestionWithAnswer> Questions { get; set; }
+    public List<ExamQuestionWithAnswerDto> Questions { get; set; }
 }

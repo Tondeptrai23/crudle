@@ -135,7 +135,8 @@ public class MappingProfile : Profile
             .ForAllMembers(opt =>
                 opt.Condition((_, _, srcMember) => srcMember != null));
 
-        CreateMap<ExamQuestion, ExamQuestionDto>();
+        CreateMap<ExamQuestion, ExamQuestionDto>()
+            .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.ExamAnswers));
         CreateMap<ExamQuestionDto, ExamQuestion>();
         CreateMap<ExamQuestion, ExamQuestionForStudentDto>()
             .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src =>
@@ -154,7 +155,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src =>
                 src.Type.Equals(QuestionType.FillInBlank, StringComparison.OrdinalIgnoreCase)
                     ? new List<ExamAnswerForStudentDto>()
-                    : src.ExamAnswers.Select(answer =>
+                    : src.Answers.Select(answer =>
                         new ExamAnswerForStudentDto
                         {
                             AnswerId = answer.AnswerId,
@@ -173,7 +174,10 @@ public class MappingProfile : Profile
         CreateMap<CreateExamAnswerRequestDto, ExamAnswer>();
 
         CreateMap<ExamSubmission, ExamSubmissionDto>()
-            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Exam.ExamQuestions));
+            .ForMember(dest=>dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname))
+            .ForMember(dest => dest.Questions , opt => opt.MapFrom(src => src.Exam.ExamQuestions))
+            .ForMember(dest=>dest.ExamDueDate, opt => opt.MapFrom(src => src.Exam.EndDate));
+        
         CreateMap<ExamSubmissionDto, ExamSubmission>();
         CreateMap<ExamSubmission, ExamSubmissionResponseDto>()
             .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
@@ -194,16 +198,24 @@ public class MappingProfile : Profile
         CreateMap<ExamStudentAnswerDto, StudentAnswerExam>()
             .ForAllMembers(opt => opt.Condition(
                 (_, _, srcMember) => srcMember != null));
-        CreateMap<StudentAnswerExam, ExamQuestionWithAnswer>()
-            .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src => src.ExamSubmission.StudentAnswers));
 
         CreateMap<ExamSubmission, ExamSubmissionMinimalDto>()
-            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname))
+            .ForMember(dest => dest.ExamDueDate, opt => opt.MapFrom(src => src.Exam.EndDate));
         
         CreateMap<ExamSubmission, ExamSubmissionForStudentDto>()
             .ForMember(dest => dest.ExamQuestions, opt => opt.MapFrom(src => src.Exam.ExamQuestions));
-        CreateMap<ExamQuestion, ExamQuestionWithAnswerForStudent>()
+        CreateMap<ExamSubmissionDto, ExamSubmissionForStudentDto>()
+            .ForMember(dest => dest.ExamQuestions, opt => opt.MapFrom(src => src.Questions));
+        CreateMap<ExamQuestion, ExamQuestionWithAnswerForStudentDto>()
             .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src => src.ExamAnswers));
+        CreateMap<ExamQuestionDto, ExamQuestionWithAnswerForStudentDto>()
+            .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src => src.Answers));
+        CreateMap<ExamQuestionWithAnswerDto, ExamQuestionWithAnswerForStudentDto>()
+            .ForMember(dest => dest.ExamAnswers, opt => opt.MapFrom(src => src.Answers));
+        CreateMap<ExamQuestion, ExamQuestionWithAnswerDto>()
+            .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.ExamAnswers))
+            .ForMember(dest => dest.StudentAnswer, opt => opt.MapFrom(src => src.StudentAnswers));
         CreateMap<ExamAnswer, ExamStudentAnswerDto>();
         CreateMap<ExamStudentAnswerDto, ExamAnswer>();
     }
