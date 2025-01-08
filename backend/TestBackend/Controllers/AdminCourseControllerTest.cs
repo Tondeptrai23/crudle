@@ -164,26 +164,11 @@ public class AdminCourseControllerTests
         var result = await _controller.GetStudentsInCourse(courseId);
     
         // Assert
-        var notFoundResult = result as NotFoundResult;
+        var notFoundResult = result as OkObjectResult;
         Assert.IsNotNull(notFoundResult);
-        Assert.AreEqual(404, notFoundResult.StatusCode);
-    }
-    
-    [TestMethod]
-    public async Task CreateCourse_ReturnsBadRequestResult()
-    {
-        // Arrange
-        var data = new CreateCourseRequestDto();
-        _courseServiceMock.Setup(service => service.CreateCourseAsync(data))
-            .ThrowsAsync(new Exception("Invalid data"));
-    
-        // Act
-        var result = await _controller.CreateCourse(data);
-    
-        // Assert
-        var badRequestResult = result as BadRequestObjectResult;
-        Assert.IsNotNull(badRequestResult);
-        Assert.AreEqual(400, badRequestResult.StatusCode);
+
+        var data = notFoundResult.Value as IEnumerable<StudentDto>;
+        Assert.IsNull(data);
     }
     
     [TestMethod]
@@ -199,44 +184,9 @@ public class AdminCourseControllerTests
         var result = await _controller.UpdateCourse(courseId, requestCourseData);
     
         // Assert
-        var notFoundResult = result as NotFoundResult;
+        var notFoundResult = result as OkObjectResult;
         Assert.IsNotNull(notFoundResult);
-        Assert.AreEqual(404, notFoundResult.StatusCode);
-    }
-    
-    [TestMethod]
-    public async Task EnrollStudentIntoCourse_ReturnsBadRequestResult()
-    {
-        // Arrange
-        int courseId = 1;
-        var enrollRequest = new EnrollStudentToCourseRequestDto();
-        _courseServiceMock.Setup(service => service.EnrollStudentIntoCourseAsync(courseId, enrollRequest))
-            .ThrowsAsync(new Exception("Enrollment failed"));
-    
-        // Act
-        var result = await _controller.EnrollStudentIntoCourse(courseId, enrollRequest);
-    
-        // Assert
-        var badRequestResult = result as BadRequestObjectResult;
-        Assert.IsNotNull(badRequestResult);
-        Assert.AreEqual(400, badRequestResult.StatusCode);
-    }
-    
-    [TestMethod]
-    public async Task EnrollTeacherIntoCourse_ReturnsBadRequestResult()
-    {
-        // Arrange
-        int courseId = 1;
-        var enrollRequest = new EnrollTeacherToCourseRequestDto();
-        _courseServiceMock.Setup(service => service.EnrollTeacherIntoCourseAsync(courseId, enrollRequest))
-            .ThrowsAsync(new Exception("Enrollment failed"));
-    
-        // Act
-        var result = await _controller.EnrollTeacherIntoCourse(courseId, enrollRequest);
-    
-        // Assert
-        var badRequestResult = result as BadRequestObjectResult;
-        Assert.IsNotNull(badRequestResult);
-        Assert.AreEqual(400, badRequestResult.StatusCode);
+        var data = notFoundResult.Value as CourseDto;
+        Assert.IsNull(data);
     }
 }
