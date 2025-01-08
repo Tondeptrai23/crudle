@@ -1,5 +1,4 @@
-﻿using _3w1m.Dtos;
-using _3w1m.Dtos.Exam;
+﻿using _3w1m.Dtos.Exam;
 using _3w1m.Dtos.Exam.Student;
 using _3w1m.Dtos.Exam.Teacher;
 using _3w1m.Dtos.ExamSubmission;
@@ -11,7 +10,6 @@ public interface IExamService
 {
     Task<(int, IEnumerable<ExamMinimalDto>)>
         GetExamsAsync(int courseId, int teacherId, ExamQueryCollectionDto queryDto);
-
     Task<ExamDto> GetDetailExamForTeacherAsync(int courseId, int examId, int teacherId);
     Task<ExamStudentResponseDto> GetDetailExamForStudentAsync(int courseId, int examId, int studentId);
     Task<ExamDto> CreateExamAsync(int courseId, int teacherId, CreateExamRequestDto createExamRequestDto);
