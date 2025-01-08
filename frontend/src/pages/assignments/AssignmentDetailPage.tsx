@@ -1,4 +1,5 @@
 import QuestionCard from '@/components/assignments/QuestionCard';
+import SubmissionsTable from '@/components/assignments/SubmissionsTable';
 import {
   Accordion,
   AccordionContent,
@@ -22,6 +23,7 @@ import { Role } from '@/types/enums';
 import { useCustomParams } from '@/utils/helper';
 import {
   Calendar,
+  ClipboardCheck,
   Clock,
   Edit,
   FileQuestion,
@@ -182,32 +184,64 @@ const AssignmentDetailPage = () => {
 
         {/* Questions Section */}
         {role === Role.Teacher ? (
-          <Card className='border-2'>
-            <Accordion type='single' collapsible className='w-full'>
-              <AccordionItem value='questions-section' className='border-none'>
-                <AccordionTrigger className='px-6 py-4 hover:no-underline'>
-                  <div className='flex items-center gap-2'>
-                    <FileQuestion className='h-5 w-5 text-blue-600' />
-                    <p className='text-base'>Questions Section</p>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className='px-6 pb-4'>
-                  <div className='space-y-4'>
-                    {assignment.questions.map((question, index) => (
-                      <QuestionCard
-                        key={question.questionId}
-                        showButton={false}
-                        question={question}
-                        index={index}
-                        onDelete={() => {}}
-                        onQuestionChange={() => {}}
-                      />
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </Card>
+          <>
+            <Card className='border-2'>
+              <Accordion type='single' collapsible className='w-full'>
+                <AccordionItem
+                  value='questions-section'
+                  className='border-none'
+                >
+                  <AccordionTrigger className='px-6 py-4 hover:no-underline'>
+                    <div className='flex items-center gap-2'>
+                      <FileQuestion className='h-5 w-5 text-blue-600' />
+                      <p className='text-base'>Questions Section</p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className='px-6 pb-4'>
+                    <div className='space-y-4'>
+                      {assignment.questions.map((question, index) => (
+                        <QuestionCard
+                          key={question.questionId}
+                          showButton={false}
+                          question={question}
+                          index={index}
+                          onDelete={() => {}}
+                          onQuestionChange={() => {}}
+                        />
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </Card>
+
+            <Card className='border-2'>
+              <Accordion
+                type='single'
+                collapsible
+                className='w-full'
+                defaultValue='assignment-details'
+              >
+                <AccordionItem
+                  value='assignment-details'
+                  className='border-none'
+                >
+                  <AccordionTrigger className='px-6 py-4 hover:no-underline'>
+                    <div className='flex items-center gap-2'>
+                      <ClipboardCheck className='h-5 w-5 text-blue-600' />
+                      <p className='text-base'>Students' Submissions</p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className='px-6 pb-4'>
+										<SubmissionsTable
+											courseId={courseId}
+											assignmentId={assignmentId}
+										/>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </Card>
+          </>
         ) : (
           <div className='flex items-center justify-center'>
             <LoadingButton

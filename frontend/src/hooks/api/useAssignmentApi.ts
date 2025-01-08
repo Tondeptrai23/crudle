@@ -176,3 +176,17 @@ export const useSubmitAssignment = () => {
     },
   });
 };
+
+export const useSubmissions = (
+	courseId: number,
+	assignmentId: number,
+) => {
+	return useQuery({
+		queryKey: ['submissions', courseId, assignmentId],
+		queryFn: () => assignmentService.getSubmissions(courseId, assignmentId),
+		staleTime: 5 * 60 * 1000,
+		placeholderData: keepPreviousData,
+		refetchOnWindowFocus: false,
+		retry: false,
+	});
+};

@@ -7,6 +7,7 @@ import Assignment, {
   QuestionResponse,
 } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
+import Submission, { mapToSubmission } from '@/types/submission';
 import api from '@/utils/api';
 
 export default class AssignmentService {
@@ -263,6 +264,18 @@ export default class AssignmentService {
       questions: response.data.Data.Questions.map(mapToQuestion),
     };
   }
+
+	async getSubmissions(courseId: number, assignmentId: number): Promise<Submission[]> {
+		const response = await api.get(`/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions`);
+
+		if (!response.data.Success) {
+			throw new Error(response.data.Message);
+		}
+
+		return response.data.Data.map(mapToSubmission).filter(
+			(submission: Submission) => submission.score !== null
+		);
+	}
 }
 
 export const mapToAssignment = (response: AssignmentResponse) => ({
