@@ -27,7 +27,6 @@ import CoursePage from './pages/course/CoursePage.tsx';
 import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
