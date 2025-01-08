@@ -47,7 +47,7 @@ public class ExamSubmissionService: IExamSubmissionService
         return (await query.CountAsync(), examSubmissionDtos);
     }
 
-    public async Task<ExamSubmissionDto> GetDetailExamSubmissionTeacherAsync(int courseId, int examId, int studentId, int examSubmissionId)
+    public async Task<ExamSubmissionDto> GetDetailExamSubmissionTeacherAsync(int courseId, int examId, int examSubmissionId)
     {
         if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
         {
@@ -62,8 +62,10 @@ public class ExamSubmissionService: IExamSubmissionService
         var examSubmission = await _context.ExamSubmissions
             .Include(es => es.Student)
             .Include(es => es.StudentAnswers)
-            .ThenInclude(sq => sq.ExamQuestion)
-            .FirstOrDefaultAsync(es => es.ExamId == examId && es.StudentId == studentId && es.SubmissionId == examSubmissionId);
+            .Include(es=>es.Exam)
+            .ThenInclude(e =>e.ExamQuestions)
+            .ThenInclude(eq => eq.ExamAnswers)
+            .FirstOrDefaultAsync(es => es.ExamId == examId && es.SubmissionId == examSubmissionId);
 
         if (examSubmission == null)
         {

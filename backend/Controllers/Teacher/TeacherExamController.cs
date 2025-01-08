@@ -169,7 +169,7 @@ public class TeacherExamController : Controller
     }
     
     [HttpGet]
-    [Route("{examId:int}/Submission")]
+    [Route("{examId:int}/Submissions")]
     public async Task<IActionResult> GetExamSubmissionsAsync([FromRoute] int courseId, [FromRoute] int examId,
         [FromQuery] ExamSubmissionQueryCollectionDto queryCollectionDto)
     {
@@ -212,7 +212,7 @@ public class TeacherExamController : Controller
             throw new ForbiddenException("You are not enrolled in this course");
         }
 
-        var examSubmission = await _examSubmission.GetDetailExamSubmissionTeacherAsync(courseId, examId, teacher.TeacherId, examSubmissionId);
+        var examSubmission = await _examSubmission.GetDetailExamSubmissionTeacherAsync(courseId, examId, examSubmissionId);
         return Ok(new ResponseDto<ExamSubmissionDto>(examSubmission));
     }
 }
