@@ -22,3 +22,10 @@ CONNECTION_STRING = "Server=SERVER_NAME;Database=DATABASE_NAME;Trusted_Connectio
 ```
 
 Replace `DATABASE_NAME`, `PASSWORD`, and `SERVER_NAME` with your actual database values.
+
+## Running tests
+
+To run the tests, run the following command:
+```bash
+dotnet test
+```
