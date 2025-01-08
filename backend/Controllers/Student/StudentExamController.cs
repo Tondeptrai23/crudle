@@ -7,6 +7,7 @@ using _3w1m.Dtos.ExamSubmission.Student;
 using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,16 +24,18 @@ public class StudentExamController : Controller
     private readonly IStudentService _studentService;
     private readonly ICourseService _courseService;
     private readonly IExamSubmissionService _examSubmissionService;
+    private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
 
     public StudentExamController(IExamService examService, IStudentService studentService, ICourseService courseService,
-        UserManager<User> userManager, IExamSubmissionService examSubmissionService)
+        UserManager<User> userManager, IExamSubmissionService examSubmissionService, IMapper mapper)
     {
         _examService = examService;
         _studentService = studentService;
         _courseService = courseService;
         _userManager = userManager;
         _examSubmissionService = examSubmissionService;
+        _mapper = mapper;
     }
 
     [HttpGet]
@@ -127,8 +130,8 @@ public class StudentExamController : Controller
     }
     
     [HttpGet]
-    [Route("{examId:int}/Submission")]
-    public async Task<IActionResult> GetExamSubmissionsAsync([FromRoute] int courseId, [FromRoute] int examId,
+    [Route("Submissions")]
+    public async Task<IActionResult> GetExamSubmissionsAsync([FromRoute] int courseId,
         [FromQuery] ExamSubmissionQueryCollectionDto queryCollectionDto)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -143,7 +146,7 @@ public class StudentExamController : Controller
         }
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-        var (total, examSubmissions) = await _examSubmissionService.GetExamSubmissionsHistoryAsync(courseId, examId, student.StudentId, queryCollectionDto);
+        var (total, examSubmissions) = await _examSubmissionService.GetExamSubmissionsHistoryAsync(courseId, student.StudentId, queryCollectionDto);
 
         return Ok(new PaginationResponseDto<IEnumerable<ExamSubmissionMinimalDto>>(
             examSubmissions,
@@ -171,6 +174,12 @@ public class StudentExamController : Controller
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
         var examSubmission = await _examSubmissionService.GetDetailExamSubmissionStudentAsync(courseId, examId, student.StudentId, examSubmissionId);
 
-        return Ok(new ResponseDto<ExamSubmissionForStudentDto>(examSubmission));
+        if (examSubmission.ExamDueDate < DateTime.Now)
+        {
+            return Ok(new ResponseDto<ExamSubmissionDto>(examSubmission));
+        } else
+        {
+            return Ok(new ResponseDto<ExamSubmissionForStudentDto>(_mapper.Map<ExamSubmissionForStudentDto>(examSubmission)));
+        }
     }
 }
