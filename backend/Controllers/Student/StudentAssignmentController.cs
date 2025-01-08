@@ -173,11 +173,15 @@ public class StudentAssignmentController : ControllerBase
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
 
-
         var submission =
             await _assignmentSubmissionService.GetDetailSubmissionForStudentAsync(courseId, assignmentId,
                 submissionId, student.StudentId);
-
-        return Ok(new ResponseDto<AssignmentSubmissionForStudentDto>(submission));
+        
+        if (submission.AssignmentDueDate > DateTime.Now)
+        {
+            return Ok(new ResponseDto<AssignmentSubmissionForStudentDto>(_mapper.Map<AssignmentSubmissionForStudentDto>(submission)));
+        }
+        
+        return Ok(new ResponseDto<AssignmentSubmissionDto>(submission));
     }
 }
