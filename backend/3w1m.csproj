@@ -30,13 +30,4 @@
       <Folder Include="Migrations\" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Update="BackendTest\Test1.cs">
-        <Link>TestProject1\Test1.cs</Link>
-      </Compile>
-      <Compile Update="BackendTest\MSTestSettings.cs">
-        <Link>TestProject1\MSTestSettings.cs</Link>
-      </Compile>
-    </ItemGroup>
-
 </Project>
