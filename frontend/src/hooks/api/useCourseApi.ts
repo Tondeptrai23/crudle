@@ -96,7 +96,10 @@ export const useStudentCourses = () => {
   });
 };
 
-export const useRoleBasedCourses = (role: string) => {
+export const useRoleBasedCourses = (
+  role: string,
+  options?: { enabled?: boolean } 
+) => {
   const queryFn =
     role === Role.Student
       ? async () => courseService.getCoursesByStudent()
@@ -107,5 +110,6 @@ export const useRoleBasedCourses = (role: string) => {
     queryFn: queryFn,
     retry: 3,
     staleTime: 5 * 60 * 1000,
+    enabled: options?.enabled ?? true, 
   });
 };

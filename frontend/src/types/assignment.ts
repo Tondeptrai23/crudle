@@ -100,3 +100,40 @@ export interface AssignmentStartDto {
   startedAt: Date;
   questions: Question[];
 }
+
+export interface UpcomingAssignment {
+  assignmentId: number;
+  name: string;
+  dueDate: Date;
+  courseId: number;
+  courseName: string;
+}
+
+export const mapToAssignment = (response: AssignmentResponse) => ({
+  assignmentId: response.AssignmentId,
+  courseId: response.CourseId,
+  name: response.Name,
+  content: response.Content,
+  dueDate: response.DueDate,
+  createdAt: response.CreatedAt,
+  updatedAt: response.UpdatedAt,
+  canViewScore: response.CanViewScore,
+  canRetry: response.CanRetry,
+  type: response.Type,
+  questions: response.Questions?.map(mapToQuestion),
+});
+
+export const mapToQuestion = (response: QuestionResponse) => ({
+  questionId: response.QuestionId,
+  assignmentId: response.AssignmentId,
+  content: response.Content,
+  answers: response.Answers?.map(mapToAnswer),
+  type: response.Type,
+});
+
+export const mapToAnswer = (response: AnswerResponse) => ({
+  answerId: response.AnswerId,
+  questionId: response.QuestionId,
+  value: response.Value,
+  isCorrect: response.IsCorrect,
+});

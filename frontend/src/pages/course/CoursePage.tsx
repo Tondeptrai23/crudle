@@ -10,7 +10,7 @@ const CoursePage: React.FC = () => {
     data: courses,
     isLoading: isLoading,
     error: error,
-  } = useRoleBasedCourses(role);
+  } = useRoleBasedCourses(role, { enabled: true });
 
   if (isLoading) {
     return (

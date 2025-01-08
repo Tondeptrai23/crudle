@@ -141,7 +141,7 @@ public class TeacherService : ITeacherService
         {
             teachers = teachers.Where(t => t.Fullname.ToLower().Contains(queryDto.Fullname.ToLower()));
         }
-        
+
         if (queryDto.ContactEmail != null && queryDto.ContactEmail.Length > 0)
         {
             foreach (var email in queryDto.ContactEmail)
@@ -149,12 +149,12 @@ public class TeacherService : ITeacherService
                 teachers = teachers.Where(t => t.ContactEmail.ToLower().Contains(email.ToLower()));
             }
         }
-        
+
         if (queryDto.ContactPhone != null)
         {
             teachers = teachers.Where(t => t.ContactPhone.ToLower().Contains(queryDto.ContactPhone.ToLower()));
         }
-        
+
         return teachers;
     }
 

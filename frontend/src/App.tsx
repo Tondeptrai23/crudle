@@ -19,9 +19,9 @@ import AddAssignmentPage from './pages/assignments/AddAssignmentPage.tsx';
 import AssignmentDetailPage from './pages/assignments/AssignmentDetailPage.tsx';
 import AssignmentSessionPage from './pages/assignments/AssignmentSessionPage.tsx';
 import EditAssignmentPage from './pages/assignments/EditAssignmentPage.tsx';
+import { DashboardPage } from './pages/DashboardPage.tsx';
 import { LoginPage } from './pages/common/LoginPage.tsx';
 import ProfilePage from './pages/common/ProfilePage.tsx';
-import { WeatherPage } from './pages/common/WeatherPage.tsx';
 import CourseDetailPage from './pages/course/CourseDetailPage.tsx';
 import CoursePage from './pages/course/CoursePage.tsx';
 import { Role } from './types/enums.ts';
@@ -77,30 +77,44 @@ const App: React.FC = () => {
               element={
                 <ErrorBoundary>
                   <MainLayout>
-                    <RequireAuth allowedRoles={[Role.Teacher]}>
-                      <Routes>
-                        <Route
-                          path='/course/:courseId/assignment/:assignmentId/edit'
-                          element={<EditAssignmentPage />}
-                        />
-                        <Route
-                          path='/course/:courseId/assignment/add'
-                          element={<AddAssignmentPage />}
-                        />
-                        <Route
-                          path='/course/:courseId/article/:articleId/edit'
-                          element={<ArticleUpdatePage />}
-                        />
-                        <Route
-                          path='/course/:courseId/article/new'
-                          element={<ArticleCreatePage />}
-                        />
-                      </Routes>
-                    </RequireAuth>
+                    <Routes>
+                      <Route
+                        path='/course/:courseId/assignment/:assignmentId/edit'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <EditAssignmentPage />
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path='/course/:courseId/add-assignment'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <AddAssignmentPage />
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path='/course/:courseId/article/:articleId/edit'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <ArticleUpdatePage />
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path='/course/:courseId/add-article'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <ArticleCreatePage />
+                          </RequireAuth>
+                        }
+                      />
+                    </Routes>
 
                     <RequireAuth allowedRoles={[Role.User]}>
                       <Routes>
-                        <Route path='/dashboard' element={<WeatherPage />} />
+                        <Route path='/dashboard' element={<DashboardPage />} />
                         <Route path='/course' element={<CoursePage />} />
                         <Route
                           path='/course/:courseId'
@@ -128,7 +142,6 @@ const App: React.FC = () => {
                         />
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path='/settings' element={<div>Settings</div>} />
-                        <Route path='*' element={<div>Not Found</div>} />
                       </Routes>
                     </RequireAuth>
                   </MainLayout>
