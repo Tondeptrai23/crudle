@@ -45,7 +45,7 @@ public class MappingProfile : Profile
         CreateMap<Article, ArticleDto>()
             .ForMember(dest => dest.ReadAt,
                 opt =>
-                        opt.MapFrom(scr => scr.ArticleProgresses.Any() ? scr.ArticleProgresses.First().ReadAt : null));
+                    opt.MapFrom(scr => scr.ArticleProgresses.Any() ? scr.ArticleProgresses.First().ReadAt : null));
         CreateMap<ArticleDto, StudentArticleResponseDto>()
             .ForMember(dest => dest.IsRead,
                 opt => opt.MapFrom(src => src.ReadAt != null));
@@ -72,14 +72,24 @@ public class MappingProfile : Profile
         CreateMap<AssignmentDto, AssignmentForStudentDto>();
         CreateMap<Assignment, UpcomingAssignmentDto>()
             .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name));
- 
+
         CreateMap<CreateQuestionRequestDto, Question>();
         CreateMap<Question, QuestionDto>();
         CreateMap<QuestionDto, Question>();
+        CreateMap<QuestionDto, QuestionForStudentDto>()
+            .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
+            src.Type == "Fill In Blank"
+                ? new List<AnswerForStudentDto>()
+                : src.Answers.Select(answer => new AnswerForStudentDto
+                {
+                    QuestionId = answer.QuestionId,
+                    AnswerId = answer.AnswerId,
+                    Value = answer.Value
+                }).ToList()));
         CreateMap<Question, QuestionForStudentDto>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
-                src.Type == "Fill In Blank" 
-                    ? new List<AnswerForStudentDto>() 
+                src.Type == "Fill In Blank"
+                    ? new List<AnswerForStudentDto>()
                     : src.Answers.Select(answer => new AnswerForStudentDto
                     {
                         QuestionId = answer.QuestionId,
@@ -88,11 +98,12 @@ public class MappingProfile : Profile
                     }).ToList()));
         CreateMap<Question, QuestionWithStudentAnswerDto>();
         CreateMap<Question, QuestionWithAnswerForStudentDto>();
+        CreateMap<QuestionWithStudentAnswerDto, QuestionWithAnswerForStudentDto>();
 
         CreateMap<QuestionDto, QuestionForStudentDto>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
-                src.Type == "Fill In Blank" 
-                    ? new List<AnswerForStudentDto>() 
+                src.Type == "Fill In Blank"
+                    ? new List<AnswerForStudentDto>()
                     : src.Answers.Select(answer => new AnswerForStudentDto
                     {
                         QuestionId = answer.QuestionId,
@@ -111,11 +122,14 @@ public class MappingProfile : Profile
         CreateMap<AssignmentSubmission, AssignmentSubmissionDto>()
             .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
         CreateMap<AssignmentSubmission, AssignmentSubmissionMinimalDto>()
-            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname))
+            .ForMember(dest => dest.AssignmentDueDate, opt => opt.MapFrom(src => src.Assignment.DueDate));
 
-        CreateMap<AssignmentSubmissionDto, AssignmentSubmission>();
         CreateMap<AssignmentSubmission, AssignmentSubmissionForStudentDto>();
+        CreateMap<AssignmentSubmissionDto, AssignmentSubmission>();
         CreateMap<AssignmentSubmissionDto, AssignmentSubmissionResponseDto>();
+        CreateMap<AssignmentSubmissionDto, AssignmentSubmissionForStudentDto>()
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.QuestionWithStudentAnswer));
         CreateMap<AssignmentSubmissionMinimalDto, AssignmentSubmissionResponseDto>();
     }
 }
