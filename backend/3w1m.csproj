@@ -6,6 +6,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>_3w1m</RootNamespace>
         <NoWarn>NU1605</NoWarn>
+        
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
 
     <ItemGroup>
