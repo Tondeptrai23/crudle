@@ -1,11 +1,11 @@
 import Course, {
   CourseResponse,
   CreateCourseDTO,
+  mapToCourse,
   UpdateCourseDTO,
 } from '@/types/course';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import api from '@/utils/api';
-import { mapToStudent } from './StudentService';
 
 export default class CourseService {
   async getCoursesByStudent(): Promise<Course[]> {

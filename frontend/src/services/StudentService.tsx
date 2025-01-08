@@ -2,6 +2,7 @@ import Assignment, { UpcomingAssignment } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Student, {
   CreateStudentDTO,
+  mapToStudent,
   StudentResponse,
   UpdateStudentDTO,
 } from '@/types/student';

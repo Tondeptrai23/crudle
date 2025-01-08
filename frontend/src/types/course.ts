@@ -1,4 +1,4 @@
-import Student, { StudentResponse } from './student';
+import Student, { mapToStudent, StudentResponse } from './student';
 import { TeacherResponse } from './teacher';
 
 export interface CourseResponse {
