@@ -15,11 +15,6 @@ If you're using MySQL, set the environment variables as follows:
 DATABASE = MYSQL
 CONNECTION_STRING = "server=localhost;database=DATABASE_NAME;user=root;password=PASSWORD"
 ```
-If you're using SQL Server, set the environment variables as follows:
-```env
-DATABASE = SQLSERVER
-CONNECTION_STRING = "Server=SERVER_NAME;Database=DATABASE_NAME;Trusted_Connection=True;TrustServerCertificate=True;"
-```
 
 Replace `DATABASE_NAME`, `PASSWORD`, and `SERVER_NAME` with your actual database values.
 
