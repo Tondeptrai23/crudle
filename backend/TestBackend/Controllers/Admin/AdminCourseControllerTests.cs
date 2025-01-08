@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using _3w1m.Dtos;
 using _3w1m.Models.Domain;
 
-namespace TestBackend;
+namespace TestBackend.Controllers.AdminTests;
 [TestClass]
 public class AdminCourseControllerTests
 {
