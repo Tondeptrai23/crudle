@@ -23,4 +23,6 @@ public class Course
     public ICollection<Assignment> Assignments { get; set; }
     
     public ICollection<Article> Articles { get; set; }
+    
+    public ICollection<Exam> Exams { get; set; }
 }
