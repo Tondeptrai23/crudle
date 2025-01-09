@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using _3w1m.Models.Exceptions;
 
 namespace TestBackend.Controllers.UserTests;
 
@@ -49,18 +50,15 @@ public class TeacherControllerTests
         Assert.AreEqual(teacherDto, responseDto.Data);
     }
 
-[TestMethod]
+    [TestMethod]
     public async Task GetTeacherById_ReturnsNotFound_WhenTeacherNotFound()
     {
         // Arrange
         var teacherId = 1;
-        _teacherServiceMock.Setup(service => service.GetTeacherByIdAsync(teacherId)).ReturnsAsync((TeacherDetailDto)null);
-
-        // Act
-        var result = await _controller.GetTeacherById(teacherId);
-
-        // Assert
-        Assert.IsInstanceOfType(result, typeof(NotFoundResult));
+        _teacherServiceMock.Setup(service => service.GetTeacherByIdAsync(teacherId)).Throws(new ResourceNotFoundException("Teacher not found"));
+        
+        // Act & Assert
+        await Assert.ThrowsExceptionAsync<ResourceNotFoundException>(async () => await _controller.GetTeacherById(teacherId));
     }
 
     // TODO: Try another way to mock

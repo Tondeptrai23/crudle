@@ -45,10 +45,6 @@ public class TeacherController : ControllerBase
         }
 
         var teacher = await _teacherService.GetTeacherByUserIdAsync(user.Id);
-        if (teacher == null)
-        {
-            return Unauthorized();
-        }
         var response = await _assignmentService.GetAssignmentsByTeacherId(teacher.TeacherId, year, month);
         return Ok(new ResponseDto<IEnumerable<UpcomingAssignmentDto>>(response.Item2));
     }
