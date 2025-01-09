@@ -118,7 +118,7 @@ export default class AssignmentService {
   }
 
   async createAssignment(
-    courseId: number,
+    courseId: string,
     data: CreateAssignmentDto,
   ): Promise<Assignment> {
     // Remove all ids from the data except for the courseId
@@ -153,8 +153,8 @@ export default class AssignmentService {
   }
 
   async updateAssignment(
-    courseId: number,
-    assignmentId: number,
+    courseId: string,
+    assignmentId: string,
     data: CreateAssignmentDto,
   ): Promise<Assignment> {
     const body = {
@@ -267,7 +267,7 @@ export default class AssignmentService {
     };
   }
 
-	async getSubmissions(courseId: string, assignmentId: string): Promise<SubmissionWithStatus[]> {
+	async getLatestSubmissions(courseId: string, assignmentId: string): Promise<SubmissionWithStatus[]> {
 		const [response, course] = await Promise.all([
 			api.get(`/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions?OrderBy=SubmittedAt&OrderDirection=desc`),
 			courseService.getCourse('Teacher', courseId)

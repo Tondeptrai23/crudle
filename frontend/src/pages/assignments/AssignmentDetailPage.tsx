@@ -236,6 +236,7 @@ const AssignmentDetailPage = () => {
 										<SubmissionsTable
 											courseId={courseId}
 											assignmentId={assignmentId}
+											maxScore={assignment.questions.length}
 										/>
                   </AccordionContent>
                 </AccordionItem>

@@ -21,7 +21,7 @@ export const useAssignments = (
   role: string,
   data: QueryHookParams,
 ) => {
-  let { page } = data;
+  const { page } = data;
   const { pageSize, filters, sort } = data;
   const nameFilter = filters.name as string;
 
@@ -85,7 +85,7 @@ export const useUpdateAssignment = () => {
 
   return useMutation({
     mutationFn: async (data: {
-      assignmentId: number;
+      assignmentId: string;
       assignment: CreateAssignmentDto;
     }) => {
       await assignmentService.updateAssignment(
@@ -177,16 +177,14 @@ export const useSubmitAssignment = () => {
   });
 };
 
-export const useSubmissions = (
-	courseId: number,
-	assignmentId: number,
-) => {
-	return useQuery({
-		queryKey: ['submissions', courseId, assignmentId],
-		queryFn: () => assignmentService.getSubmissions(courseId, assignmentId),
-		staleTime: 5 * 60 * 1000,
-		placeholderData: keepPreviousData,
-		refetchOnWindowFocus: false,
-		retry: false,
-	});
+export const useLatestSubmissions = (courseId: string, assignmentId: string) => {
+  return useQuery({
+    queryKey: ['submissions', courseId, assignmentId],
+    queryFn: () =>
+      assignmentService.getLatestSubmissions(courseId, assignmentId),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 };

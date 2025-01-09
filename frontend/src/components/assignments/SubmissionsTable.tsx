@@ -6,19 +6,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/common/ui/table';
-import { useSubmissions } from '@/hooks/api/useAssignmentApi';
+import { useLatestSubmissions } from '@/hooks/api/useAssignmentApi';
 import { SubmissionStatus } from '@/types/submission';
 import { Link } from 'react-router-dom';
 import { Badge } from '../common/ui/badge';
 import { Clock, CheckCircle2, Ban } from 'lucide-react';
 
 interface SubmissionsTableProps {
-	courseId: number;
-	assignmentId: number;
+	courseId: string;
+	assignmentId: string;
+	maxScore: number;
 }
 
-const SubmissionsTable: React.FC<SubmissionsTableProps> = ({ courseId, assignmentId }) => {
-	const { data: submissions, isLoading } = useSubmissions(courseId, assignmentId);
+const SubmissionsTable: React.FC<SubmissionsTableProps> = ({ courseId, assignmentId, maxScore }) => {
+	const { data: submissions, isLoading } = useLatestSubmissions(
+    courseId,
+    assignmentId,
+  );
 
 	if (isLoading) {
 		return <div>Loading...</div>;
@@ -55,10 +59,11 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({ courseId, assignmen
       <TableHeader>
         <TableRow>
           <TableHead>Student</TableHead>
-          <TableHead className='w-[100px]'>Status</TableHead>
+          <TableHead className='w-[150px]'>Status</TableHead>
           <TableHead className='w-[50px]'>Score</TableHead>
-          <TableHead className='w-[150px]'>Started</TableHead>
-          <TableHead className='w-[150px]'>Submitted</TableHead>
+          <TableHead className='w-[50px]'>Percentage</TableHead>
+          <TableHead className='w-[120px]'>Started</TableHead>
+          <TableHead className='w-[120px]'>Submitted</TableHead>
           <TableHead className='w-[100px]'></TableHead>
         </TableRow>
       </TableHeader>
@@ -66,22 +71,29 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({ courseId, assignmen
         {submissions?.map((submission) => (
           <TableRow key={submission.submissionId}>
             <TableCell>{submission.studentName}</TableCell>
-            <TableCell className='text-center'>
-              {getStatusBadge(submission.status)}
+            <TableCell>{getStatusBadge(submission.status)}</TableCell>
+            <TableCell className='text-right tabular-nums'>
+              {submission.score === null ? '-' : (submission.score ?? 0)} /{' '}
+              {maxScore}
             </TableCell>
-            <TableCell className='text-center tabular-nums'>
-              {submission.score}
+            <TableCell className='text-right tabular-nums'>
+              {submission.score === null
+                ? '-'
+                : (((submission.score ?? 0) / maxScore) * 100).toFixed(2)}
+              %
             </TableCell>
-            <TableCell className='tabular-nums'>
+            <TableCell className='text-right tabular-nums'>
               <div>{submission.startedAt?.toLocaleDateString('en-GB')}</div>
               <div>{submission.startedAt?.toLocaleTimeString('en-GB')}</div>
             </TableCell>
-            <TableCell className='tabular-nums'>
+            <TableCell className='text-right tabular-nums'>
               <div>{submission.submittedAt?.toLocaleDateString('en-GB')}</div>
               <div>{submission.submittedAt?.toLocaleTimeString('en-GB')}</div>
             </TableCell>
             <TableCell className='text-center underline hover:text-primary'>
-              <Link to='/'>View</Link>
+              {submission.status === SubmissionStatus.DONE ? (
+                <Link to='/'>View</Link>
+              ) : null}
             </TableCell>
           </TableRow>
         ))}
