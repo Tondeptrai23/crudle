@@ -1,10 +1,9 @@
 import Assignment, {
-  AnswerResponse,
-  AssignmentResponse,
   AssignmentStartDto,
   AssignmentSubmitDto,
   CreateAssignmentDto,
-  QuestionResponse,
+  mapToAssignment,
+  mapToQuestion,
 } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Submission, { mapToSubmission } from '@/types/submission';

@@ -45,7 +45,7 @@ const ArticleCard = ({ article, courseId, onRead }: ArticleCardProps) => {
   return (
     <Card
       key={article.id}
-      className='bg-primary-50 flex cursor-pointer flex-col transition-all hover:shadow-md'
+      className='bg-primary-50 flex cursor-pointer flex-col transition-all hover:shadow-md pt-2'
       onClick={handleClick}
     >
       <CardHeader className='py-3'>

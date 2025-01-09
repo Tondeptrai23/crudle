@@ -19,9 +19,9 @@ import AddAssignmentPage from './pages/assignments/AddAssignmentPage.tsx';
 import AssignmentDetailPage from './pages/assignments/AssignmentDetailPage.tsx';
 import AssignmentSessionPage from './pages/assignments/AssignmentSessionPage.tsx';
 import EditAssignmentPage from './pages/assignments/EditAssignmentPage.tsx';
+import { DashboardPage } from './pages/DashboardPage.tsx';
 import { LoginPage } from './pages/common/LoginPage.tsx';
 import ProfilePage from './pages/common/ProfilePage.tsx';
-import { WeatherPage } from './pages/common/WeatherPage.tsx';
 import CourseDetailPage from './pages/course/CourseDetailPage.tsx';
 import CoursePage from './pages/course/CoursePage.tsx';
 import { Role } from './types/enums.ts';
@@ -114,7 +114,7 @@ const App: React.FC = () => {
 
                     <RequireAuth allowedRoles={[Role.User]}>
                       <Routes>
-                        <Route path='/dashboard' element={<WeatherPage />} />
+                        <Route path='/dashboard' element={<DashboardPage />} />
                         <Route path='/course' element={<CoursePage />} />
                         <Route
                           path='/course/:courseId'

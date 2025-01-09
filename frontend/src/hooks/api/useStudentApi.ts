@@ -8,6 +8,7 @@ import {
 
 import StudentService from '@/services/StudentService';
 import { QueryHookParams } from '@/types/table';
+import { UpcomingAssignment } from '@/types/assignment';
 
 const studentKeys = {
   lists: () => ['students'],
@@ -92,6 +93,14 @@ export const useStudentDetail = (id: string) => {
   });
 };
 
+export const useUpcomingAssignments = (date: Date) => {
+  return useQuery<UpcomingAssignment[], Error>({
+    queryKey: ['upcomingAssignments', date],
+    queryFn: async () => {
+      return await studentService.getUpcomingAssignments(date);
+    },
+  });
+};
 // export const useDeleteStudent = () => {
 //   const queryClient = useQueryClient();
 
