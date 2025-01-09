@@ -149,7 +149,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
         
         modelBuilder.Entity<ExamQuestion>()
             .HasOne<Exam>(examQues => examQues.Exam)
-            .WithMany(exam => exam.ExamQuestions)
+            .WithMany(exam => exam.Questions)
             .HasForeignKey(examQues => examQues.ExamId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -157,8 +157,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasKey(examAns => examAns.AnswerId);
         
         modelBuilder.Entity<ExamAnswer>()
-            .HasOne<ExamQuestion>(examAns => examAns.ExamQuestion)
-            .WithMany(examQues => examQues.ExamAnswers)
+            .HasOne<ExamQuestion>(examAns => examAns.Question)
+            .WithMany(examQues => examQues.Answers)
             .HasForeignKey(examAns => examAns.ExamQuestionId)
             .OnDelete(DeleteBehavior.Cascade);
         

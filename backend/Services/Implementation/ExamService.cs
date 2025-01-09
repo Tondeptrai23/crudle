@@ -52,8 +52,8 @@ public class ExamService : IExamService
 
         var exam = await _context.Exams
             .Include(e => e.Submissions)
-            .Include(e => e.ExamQuestions)
-            .ThenInclude(eq => eq.ExamAnswers)
+            .Include(e => e.Questions)
+            .ThenInclude(eq => eq.Answers)
             .FirstOrDefaultAsync(e => e.CourseId == courseId && e.ExamId == examId);
 
         if (exam == null)
@@ -72,8 +72,8 @@ public class ExamService : IExamService
         }
         
         var exam = await _context.Exams
-            .Include(e => e.ExamQuestions)
-            .ThenInclude(eq => eq.ExamAnswers)
+            .Include(e => e.Questions)
+            .ThenInclude(eq => eq.Answers)
             .FirstOrDefaultAsync(e => e.CourseId == courseId && e.ExamId == examId);
  
         if (exam == null)
@@ -109,95 +109,62 @@ public class ExamService : IExamService
 
         return _mapper.Map<ExamDto>(exam);
     }
-
-    public async Task<ExamDto> UpdateExamAsync(int courseId, int teacherId, int examId,
-        UpdateExamRequestDto updateExamRequestDto)
+    public async Task<ExamDto> ReplaceExamAsync(int courseId, int teacherId, int examId, 
+        CreateExamRequestDto replaceExamRequestDto)
     {
         if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
         {
             throw new ResourceNotFoundException("Course not found");
         }
-
-        var exam = await _context.Exams
-            .Include(e => e.ExamQuestions)
-            .ThenInclude(eq => eq.ExamAnswers)
+    
+        // Load the existing exam with its related entities
+        var existingExam = await _context.Exams
+            .Include(e => e.Questions)
+                .ThenInclude(q => q.Answers)
             .FirstOrDefaultAsync(e => e.CourseId == courseId && e.ExamId == examId);
-
-        if (exam == null)
+    
+        if (existingExam == null)
         {
             throw new ResourceNotFoundException("Exam not found");
         }
-
-        if (updateExamRequestDto.Name != null)
+    
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try 
         {
-            exam.Name = updateExamRequestDto.Name;
-        }
-
-        if (updateExamRequestDto.StartDate != null)
-        {
-            exam.StartDate = updateExamRequestDto.StartDate.Value;
-        }
-
-        if (updateExamRequestDto.Duration != null)
-        {
-            exam.Duration = updateExamRequestDto.Duration.Value;
-        }
-
-        exam.EndDate = exam.StartDate.AddMinutes(exam.Duration);
-
-        if (updateExamRequestDto.ExamQuestions != null)
-        {
-            foreach (var questionDto in updateExamRequestDto.ExamQuestions)
-            {
-                if (exam.ExamQuestions.Any(q => q.ExamQuestionId == questionDto.ExamQuestionId))
+            // Remove existing questions and their answers
+            _context.RemoveRange(existingExam.Questions);
+    
+            // Update the exam properties
+            existingExam.Name = replaceExamRequestDto.Name;
+            existingExam.Content = replaceExamRequestDto.Content;
+            existingExam.StartDate = replaceExamRequestDto.StartDate;
+            existingExam.Duration = replaceExamRequestDto.Duration;
+            existingExam.EndDate = replaceExamRequestDto.StartDate.AddMinutes(replaceExamRequestDto.Duration);
+            existingExam.UpdatedAt = DateTime.Now;
+    
+            // Add new questions
+            existingExam.Questions = replaceExamRequestDto.Questions
+                .Select(q => new ExamQuestion
                 {
-                    // Update actions 
-                    var question = exam.ExamQuestions.First(q => q.ExamQuestionId == questionDto.ExamQuestionId);
-                    question.Content = questionDto.Content;
-                    question.Type = questionDto.Type;
-                    if (!questionDto.Answers.IsNullOrEmpty())
+                    Content = q.Content,
+                    Type = q.Type,
+                    Answers = q.Answers.Select(a => new ExamAnswer
                     {
-                        // Handle add new or update existing answers
-                        foreach (var answerDto in questionDto.Answers)
-                        {
-                            if (question.ExamAnswers.Any(a => a.AnswerId == answerDto.AnswerId))
-                            {
-                                var answer = question.ExamAnswers.First(a => a.AnswerId == answerDto.AnswerId);
-                                answer.Value = answerDto.Value;
-                                answer.IsCorrect = answerDto.IsCorrect;
-                            }
-                            else
-                            {
-                                question.ExamAnswers.Add(new ExamAnswer
-                                {
-                                    Value = answerDto.Value,
-                                    IsCorrect = answerDto.IsCorrect
-                                });
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    var newQuestion = new ExamQuestion
-                    {
-                        ExamId = examId,
-                        Content = questionDto.Content,
-                        Type = questionDto.Type,
-                        ExamAnswers = questionDto.Answers.Select(a => new ExamAnswer
-                        {
-                            Value = a.Value,
-                            IsCorrect = a.IsCorrect
-                        }).ToList()
-                    };
-                    exam.ExamQuestions.Add(newQuestion);
-                }
-            }
+                        Value = a.Value,
+                        IsCorrect = a.IsCorrect
+                    }).ToList()
+                }).ToList();
+    
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            
+            return _mapper.Map<ExamDto>(existingExam);
         }
-
-        await _context.SaveChangesAsync();
-
-        return _mapper.Map<ExamDto>(exam);
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<ExamMinimalDto> UpdatePartiallyExamAsync(int courseId, int teacherId, int examId,
@@ -281,8 +248,8 @@ public class ExamService : IExamService
 
         examSubmission = await _context.ExamSubmissions
             .Include(es => es.Exam)
-            .ThenInclude(e => e.ExamQuestions)
-            .ThenInclude(eq => eq.ExamAnswers)
+            .ThenInclude(e => e.Questions)
+            .ThenInclude(eq => eq.Answers)
             .FirstOrDefaultAsync(es => es.SubmissionId == examSubmission.SubmissionId);
         
         return _mapper.Map<ExamStartResponseDto>(examSubmission);
@@ -297,8 +264,8 @@ public class ExamService : IExamService
         }
 
         var exam = await _context.Exams
-            .Include(e => e.ExamQuestions)
-            .ThenInclude(eq => eq.ExamAnswers)
+            .Include(e => e.Questions)
+            .ThenInclude(eq => eq.Answers)
             .FirstOrDefaultAsync(e => e.ExamId == examId && e.CourseId == courseId);
 
         if (exam == null)
@@ -306,7 +273,7 @@ public class ExamService : IExamService
             throw new ResourceNotFoundException("Exam not found");
         }
         
-        if (exam.EndDate < DateTime.Now)
+        if (exam.EndDate < examSubmissionRequestDto.SubmissionTime)
         {
             throw new ForbiddenException("Exam has already ended");
         }
@@ -325,7 +292,7 @@ public class ExamService : IExamService
 
         examSubmission.SubmittedAt = DateTime.Now;
         var answers = examSubmission.StudentAnswers.Select(sa => sa.Value);
-        var correctAnswers = exam.ExamQuestions.SelectMany(eq => eq.ExamAnswers)
+        var correctAnswers = exam.Questions.SelectMany(eq => eq.Answers)
             .Where(ea => ea.IsCorrect).Select(ea => ea.Value);
 
         examSubmission.Score = answers.Count(a => correctAnswers.Contains(a, StringComparer.OrdinalIgnoreCase));

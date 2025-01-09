@@ -19,11 +19,15 @@ import AddAssignmentPage from './pages/assignments/AddAssignmentPage.tsx';
 import AssignmentDetailPage from './pages/assignments/AssignmentDetailPage.tsx';
 import AssignmentSessionPage from './pages/assignments/AssignmentSessionPage.tsx';
 import EditAssignmentPage from './pages/assignments/EditAssignmentPage.tsx';
-import { DashboardPage } from './pages/DashboardPage.tsx';
 import { LoginPage } from './pages/common/LoginPage.tsx';
 import ProfilePage from './pages/common/ProfilePage.tsx';
 import CourseDetailPage from './pages/course/CourseDetailPage.tsx';
 import CoursePage from './pages/course/CoursePage.tsx';
+import { DashboardPage } from './pages/DashboardPage.tsx';
+import AddExamPage from './pages/exams/AddExamPage.tsx';
+import EditExamPage from './pages/exams/EditExamPage.tsx';
+import ExamDetailPage from './pages/exams/ExamDetailPage.tsx';
+import ExamSessionPage from './pages/exams/ExamSessionPage.tsx';
 import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
 
@@ -110,6 +114,22 @@ const App: React.FC = () => {
                           </RequireAuth>
                         }
                       />
+                      <Route
+                        path='/course/:courseId/exam/:examId/edit'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <EditExamPage />
+                          </RequireAuth>
+                        }
+                      />
+                      <Route
+                        path='/course/:courseId/add-exam'
+                        element={
+                          <RequireAuth allowedRoles={[Role.Teacher]}>
+                            <AddExamPage />
+                          </RequireAuth>
+                        }
+                      />
                     </Routes>
 
                     <RequireAuth allowedRoles={[Role.User]}>
@@ -139,6 +159,14 @@ const App: React.FC = () => {
                         <Route
                           path='/course/:courseId/assignment/:assignmentId/session/:submissionId'
                           element={<AssignmentSessionPage />}
+                        />
+                        <Route
+                          path='/course/:courseId/exam/:examId'
+                          element={<ExamDetailPage />}
+                        />
+                        <Route
+                          path='/course/:courseId/exam/:examId/session/:submissionId'
+                          element={<ExamSessionPage />}
                         />
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path='/settings' element={<div>Settings</div>} />
