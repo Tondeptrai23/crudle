@@ -102,7 +102,7 @@ const AssignmentSessionPage = () => {
   );
 };
 
-const AssignmentWorkspaceSkeleton = () => (
+export const AssignmentWorkspaceSkeleton = () => (
   <div className='container mx-auto h-[calc(100vh-4rem)] p-4'>
     <div className='grid grid-cols-12 gap-4'>
       <div className='col-span-9 space-y-4'>

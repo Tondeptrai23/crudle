@@ -308,4 +308,14 @@ export default class AssignmentService {
 
 		return submissionsWithStatus;
 	}
+
+	async getSubmission(courseId: string, assignmentId: string, submissionId: string): Promise<Submission> {
+		const response = await api.get(`/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions/${submissionId}`);
+
+		if (!response.data.Success) {
+			throw new Error(response.data.Message);
+		}
+
+		return mapToSubmission(response.data.Data);
+	}
 }

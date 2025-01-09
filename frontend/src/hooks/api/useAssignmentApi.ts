@@ -188,3 +188,15 @@ export const useLatestSubmissions = (courseId: string, assignmentId: string) => 
     retry: false,
   });
 };
+
+export const useSubmission = (courseId: string, assignmentId: string, submissionId: string) => {
+	return useQuery({
+		queryKey: ['submission', courseId, assignmentId, submissionId],
+		queryFn: () =>
+			assignmentService.getSubmission(courseId, assignmentId, submissionId),
+		staleTime: 5 * 60 * 1000,
+		placeholderData: keepPreviousData,
+		refetchOnWindowFocus: false,
+		retry: false,
+	});
+}

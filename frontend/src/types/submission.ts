@@ -39,7 +39,7 @@ export interface SubmissionResponse {
   StartedAt: string | null;
   SubmittedAt: string | null;
   Score: number | null;
-  AnsweredQuestions: AnsweredQuestionResponse[] | null;
+  QuestionWithStudentAnswer: AnsweredQuestionResponse[] | null;
 }
 
 interface AnsweredQuestionResponse {
@@ -58,15 +58,16 @@ interface StudentAnswerResponse {
 
 export function mapToSubmission(response: SubmissionResponse): Submission {
 	return {
-		answeredQuestions: response.AnsweredQuestions?.map(mapToAnsweredQuestion) ?? null,
-		submissionId: response.SubmissionId,
-		assignmentId: response.AssignmentId,
-		studentId: response.StudentId,
-		studentName: response.StudentName,
-		startedAt: response.StartedAt ? new Date(response.StartedAt) : null,
-		submittedAt: response.SubmittedAt ? new Date(response.SubmittedAt) : null,
-		score: response.Score,
-	};
+    answeredQuestions:
+      response.QuestionWithStudentAnswer?.map(mapToAnsweredQuestion) ?? null,
+    submissionId: response.SubmissionId,
+    assignmentId: response.AssignmentId,
+    studentId: response.StudentId,
+    studentName: response.StudentName,
+    startedAt: response.StartedAt ? new Date(response.StartedAt) : null,
+    submittedAt: response.SubmittedAt ? new Date(response.SubmittedAt) : null,
+    score: response.Score,
+  };
 }
 
 function mapToAnsweredQuestion(response: AnsweredQuestionResponse): AnsweredQuestion {

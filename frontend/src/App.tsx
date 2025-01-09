@@ -26,6 +26,7 @@ import CourseDetailPage from './pages/course/CourseDetailPage.tsx';
 import CoursePage from './pages/course/CoursePage.tsx';
 import { Role } from './types/enums.ts';
 import { ForbiddenError, RefreshTokenExpiredError } from './types/error.ts';
+import AssignmentSubmissionDetailPage from './pages/assignments/AssignmentSubmissionDetailPage.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -110,6 +111,14 @@ const App: React.FC = () => {
                           </RequireAuth>
                         }
                       />
+											<Route
+												path='/course/:courseId/assignment/:assignmentId/submission/:submissionId'
+												element={
+													<RequireAuth allowedRoles={[Role.Teacher]}>
+														<AssignmentSubmissionDetailPage />
+													</RequireAuth>
+												}
+											/>
                     </Routes>
 
                     <RequireAuth allowedRoles={[Role.User]}>

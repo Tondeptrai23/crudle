@@ -92,7 +92,9 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({ courseId, assignmen
             </TableCell>
             <TableCell className='text-center underline hover:text-primary'>
               {submission.status === SubmissionStatus.DONE ? (
-                <Link to='/'>View</Link>
+                <Link to={`/course/${courseId}/assignment/${assignmentId}/submission/${submission.submissionId}`}>
+                  View
+                </Link>
               ) : null}
             </TableCell>
           </TableRow>
