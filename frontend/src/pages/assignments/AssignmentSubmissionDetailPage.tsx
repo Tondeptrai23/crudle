@@ -6,10 +6,12 @@ import { Card } from "@/components/common/ui/card";
 import { Button } from "@/components/common/ui/button";
 import { cn } from "@/lib/utils";
 import QuestionCard from "@/components/assignments/QuestionCard";
+import { useNavigate } from "react-router-dom";
 
 const AssignmentSubmissionDetail : React.FC = () => {
 	const { assignmentId, courseId, submissionId } = useCustomParams();
   const { role } = useAuth();
+	const navigate = useNavigate();
 
   const {
     data: assignment,
@@ -72,10 +74,10 @@ const AssignmentSubmissionDetail : React.FC = () => {
                     key={question.questionId}
                     className={cn(
                       'flex h-10 w-10 cursor-pointer items-center justify-center rounded-full font-medium transition-colors',
-                      // selectedAnswers[question.questionId]
-                      //   ? 'bg-green-500 text-white'
-                      //   : 'bg-gray-200 text-gray-700',
-                      'bg-gray-200 text-gray-700',
+                      question.answers.filter((a) => a.isCorrect)[0].value 
+												=== (question.studentsAnswers?.at(0)?.value ?? '') 
+                        ? 'bg-green-500 text-white'
+                        : 'bg-red-500 text-white',
                     )}
                     onClick={() => {
                       document
@@ -91,7 +93,7 @@ const AssignmentSubmissionDetail : React.FC = () => {
                 ))}
               </div>
               <div className='space-y-2'>
-                <Button variant='outline' className='w-full' onClick={() => {}}>
+                <Button variant='outline' className='w-full' onClick={() => navigate(-1)}>
                   Back
                 </Button>
               </div>

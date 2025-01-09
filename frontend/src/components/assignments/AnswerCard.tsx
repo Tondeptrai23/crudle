@@ -13,10 +13,18 @@ interface AnswerCardProps {
 const AnswerCard = ({ answer, index, questionType, selected }: AnswerCardProps) => {
   if (questionType === 'Fill In Blank') {
     return (
-      <div className='flex items-center space-x-4 rounded-lg bg-slate-200 p-2'>
-        <div className='font-semibold'>Correct Answer:</div>
-        <div>{answer.value}</div>
-      </div>
+      <>
+        {selected !== false && (
+        <div className='flex items-center space-x-4 rounded-lg bg-slate-200 p-2'>
+          <div className='font-semibold'>Selected Answer:</div>
+          <div>{selected}</div>
+        </div>
+        )}
+        <div className='flex items-center space-x-4 rounded-lg bg-slate-200 p-2'>
+          <div className='font-semibold'>Correct Answer:</div>
+          <div>{answer.value}</div>
+        </div>
+      </>
     );
   }
 
