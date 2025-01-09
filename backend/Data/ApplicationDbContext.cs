@@ -123,6 +123,60 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .HasForeignKey(stAns => stAns.SubmissionId)
             .OnDelete(DeleteBehavior.Cascade);
         
+        modelBuilder.Entity<Exam>()
+            .HasOne<Course>(exam => exam.Course)
+            .WithMany(c => c.Exams)
+            .HasForeignKey(exam => exam.CourseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<ExamSubmission>()
+            .HasKey(examSub => examSub.SubmissionId);
+        
+        modelBuilder.Entity<ExamSubmission>()
+            .HasOne<Exam>(examSub => examSub.Exam)
+            .WithMany(exam => exam.Submissions)
+            .HasForeignKey(examSub => examSub.ExamId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<ExamSubmission>()
+            .HasOne<Student>(examSub => examSub.Student)
+            .WithMany(st => st.ExamSubmissions)
+            .HasForeignKey(examSub => examSub.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<ExamQuestion>()
+            .HasKey(examQues => examQues.ExamQuestionId);
+        
+        modelBuilder.Entity<ExamQuestion>()
+            .HasOne<Exam>(examQues => examQues.Exam)
+            .WithMany(exam => exam.ExamQuestions)
+            .HasForeignKey(examQues => examQues.ExamId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ExamAnswer>()
+            .HasKey(examAns => examAns.AnswerId);
+        
+        modelBuilder.Entity<ExamAnswer>()
+            .HasOne<ExamQuestion>(examAns => examAns.ExamQuestion)
+            .WithMany(examQues => examQues.ExamAnswers)
+            .HasForeignKey(examAns => examAns.ExamQuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<StudentAnswerExam>()
+            .HasKey(stAnsExam => stAnsExam.StudentAnswerId);
+        
+        modelBuilder.Entity<StudentAnswerExam>()
+            .HasOne<ExamQuestion>(stAnsExam => stAnsExam.ExamQuestion)
+            .WithMany(examQues => examQues.StudentAnswers)
+            .HasForeignKey(stAnsExam => stAnsExam.ExamQuestionId)
+            .OnDelete(DeleteBehavior.Cascade);
+            
+        modelBuilder.Entity<StudentAnswerExam>()
+            .HasOne<ExamSubmission>(stAnsExam => stAnsExam.ExamSubmission)
+            .WithMany(examSub => examSub.StudentAnswers)
+            .HasForeignKey(stAnsExam => stAnsExam.SubmissionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         // Seed data 
         var hasher = new PasswordHasher<User>();
 
@@ -449,6 +503,70 @@ public class ApplicationDbContext : IdentityDbContext<User>
                 }
             }
         );
+        
+        modelBuilder.Entity<Exam>().HasData(
+            new List<Exam>() {
+                new() {
+                    ExamId = 1,
+                    CourseId = 3,
+                    Name = "Exam 1",
+                    Content = "Content 1",
+                    Duration = 60,
+                    StartDate = new DateTime(2025, 1, 1),
+                    EndDate = new DateTime(2025, 1, 1),
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                }
+            }
+        );
+        
+        modelBuilder.Entity<ExamQuestion>().HasData(
+            new List<ExamQuestion>() {
+                new() {
+                    ExamQuestionId = 1,
+                    ExamId = 1,
+                    Content = "Question 1",
+                    Type = "Multiple Choice"
+                },
+                new() {
+                    ExamQuestionId = 2,
+                    ExamId = 1,
+                    Content = "Question 2",
+                    Type = "Multiple Choice"
+                }
+            }
+        );
+        
+        modelBuilder.Entity<ExamSubmission>().HasData(
+            new List<ExamSubmission>() {
+                new() {
+                    SubmissionId = 1,
+                    ExamId = 1,
+                    StudentId = 2,
+                    StartedAt = DateTime.Now,
+                    SubmittedAt = DateTime.Now
+                }
+            }
+        );
+
+        modelBuilder.Entity<StudentAnswerExam>().HasData(
+            new List<StudentAnswerExam>() {
+                new() {
+                    StudentAnswerId = 1,
+                    ExamQuestionId = 1,
+                    SubmissionId = 1,
+                    Value = "Answer 1"
+                },
+                new() {
+                    StudentAnswerId = 2,
+                    ExamQuestionId = 2,
+                    SubmissionId = 1,
+                    Value = "Answer 3"
+                }
+            }
+        );
+        
+        
     }
 
     public DbSet<Student> Students { get; set; }
@@ -465,7 +583,11 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<AssignmentSubmission> AssignmentSubmissions { get; set; }
     
     public DbSet<StudentAnswer> StudentAnswers { get; set; }
-
+    
+    public DbSet<Exam> Exams { get; set; }
+    public DbSet<ExamSubmission> ExamSubmissions { get; set; }
+    public DbSet<ExamQuestion> ExamQuestions { get; set; }
+    public DbSet<ExamAnswer> ExamAnswers { get; set; }
     private static class UserSeeding
     {
         // Define constant GUIDs for each user

@@ -1,10 +1,8 @@
 ﻿using _3w1m.Constants;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Article;
-using _3w1m.Dtos.Assignment;
 using _3w1m.Dtos.Course;
 using _3w1m.Models.Domain;
-using _3w1m.Models.Exceptions;
 using _3w1m.Models.Exceptions;
 using _3w1m.Services.Interface;
 using _3w1m.Specifications;
