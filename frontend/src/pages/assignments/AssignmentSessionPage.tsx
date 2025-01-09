@@ -91,7 +91,7 @@ const AssignmentSessionPage = () => {
           <AlertDialogFooter>
             <AlertDialogAction
               className='bg-blue-500 hover:bg-blue-700'
-              onClick={() => navigate(`/course/${courseId}/assignment`)}
+              onClick={() => navigate(`/course/${courseId}`)}
             >
               Return
             </AlertDialogAction>

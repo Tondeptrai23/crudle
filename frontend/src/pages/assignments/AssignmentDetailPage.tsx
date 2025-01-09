@@ -1,5 +1,5 @@
 import QuestionCard from '@/components/assignments/QuestionCard';
-import SubmissionsTable from '@/components/assignments/SubmissionsTable';
+import SubmissionsTable from '@/components/submissions/SubmissionsTable';
 import {
   Accordion,
   AccordionContent,
@@ -201,6 +201,7 @@ const AssignmentDetailPage = () => {
                     <div className='space-y-4'>
                       {assignment.questions.map((question, index) => (
                         <QuestionCard
+													selected={false}
                           key={question.questionId}
                           showButton={false}
                           question={question}
@@ -234,8 +235,8 @@ const AssignmentDetailPage = () => {
                   </AccordionTrigger>
                   <AccordionContent className='px-6 pb-4'>
 										<SubmissionsTable
-											courseId={courseId}
-											assignmentId={assignmentId}
+											courseId={courseId.toString()}
+											assignmentId={assignmentId.toString()}
 											maxScore={assignment.questions.length}
 										/>
                   </AccordionContent>

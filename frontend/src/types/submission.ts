@@ -47,7 +47,7 @@ interface AnsweredQuestionResponse {
 	Content: string;
 	Type: string;
 	Answers: AnswerResponse[];
-	StudentsAnswers: StudentAnswerResponse[];
+	StudentAnswers: StudentAnswerResponse[];
 }
 
 interface StudentAnswerResponse {
@@ -77,7 +77,7 @@ function mapToAnsweredQuestion(response: AnsweredQuestionResponse): AnsweredQues
 		content: response.Content,
 		answers: response.Answers.map(mapToAnswer),
 		type: response.Type as Question['type'],
-		studentsAnswers: response.StudentsAnswers.map(mapToStudentAnswer),
+		studentsAnswers: response.StudentAnswers.map(mapToStudentAnswer),
 	};
 }
 

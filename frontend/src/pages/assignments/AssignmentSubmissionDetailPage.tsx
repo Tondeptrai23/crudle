@@ -4,9 +4,8 @@ import useAuth from "@/hooks/useAuth";
 import { useGetAssignment, useSubmission } from "@/hooks/api/useAssignmentApi";
 import { Card } from "@/components/common/ui/card";
 import { Button } from "@/components/common/ui/button";
-import LoadingButton from "@/components/common/ui/LoadingButton";
-import WorkspaceQuestionCard from "@/components/assignments/WorkspaceQuestionCard";
 import { cn } from "@/lib/utils";
+import QuestionCard from "@/components/assignments/QuestionCard";
 
 const AssignmentSubmissionDetail : React.FC = () => {
 	const { assignmentId, courseId, submissionId } = useCustomParams();
@@ -51,12 +50,14 @@ const AssignmentSubmissionDetail : React.FC = () => {
                 key={question.questionId}
                 id={`question-${question.questionId}`}
               >
-                <WorkspaceQuestionCard
+                <QuestionCard
+                  key={question.questionId}
+									selected={question.studentsAnswers ? question.studentsAnswers[0].value : ''}
+                  showButton={false}
                   question={question}
                   index={index}
-                  selectedAnswer={question.answers[0].value}
-                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                  onAnswerSelect={(_value) => {}}
+                  onDelete={() => {}}
+                  onQuestionChange={() => {}}
                 />
               </div>
             ))}
@@ -90,11 +91,8 @@ const AssignmentSubmissionDetail : React.FC = () => {
                 ))}
               </div>
               <div className='space-y-2'>
-                <LoadingButton className='w-full bg-blue-500 hover:bg-blue-700'>
-                  Submit
-                </LoadingButton>
                 <Button variant='outline' className='w-full' onClick={() => {}}>
-                  Cancel
+                  Back
                 </Button>
               </div>
             </Card>

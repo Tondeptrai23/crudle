@@ -6,10 +6,11 @@ import { AlphabetMapper } from '@/utils/helper';
 interface AnswerCardProps {
   answer: CreateAnswerDto;
   index: number;
+  selected: string | false;
   questionType: QuestionType;
 }
 
-const AnswerCard = ({ answer, index, questionType }: AnswerCardProps) => {
+const AnswerCard = ({ answer, index, questionType, selected }: AnswerCardProps) => {
   if (questionType === 'Fill In Blank') {
     return (
       <div className='flex items-center space-x-4 rounded-lg bg-slate-200 p-2'>
@@ -24,9 +25,13 @@ const AnswerCard = ({ answer, index, questionType }: AnswerCardProps) => {
       <div
         className={cn(
           'flex h-10 w-10 items-center justify-center rounded-md border border-gray-300 font-semibold',
-          answer.isCorrect
-            ? 'bg-green-500 text-white'
-            : 'bg-white text-gray-800',
+          (answer.isCorrect) 
+            ? (selected === false || selected === answer.value)
+							? 'bg-green-500 text-white'
+							: 'bg-blue-500 text-white'
+            :	(selected === answer.value) 
+							? 'bg-red-500 text-white' 
+							: 'bg-white text-gray-800',
         )}
       >
         {AlphabetMapper.numberToLetter(index)}

@@ -290,6 +290,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
         <div className='space-y-4'>
           {questions.map((question, index) => (
             <QuestionCard
+							selected={false}
               key={question.questionId}
               showButton={true}
               question={question}

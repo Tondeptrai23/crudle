@@ -11,6 +11,7 @@ interface QuestionCardProps {
   question: CreateQuestionDto;
   index: number;
   showButton: boolean;
+  selected: string | false;
   onQuestionChange: (content: CreateQuestionDto) => void;
   onDelete: (questionId: number) => void;
 }
@@ -19,6 +20,7 @@ const QuestionCard = ({
   question,
   index,
   showButton,
+	selected,
   onDelete,
   onQuestionChange,
 }: QuestionCardProps) => {
@@ -31,7 +33,7 @@ const QuestionCard = ({
       onCancel={() => {
         setIsEditing(false);
         if (question.isNew) {
-          onDelete(question.questionId);
+          onDelete(Number.parseInt(question.questionId));
         }
       }}
       onDone={(question) => {
@@ -74,6 +76,7 @@ const QuestionCard = ({
       <div className='space-y-2'>
         {question.answers.map((answer, index) => (
           <AnswerCard
+            selected={selected}
             key={answer.answerId}
             answer={answer}
             index={index}
