@@ -1,5 +1,4 @@
-import { mapToAnswer } from '@/services/AssignmentService';
-import { AnswerResponse, Question } from '@/types/assignment';
+import { AnswerResponse, Question, mapToAnswer } from '@/types/assignment';
 
 export default interface Submission {
 	answeredQuestions: AnsweredQuestion[] | null;
