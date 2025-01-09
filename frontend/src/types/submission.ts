@@ -2,18 +2,28 @@ import { AnswerResponse, Question, mapToAnswer } from '@/types/assignment';
 
 export default interface Submission {
 	answeredQuestions: AnsweredQuestion[] | null;
-	submissionId: number;
-	assignmentId: number;
-	studentId: number;
+	submissionId: string;
+	assignmentId: string;
+	studentId: string;
 	studentName: string;
 	startedAt: Date | null;
 	submittedAt: Date | null;
 	score: number | null;
 };
 
+export enum SubmissionStatus {
+	DONE,
+	IN_PROGRESS,
+	NOT_STARTED,
+}
+
+export interface SubmissionWithStatus extends Partial<Submission> {
+	status: SubmissionStatus
+}
+
 interface StudentAnswer {
-	submissionId: number;
-	questionId: number;
+	submissionId: string;
+	questionId: string;
 	value: string;
 }
 
@@ -22,18 +32,18 @@ interface AnsweredQuestion extends Question {
 }
 
 export interface SubmissionResponse {
-	SubmissionId: number;
-	AssignmentId: number;
-	StudentId: number;
-	StudentName: string;
-	StartedAt: string | null;
-	SubmittedAt: string | null;
-	Score: number | null;
-	AnsweredQuestions: AnsweredQuestionResponse[] | null;
+  SubmissionId: string;
+  AssignmentId: string;
+  StudentId: string;
+  StudentName: string;
+  StartedAt: string | null;
+  SubmittedAt: string | null;
+  Score: number | null;
+  AnsweredQuestions: AnsweredQuestionResponse[] | null;
 }
 
 interface AnsweredQuestionResponse {
-	QuestionId: number;
+	QuestionId: string;
 	Content: string;
 	Type: string;
 	Answers: AnswerResponse[];
@@ -41,8 +51,8 @@ interface AnsweredQuestionResponse {
 }
 
 interface StudentAnswerResponse {
-	SubmissionId: number;
-	QuestionId: number;
+	SubmissionId: string;
+	QuestionId: string;
 	Value: string;
 }
 

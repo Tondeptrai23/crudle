@@ -6,8 +6,11 @@ import Assignment, {
   mapToQuestion,
 } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
-import Submission, { mapToSubmission } from '@/types/submission';
+import Submission, { mapToSubmission, SubmissionStatus, SubmissionWithStatus } from '@/types/submission';
 import api from '@/utils/api';
+import CourseService from '@/services/CourseService';
+
+const courseService = new CourseService();
 
 export default class AssignmentService {
   async getAssignmentsForTeacher(
@@ -264,15 +267,45 @@ export default class AssignmentService {
     };
   }
 
-	async getSubmissions(courseId: number, assignmentId: number): Promise<Submission[]> {
-		const response = await api.get(`/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions`);
+	async getSubmissions(courseId: string, assignmentId: string): Promise<SubmissionWithStatus[]> {
+		const [response, course] = await Promise.all([
+			api.get(`/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions?OrderBy=SubmittedAt&OrderDirection=desc`),
+			courseService.getCourse('Teacher', courseId)
+		]);
 
 		if (!response.data.Success) {
 			throw new Error(response.data.Message);
 		}
 
-		return response.data.Data.map(mapToSubmission).filter(
-			(submission: Submission) => submission.score !== null
-		);
+		const students = course.students ?? [];
+		const submissions = response.data.Data.map(mapToSubmission);
+		const submissionsWithStatus: SubmissionWithStatus[] = [];
+
+		submissions.forEach((submission : Submission) => {
+			const possibleIndex = submissionsWithStatus.findIndex(
+				(submissionWithStatus) => submissionWithStatus.studentId === submission.studentId
+			);
+			const status = submission.score === null 
+				? SubmissionStatus.IN_PROGRESS 
+				: SubmissionStatus.DONE;
+
+			if (possibleIndex === -1) {
+				submissionsWithStatus.push({ ...submission, status });
+			} else if (submissionsWithStatus[possibleIndex].status === SubmissionStatus.IN_PROGRESS && status === SubmissionStatus.DONE) {
+				submissionsWithStatus[possibleIndex] = { ...submission, status };
+			}
+		});
+
+		students.forEach((student) => {
+			if (!submissionsWithStatus.find((submission) => submission.studentId === student.id)) {
+				submissionsWithStatus.push({
+					studentId: student.id,
+					studentName: student.fullname,
+					status: SubmissionStatus.NOT_STARTED,
+				});
+			}
+		});
+
+		return submissionsWithStatus;
 	}
 }
