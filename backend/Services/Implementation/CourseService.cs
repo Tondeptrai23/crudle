@@ -151,10 +151,18 @@ public class CourseService : ICourseService
             throw new ConflictException($"Students with IDs: {enrolledStudentIds} are already enrolled in the course");
         }
 
-        var nonEnrolledStudents = studentIds.Except(enrolledStudent.Select(student => student.StudentId)).ToList();
+        var existingEnrollments = await _context.Enrollments
+            .Where(e => e.CourseId == courseId)
+            .ToListAsync();
+
+        var enrollmentsToRemove = existingEnrollments
+            .Where(e => !studentIds.Contains(e.StudentId));
+        _context.Enrollments.RemoveRange(enrollmentsToRemove);
+
+        var newEnrolledStudents = studentIds.Except(enrolledStudent.Select(student => student.StudentId)).ToList();
         var enrollments = _context.Enrollments;
 
-        for (var i = 0; i < nonEnrolledStudents.Count; i++)
+        for (var i = 0; i < newEnrolledStudents.Count; i++)
         {
             var now = DateTime.Now;
             await enrollments.AddAsync(new Enrollment
@@ -208,13 +216,13 @@ public class CourseService : ICourseService
         }
 
         var enrollments = _context.Enrollments.Include(en => en.Student);
-        var isStudentEnrolled = await enrollments.AnyAsync(en => 
+        var isStudentEnrolled = await enrollments.AnyAsync(en =>
             en.CourseId == courseId && en.Student.UserId == userId);
-        
+
         var isTeacherEnrolled = course.Teacher!.UserId == userId;
-        
+
         var isEnrolled = isStudentEnrolled || isTeacherEnrolled;
-        
+
         return isEnrolled;
     }
 
