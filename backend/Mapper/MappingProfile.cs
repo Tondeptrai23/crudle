@@ -84,14 +84,14 @@ public class MappingProfile : Profile
         CreateMap<QuestionDto, Question>();
         CreateMap<QuestionDto, QuestionForStudentDto>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
-            src.Type == "Fill In Blank"
-                ? new List<AnswerForStudentDto>()
-                : src.Answers.Select(answer => new AnswerForStudentDto
-                {
-                    QuestionId = answer.QuestionId,
-                    AnswerId = answer.AnswerId,
-                    Value = answer.Value
-                }).ToList()));
+                src.Type == "Fill In Blank"
+                    ? new List<AnswerForStudentDto>()
+                    : src.Answers.Select(answer => new AnswerForStudentDto
+                    {
+                        QuestionId = answer.QuestionId,
+                        AnswerId = answer.AnswerId,
+                        Value = answer.Value
+                    }).ToList()));
         CreateMap<Question, QuestionForStudentDto>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src =>
                 src.Type.Equals(QuestionType.FillInBlank, StringComparison.OrdinalIgnoreCase)
@@ -139,9 +139,11 @@ public class MappingProfile : Profile
         CreateMap<AssignmentSubmissionMinimalDto, AssignmentSubmissionResponseDto>();
 
         CreateMap<Exam, ExamDto>()
-            .ForMember(dest => dest.NumberOfSubmissions, opt => opt.MapFrom(src => src.Submissions.Count));
+            .ForMember(dest => dest.NumberOfSubmissions, opt => opt.MapFrom(src => src.Submissions.Count))
+            .ForMember(dest => dest.MaxScore, opt => opt.MapFrom(e => e.Questions.Count));
         CreateMap<ExamDto, Exam>();
-        CreateMap<Exam, ExamMinimalDto>();
+        CreateMap<Exam, ExamMinimalDto>()
+            .ForMember(dest => dest.MaxScore, opt => opt.MapFrom(e => e.Questions.Count));
         CreateMap<ExamMinimalDto, Exam>();
         CreateMap<CreateExamRequestDto, Exam>()
             .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
@@ -191,10 +193,10 @@ public class MappingProfile : Profile
         CreateMap<CreateExamAnswerRequestDto, ExamAnswer>();
 
         CreateMap<ExamSubmission, ExamSubmissionDto>()
-            .ForMember(dest=>dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname))
-            .ForMember(dest => dest.Questions , opt => opt.MapFrom(src => src.Exam.Questions))
-            .ForMember(dest=>dest.ExamDueDate, opt => opt.MapFrom(src => src.Exam.EndDate));
-        
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname))
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Exam.Questions))
+            .ForMember(dest => dest.ExamDueDate, opt => opt.MapFrom(src => src.Exam.EndDate));
+
         CreateMap<ExamSubmissionDto, ExamSubmission>();
         CreateMap<ExamSubmission, ExamSubmissionResponseDto>()
             .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
@@ -209,7 +211,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.ExamQuestionId, opt => opt.MapFrom(src => src.ExamQuestionId));
 
         CreateMap<Exam, ExamStudentResponseDto>()
-            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions))
+            .ForMember(dest => dest.MaxScore, opt => opt.MapFrom(e => e.Questions.Count));
 
         CreateMap<StudentAnswerExam, ExamStudentAnswerDto>();
         CreateMap<ExamStudentAnswerDto, StudentAnswerExam>()
@@ -219,7 +222,6 @@ public class MappingProfile : Profile
         CreateMap<ExamSubmission, ExamSubmissionMinimalDto>()
             .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname))
             .ForMember(dest => dest.ExamDueDate, opt => opt.MapFrom(src => src.Exam.EndDate));
-        
         CreateMap<ExamSubmission, ExamSubmissionForStudentDto>()
             .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Exam.Questions));
         CreateMap<ExamSubmissionDto, ExamSubmissionForStudentDto>()
@@ -235,7 +237,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.StudentAnswer, opt => opt.MapFrom(src => src.StudentAnswers));
         CreateMap<ExamAnswer, ExamStudentAnswerDto>();
         CreateMap<ExamStudentAnswerDto, ExamAnswer>();
-        
+
         CreateMap<Exam, UpcomingExamDto>()
             .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.Course.Name));
     }

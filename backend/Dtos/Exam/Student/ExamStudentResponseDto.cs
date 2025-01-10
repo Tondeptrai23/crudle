@@ -9,7 +9,7 @@ public class ExamStudentResponseDto
     public string Content { get; set; }
     
     public int Duration { get; set; }
-    
+    public int MaxScore { get; set; }
     public DateTime StartDate { get; set; }
     
     public DateTime EndDate { get; set; }
