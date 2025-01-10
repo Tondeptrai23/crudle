@@ -76,7 +76,7 @@ const ExamSessionPage = () => {
 
     // If exam has ended, redirect back
     if (now > endDate) {
-      navigate(`/course/${courseId}/exam`);
+      navigate(`/course/${courseId}?tab=exams`);
       return;
     }
 

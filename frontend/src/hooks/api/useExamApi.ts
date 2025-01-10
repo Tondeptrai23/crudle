@@ -148,7 +148,6 @@ export const useSubmitExam = () => {
     mutationFn: async (data: { courseId: number; request: ExamSubmitDto }) => {
       const res = await examService.submitExam(data.courseId, data.request);
 
-      // Invalidate both the exam and its submission queries
       queryClient.invalidateQueries({
         queryKey: examKeys.detail(data.request.examId.toString()),
       });

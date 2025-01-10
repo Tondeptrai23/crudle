@@ -208,7 +208,7 @@ export default class ExamService {
         examSubmissionId: data.submissionId,
         submissionTime: data.submittedAt,
         studentAnswers: data.answers.map((answer) => ({
-          questionId: answer.questionId,
+          examQuestionId: answer.questionId,
           value: answer.value,
         })),
       },

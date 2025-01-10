@@ -158,6 +158,23 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
     setQuestions(result);
   };
 
+  const formatDate = (date: string | Date, format: 'display' | 'input') => {
+    const d = new Date(date);
+
+    if (format === 'input') {
+      return d.toISOString().slice(0, -8);
+    }
+
+    const pad = (num: number) => num.toString().padStart(2, '0');
+    const day = pad(d.getDate());
+    const month = pad(d.getMonth() + 1);
+    const year = d.getFullYear();
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
@@ -187,7 +204,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
                     <Input
                       type='datetime-local'
                       {...field}
-                      value={new Date(field.value).toISOString().slice(0, -8)}
+                      value={formatDate(field.value, 'input')}
                       onChange={(e) => {
                         if (e.target.value) {
                           field.onChange(
