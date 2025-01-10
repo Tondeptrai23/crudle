@@ -127,5 +127,17 @@ export default class CourseService {
 
     return response.data.Data;
   };
-}
 
+  updateCourseEnrollments = async (
+    id: string,
+    data: { studentIds: number[]; teacherId?: number },
+  ) => {
+    const response = await api.put(`/api/courses/${id}/enrollments`, data);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
+  };
+}
