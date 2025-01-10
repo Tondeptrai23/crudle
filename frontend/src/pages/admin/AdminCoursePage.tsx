@@ -42,10 +42,12 @@ import { useTeachers } from '@/hooks/api/useTeacherApi';
 import { useStudents } from '@/hooks/api/useStudentApi';
 import { AdditionalAction } from '@/types/table';
 import { EnrollmentsDialog } from './EnrollmentsDialog';
+import { useNavigate } from 'react-router-dom';
 
 const AdminCoursePage: React.FC = () => {
   const createCourse = useCreateCourse();
   const updateCourse = useUpdateCourse();
+  const navigate = useNavigate();
   const [enrollmentsOpen, setEnrollmentsOpen] = useState(false);
 
   const columns: Column<Course>[] = React.useMemo(
@@ -160,13 +162,12 @@ const AdminCoursePage: React.FC = () => {
     type: 'search',
   };
 
-  const showEnrollments = () => {
-    setEnrollmentsOpen(true);
-  };
-
   const enrollmentsOption: AdditionalAction = {
     label: 'Enrollments',
-    handler: showEnrollments,
+    handler: (index) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      navigate(`/admin/courses/${index}/enrollments`);
+    },
   };
 
   return (

@@ -37,7 +37,7 @@ export interface TablePaginationProps {
 
 export interface AdditionalAction {
   label: string;
-  handler: () => void;
+  handler: (index: string) => void;
 }
 
 export interface ActionCellProps {
