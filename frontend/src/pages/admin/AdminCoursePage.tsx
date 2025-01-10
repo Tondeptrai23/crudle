@@ -12,36 +12,8 @@ import { DateRangeFilterOption, SearchFilterOption } from '@/types/filter';
 import { Column } from '@/types/table';
 import { Calendar, Search } from 'lucide-react';
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/common/ui/dialog';
 import { useState } from 'react';
-import { Button } from '@/components/common/ui/button';
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from '@/components/common/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/common/ui/select';
-import { Plus } from 'lucide-react';
-import { useTeachers } from '@/hooks/api/useTeacherApi';
-import { useStudents } from '@/hooks/api/useStudentApi';
 import { AdditionalAction } from '@/types/table';
-import { EnrollmentsDialog } from './EnrollmentsDialog';
 import { useNavigate } from 'react-router-dom';
 
 const AdminCoursePage: React.FC = () => {
