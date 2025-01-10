@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from '@/components/common/ui/form';
 import { Input } from '@/components/common/ui/input';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useToast } from '@/hooks/use-toast';
 import useAuth from '@/hooks/useAuth';
@@ -151,9 +151,9 @@ export function LoginForm() {
             </LoadingButton>
           </form>
         </Form>
-        <Link to='/' className='mt-4 block text-center text-sm underline'>
+        {/* <Link to='/' className='mt-4 block text-center text-sm underline'>
           Forgot your password?
-        </Link>
+        </Link> */}
       </CardContent>
     </Card>
   );

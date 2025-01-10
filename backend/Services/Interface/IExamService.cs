@@ -13,7 +13,7 @@ public interface IExamService
     Task<ExamDto> GetDetailExamForTeacherAsync(int courseId, int examId, int teacherId);
     Task<ExamStudentResponseDto> GetDetailExamForStudentAsync(int courseId, int examId, int studentId);
     Task<ExamDto> CreateExamAsync(int courseId, int teacherId, CreateExamRequestDto createExamRequestDto);
-    Task<ExamDto> UpdateExamAsync(int courseId, int teacherId, int examId, UpdateExamRequestDto updateExamRequestDto);
+    Task<ExamDto> ReplaceExamAsync(int courseId, int teacherId, int examId, CreateExamRequestDto updateExamRequestDto);
 
     Task<ExamMinimalDto> UpdatePartiallyExamAsync(int courseId, int teacherI, int examId,
         UpdateMinimalExamRequestDto updateMinimalExamRequestDto);
@@ -23,4 +23,7 @@ public interface IExamService
     Task<ExamStartResponseDto> StartExamAsync(int courseId, int examId, int studentId);
     Task<ExamSubmissionResponseDto> SubmitExamAsync(int courseId, int examId, int studentId, ExamSubmissionRequestDto examSubmissionRequestDto);
     
+    Task<(int count, IEnumerable<UpcomingExamDto>)> GetExamsByStudentId(int studentId, int year, int month);
+
+    Task<(int count, IEnumerable<UpcomingExamDto>)> GetExamsByTeacherId(int teacherId, int year, int month);
 }

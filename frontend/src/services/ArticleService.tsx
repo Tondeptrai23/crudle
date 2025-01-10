@@ -123,6 +123,7 @@ export default class ArticleService {
       updatedAt: response.data.Data.UpdatedAt,
       isRead: response.data.Data.IsRead,
       readAt: response.data.Data.ReadAt,
+      courseName: response.data.Data.CourseName,
     };
   };
 

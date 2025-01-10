@@ -6,5 +6,5 @@ public class ExamAnswer
     public int ExamQuestionId { get; set; }
     public string Value { get; set; }
     public bool IsCorrect { get; set; }
-    public ExamQuestion ExamQuestion { get; set; }
+    public ExamQuestion Question { get; set; }
 }

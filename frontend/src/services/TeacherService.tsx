@@ -1,4 +1,5 @@
 import { UpcomingAssignment } from '@/types/assignment';
+import { UpcomingExam } from '@/types/exam';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Teacher, {
   CreateTeacherDTO,
@@ -139,4 +140,33 @@ export default class TeacherService {
         throw error;
       }
     };
+
+  getUpcomingExams: (date: Date) => Promise<UpcomingExam[]> = async (
+    date: Date,
+  ) => {
+    try {
+      const query = `month=${date.getMonth()}&year=${date.getFullYear()}`;
+      const response = await api.get(`api/teacher/exam/upcoming?${query}`);
+
+      if (!response.data.Success) {
+        throw new Error(response.data.Message);
+      }
+
+      return response.data.Data.map((exam: any) => {
+        return {
+          examId: exam.ExamId,
+          name: exam.Name,
+          startDate: new Date(exam.StartDate),
+          courseId: exam.CourseId,
+          courseName: exam.CourseName,
+          duration: exam.Duration,
+        };
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch exams: ${error.message}`);
+      }
+      throw error;
+    }
+  };
 }

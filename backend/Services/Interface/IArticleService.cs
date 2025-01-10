@@ -83,4 +83,6 @@ public interface IArticleService
     /// <exception cref="ConflictException">Thrown when the order's cannot be updated</exception>
     /// <exception cref="ResourceNotFoundException">Thrown when the course or any of the articles cannot be found</exception>
     Task<IEnumerable<ArticleDto>> UpdateArticleOrderAsync(int courseId, int[] articleIds);
+    
+    Task<IEnumerable<NotReadArticleDto>> GetNotReadArticlesAsync(int studentId);
 }

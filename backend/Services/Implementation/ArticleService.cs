@@ -218,7 +218,7 @@ public class ArticleService : IArticleService
         var course = await _dbContext.Courses.Include(course => course.Teacher)
             .FirstOrDefaultAsync(c => c.CourseId == courseId);
         if (course == null)
-        {
+       {
             throw new ResourceNotFoundException("Course not found");
         }
 
@@ -239,6 +239,19 @@ public class ArticleService : IArticleService
         return _mapper.Map<IEnumerable<ArticleDto>>(articles);
     }
 
+    public async Task<IEnumerable<NotReadArticleDto>> GetNotReadArticlesAsync(int studentId)
+    {
+        var notReadArticles = await _dbContext.Articles
+            .Include(a => a.Course)
+            .ThenInclude(c => c.Enrollments)
+            .Include(a => a.ArticleProgresses)
+            .Where(a =>  a.ArticleProgresses.All(ap => ap.StudentId != studentId)
+                        && a.Course.Enrollments.Any(e => e.StudentId == studentId))
+            .ToListAsync();
+        
+        return _mapper.Map<IEnumerable<NotReadArticleDto>>(notReadArticles);
+    }
+
     private IQueryable<Article> ApplyFilter(IQueryable<Article> query, ArticleCollectionQueryDto queryDto)
     {
         if (!string.IsNullOrEmpty(queryDto.Title))
@@ -253,7 +266,7 @@ public class ArticleService : IArticleService
 
         if (!string.IsNullOrEmpty(queryDto.Content))
         {
-            query = query.Where(x => x.Content.Contains(queryDto.Content));
+           query = query.Where(x => x.Content.Contains(queryDto.Content));
         }
 
         if (queryDto is { CreatedAtFrom: not null, CreatedAtTo: not null })
