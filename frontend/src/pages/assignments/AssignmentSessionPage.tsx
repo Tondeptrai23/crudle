@@ -70,7 +70,7 @@ const AssignmentSessionPage = () => {
       </div>
       <AssignmentWorkspace
         assignmentId={assignmentId}
-        submissionId={submission.submissionId}
+        submissionId={Number.parseInt(submission.submissionId)}
         questions={submission.questions}
         onSubmit={handleSubmit}
         onCancel={() => navigate(-1)}
@@ -91,7 +91,7 @@ const AssignmentSessionPage = () => {
           <AlertDialogFooter>
             <AlertDialogAction
               className='bg-blue-500 hover:bg-blue-700'
-              onClick={() => navigate(`/course/${courseId}/assignment`)}
+              onClick={() => navigate(`/course/${courseId}`)}
             >
               Return
             </AlertDialogAction>
@@ -102,7 +102,7 @@ const AssignmentSessionPage = () => {
   );
 };
 
-const AssignmentWorkspaceSkeleton = () => (
+export const AssignmentWorkspaceSkeleton = () => (
   <div className='container mx-auto h-[calc(100vh-4rem)] p-4'>
     <div className='grid grid-cols-12 gap-4'>
       <div className='col-span-9 space-y-4'>

@@ -282,7 +282,7 @@ const AddExamForm: React.FC<ExamFormProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='multiple-choice'>Multiple Choice</SelectItem>
-                <SelectItem value='fill-blank'>Fill In Blank</SelectItem>
+                <SelectItem value='fill-blank'>Open-ended</SelectItem>
               </SelectContent>
             </Select>
             <Button

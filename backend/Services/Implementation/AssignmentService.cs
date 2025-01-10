@@ -57,6 +57,7 @@ public class AssignmentService : IAssignmentService
     public async Task<AssignmentDto> GetAssignmentAsync(int courseId, int assignmentId, IAssignmentSpecification spec)
     {
         var assignment = await spec.Apply(_dbContext.Assignments)
+            .Include(asgmt => asgmt.Questions)
             .FirstOrDefaultAsync(c => c.AssignmentId == assignmentId && c.CourseId == courseId);
         if (assignment == null)
         {

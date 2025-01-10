@@ -60,13 +60,6 @@ const EditingQuestionCard = ({
       setQuestionError('At least one answer is required');
     } else if (question.type === 'Fill In Blank' && answers.length > 1) {
       setQuestionError('Fill in the blank questions can only have one answer');
-    } else if (
-      question.type === 'Fill In Blank' &&
-      questionContent.split('___').length !== 2
-    ) {
-      setQuestionError(
-        'Fill in the blank questions must have exactly one blank',
-      );
     } else {
       setQuestionError(null);
     }

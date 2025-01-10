@@ -26,7 +26,7 @@ const AddExamPage = () => {
           startDate: new Date(),
         }}
         onSave={handleSave}
-        onCancel={() => navigate('../..?tab=exams', { relative: 'path' })}
+        onCancel={() => navigate('..?tab=exams', { relative: 'path' })}
       />
     </div>
   );

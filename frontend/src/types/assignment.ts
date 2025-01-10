@@ -1,6 +1,6 @@
 export default interface Assignment {
-  assignmentId: number;
-  courseId: number;
+  assignmentId: string;
+  courseId: string;
   name: string;
   content: string;
   dueDate: Date | null;
@@ -8,13 +8,14 @@ export default interface Assignment {
   updatedAt: Date;
   canViewScore: boolean;
   canRetry: boolean;
+	totalQuestions: number;
   type: 'file' | 'questions';
   questions: Question[];
 }
 
 export interface AssignmentResponse {
-  AssignmentId: number;
-  CourseId: number;
+  AssignmentId: string;
+  CourseId: string;
   Name: string;
   Content: string;
   DueDate: Date | null;
@@ -22,27 +23,28 @@ export interface AssignmentResponse {
   UpdatedAt: Date;
   CanViewScore: boolean;
   CanRetry: boolean;
+	TotalQuestions: number;
   Type: 'file' | 'questions';
   Questions: QuestionResponse[];
 }
 
 export interface QuestionResponse {
-  QuestionId: number;
-  AssignmentId: number;
+  QuestionId: string;
+  AssignmentId: string;
   Content: string;
   Answers: AnswerResponse[];
   Type: QuestionType;
 }
 
 export interface AnswerResponse {
-  AnswerId: number;
-  QuestionId: number;
+  AnswerId: string;
+  QuestionId: string;
   Value: string;
   IsCorrect: boolean;
 }
 
 export type CreateAssignmentDto = {
-  courseId: number;
+  courseId: string;
   name: string;
   content: string;
   dueDate: Date | null;
@@ -55,22 +57,22 @@ export type CreateAssignmentDto = {
 export type QuestionType = 'Multiple Choice' | 'Fill In Blank';
 
 export interface Question {
-  questionId: number;
-  assignmentId: number;
+  questionId: string;
+  assignmentId: string;
   content: string;
   answers: Answer[];
   type: QuestionType;
 }
 
 export interface Answer {
-  answerId: number;
-  questionId: number;
+  answerId: string;
+  questionId: string;
   value: string;
   isCorrect: boolean;
 }
 
 export interface CreateQuestionDto {
-  questionId: number;
+  questionId: string;
   content: string;
   type: QuestionType;
   answers: CreateAnswerDto[];
@@ -78,34 +80,34 @@ export interface CreateQuestionDto {
 }
 
 export interface CreateAnswerDto {
-  answerId: number;
+  answerId: string;
   value: string;
   isCorrect: boolean;
 }
 
 export interface AssignmentSubmitDto {
-  assignmentId: number;
-  submissionId: number;
+  assignmentId: string;
+  submissionId: string;
   answers: AnswerSubmitDto[];
 }
 
 export interface AnswerSubmitDto {
-  questionId: number;
+  questionId: string;
   value: string;
 }
 
 export interface AssignmentStartDto {
-  submissionId: number;
-  assignmentId: number;
+  submissionId: string;
+  assignmentId: string;
   startedAt: Date;
   questions: Question[];
 }
 
 export interface UpcomingAssignment {
-  assignmentId: number;
+  assignmentId: string;
   name: string;
   dueDate: Date;
-  courseId: number;
+  courseId: string;
   courseName: string;
 }
 
@@ -119,6 +121,7 @@ export const mapToAssignment = (response: AssignmentResponse) => ({
   updatedAt: response.UpdatedAt,
   canViewScore: response.CanViewScore,
   canRetry: response.CanRetry,
+	totalQuestions: response.TotalQuestions,
   type: response.Type,
   questions: response.Questions?.map(mapToQuestion),
 });
