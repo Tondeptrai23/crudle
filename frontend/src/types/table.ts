@@ -78,4 +78,5 @@ export interface GenericTableProps<T extends { id: string }> {
   disabledActions?: ActionCellProps['disabledActions'];
   queryHook: QueryHook<T>;
   filterOptions: FilterOption[];
+  additionalActions?: AdditionalAction[];
 }

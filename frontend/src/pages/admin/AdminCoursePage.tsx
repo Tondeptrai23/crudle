@@ -12,6 +12,35 @@ import { DateRangeFilterOption, SearchFilterOption } from '@/types/filter';
 import { Column } from '@/types/table';
 import { Calendar, Search } from 'lucide-react';
 import React from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/common/ui/dialog';
+import { useState } from 'react';
+import { Button } from '@/components/common/ui/button';
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@/components/common/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/common/ui/select';
+import { Plus } from 'lucide-react';
+import { useTeachers } from '@/hooks/api/useTeacherApi';
+import { useStudents } from '@/hooks/api/useStudentApi';
+import { AdditionalAction } from '@/types/table';
 
 const AdminCoursePage: React.FC = () => {
   const createCourse = useCreateCourse();
@@ -129,6 +158,113 @@ const AdminCoursePage: React.FC = () => {
     type: 'search',
   };
 
+  const showEnrollments = () => {
+    const [open, setOpen] = useState(false);
+    const [selectedTeacher, setSelectedTeacher] = useState('');
+    const { data: teachers, isLoading: isLoadingTeachers } = useTeachers({
+      page: 1,
+      pageSize: 999, // TODO: Fix
+      filters: {
+        id: '',
+        fullname: '',
+        contactEmail: [],
+        phone: '',
+      },
+      sort: {
+        key: null,
+        direction: null,
+      },
+    });
+
+    const { data: students, isLoadingStudents } = useStudents({
+      page: 1,
+      pageSize: 999, // TODO: Fix
+      filters: {
+        id: '',
+        fullname: '',
+        contactEmail: [],
+        phone: '',
+      },
+      sort: {
+        key: null,
+        direction: null,
+      },
+    });
+
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className='min-w-[800px]'>
+          <DialogHeader>
+            <DialogTitle>Course Enrollments</DialogTitle>
+          </DialogHeader>
+
+          <div className='flex flex-col gap-4'>
+            {/* Teacher Selection */}
+            <div className='flex flex-col gap-2'>
+              <label>Teacher</label>
+              <Select
+                value={selectedTeacher}
+                onValueChange={setSelectedTeacher}
+                disabled={isLoadingTeachers}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder='Select a teacher' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Teachers</SelectLabel>
+                    {teachers?.data.map((teacher) => (
+                      <SelectItem key={teacher.id} value={teacher.id}>
+                        {teacher.fullname}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Students Table */}
+            <div className='flex flex-col gap-2'>
+              <div className='flex items-center justify-between'>
+                <h3 className='font-semibold'>Students</h3>
+                <Button size='sm'>
+                  <Plus className='mr-2 h-4 w-4' />
+                  Add Student
+                </Button>
+              </div>
+
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Student ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {/* {students.map(student => (
+                    <TableRow key={student.id}>
+                      <TableCell>{student.id}</TableCell>
+                      <TableCell>{student.fullname}</TableCell>
+                      <TableCell>
+                        <Button variant="destructive" size="sm">Remove</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))} */}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
+  const enrollmentsOption: AdditionalAction = {
+    label: 'Enrollments',
+    handler: showEnrollments,
+  };
+
   return (
     <div className='min-h-3/4 w m-auto flex flex-row gap-4'>
       <GenericTable
@@ -147,6 +283,7 @@ const AdminCoursePage: React.FC = () => {
           startDateFilter,
           teacherNameFilter,
         ]}
+        additionalActions={[enrollmentsOption]}
       />
     </div>
   );
