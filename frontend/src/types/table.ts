@@ -35,6 +35,11 @@ export interface TablePaginationProps {
   onPageSizeChange?: (pageSize: number) => void;
 }
 
+export interface AdditionalAction {
+  label: string;
+  handler: () => void;
+}
+
 export interface ActionCellProps {
   requireDeleteConfirmation?: boolean;
   isEditing?: boolean;
@@ -48,6 +53,7 @@ export interface ActionCellProps {
     edit?: boolean;
     delete?: boolean;
   };
+  additionalActions?: AdditionalAction[];
 }
 
 export type QueryHook<T> = (

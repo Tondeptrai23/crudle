@@ -36,6 +36,7 @@ const ActionCell: React.FC<ActionCellProps> = ({
     edit: false,
     delete: true,
   },
+  additionalActions = [],
 }) => {
   const handleDeleteClick = () => {
     if (requireDeleteConfirmation) {
@@ -102,6 +103,14 @@ const ActionCell: React.FC<ActionCellProps> = ({
             </>
           )}
           {!disabledActions.delete && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleDeleteClick}>
+                Delete
+              </DropdownMenuItem>
+            </>
+          )}
+          {additionalActions.map((action, index) => (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDeleteClick}>
