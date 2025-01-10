@@ -108,12 +108,22 @@ const ExamSubmissionsTable: React.FC<ExamSubmissionsTableProps> = ({
                   ).toFixed(2) + '%'}
             </TableCell>
             <TableCell className='text-right tabular-nums'>
-              <div>{submission.startedAt?.toLocaleDateString('en-GB')}</div>
-              <div>{submission.startedAt?.toLocaleTimeString('en-GB')}</div>
+              {!submission.startedAt ? (
+                'N/A'
+              ) : (
+                <>
+                  <div>{submission.startedAt?.toLocaleDateString('en-GB')}</div>
+                  <div>{submission.startedAt?.toLocaleTimeString('en-GB')}</div>
+                </>
+              )}
             </TableCell>
             <TableCell className='text-right tabular-nums'>
-              <div>{submission.submittedAt?.toLocaleDateString('en-GB')}</div>
-              <div>{submission.submittedAt?.toLocaleTimeString('en-GB')}</div>
+              {!submission.submittedAt ? ('N/A') : (
+								<>
+									<div>{submission.submittedAt?.toLocaleDateString('en-GB')}</div>
+									<div>{submission.submittedAt?.toLocaleTimeString('en-GB')}</div>
+								</>
+							)}
             </TableCell>
             <TableCell className='text-center underline hover:text-primary'>
               {submission.status === ExamSubmissionStatus.DONE &&
