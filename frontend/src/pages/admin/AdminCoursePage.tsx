@@ -161,35 +161,50 @@ const AdminCoursePage: React.FC = () => {
   const showEnrollments = () => {
     const [open, setOpen] = useState(false);
     const [selectedTeacher, setSelectedTeacher] = useState('');
-    const { data: teachers, isLoading: isLoadingTeachers } = useTeachers({
-      page: 1,
-      pageSize: 999, // TODO: Fix
-      filters: {
-        id: '',
-        fullname: '',
-        contactEmail: [],
-        phone: '',
-      },
-      sort: {
-        key: null,
-        direction: null,
-      },
-    });
+    // const { data: teachers, isLoading: isLoadingTeachers } = useTeachers({
+    //   page: 1,
+    //   pageSize: 999, // TODO: Fix
+    //   filters: {
+    //     id: '',
+    //     fullname: '',
+    //     contactEmail: [],
+    //     phone: '',
+    //   },
+    //   sort: {
+    //     key: null,
+    //     direction: null,
+    //   },
+    // });
 
-    const { data: students, isLoadingStudents } = useStudents({
-      page: 1,
-      pageSize: 999, // TODO: Fix
-      filters: {
-        id: '',
-        fullname: '',
-        contactEmail: [],
-        phone: '',
-      },
-      sort: {
-        key: null,
-        direction: null,
-      },
-    });
+    // const { data: students, isLoadingStudents } = useStudents({
+    //   page: 1,
+    //   pageSize: 999, // TODO: Fix
+    //   filters: {
+    //     id: '',
+    //     fullname: '',
+    //     contactEmail: [],
+    //     phone: '',
+    //   },
+    //   sort: {
+    //     key: null,
+    //     direction: null,
+    //   },
+    // });
+
+    const teachers = [
+      { id: '1', fullname: 'John Doe' },
+      { id: '2', fullname: 'Jane Smith' },
+      { id: '3', fullname: 'Robert Johnson' },
+    ];
+
+    const students = [
+      { id: 'ST001', fullname: 'Alice Brown' },
+      { id: 'ST002', fullname: 'Bob Wilson' },
+      { id: 'ST003', fullname: 'Carol White' },
+      { id: 'ST004', fullname: 'David Black' },
+    ];
+
+    const isLoadingTeachers = false;
 
     return (
       <Dialog open={open} onOpenChange={setOpen}>
@@ -213,7 +228,7 @@ const AdminCoursePage: React.FC = () => {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Teachers</SelectLabel>
-                    {teachers?.data.map((teacher) => (
+                    {teachers?.map((teacher) => (
                       <SelectItem key={teacher.id} value={teacher.id}>
                         {teacher.fullname}
                       </SelectItem>
