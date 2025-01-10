@@ -1,5 +1,3 @@
-using System;
-
 namespace _3w1m.Dtos.Article;
 
 public class ArticleDto

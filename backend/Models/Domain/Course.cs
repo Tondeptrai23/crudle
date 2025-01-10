@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace _3w1m.Models.Domain;
 
 public class Course

@@ -18,15 +18,13 @@ namespace TestBackend.Controllers.AdminTests;
 public class AdminStudentControllerTests
 {
     private Mock<IStudentService> _studentServiceMock;
-    private Mock<IMapper> _mapperMock;
     private StudentController _controller;
 
     [TestInitialize]
     public void Setup()
     {
         _studentServiceMock = new Mock<IStudentService>();
-        _mapperMock = new Mock<IMapper>();
-        _controller = new StudentController(_studentServiceMock.Object, _mapperMock.Object);
+        _controller = new StudentController(_studentServiceMock.Object);
     }
 
     [TestMethod]
