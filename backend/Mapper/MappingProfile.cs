@@ -69,7 +69,8 @@ public class MappingProfile : Profile
         CreateMap<UpdateArticleProgressDto, ArticleProgress>();
 
         CreateMap<CreateAssignmentRequestDto, Assignment>();
-        CreateMap<Assignment, AssignmentDto>();
+        CreateMap<Assignment, AssignmentDto>()
+            .ForMember(dest => dest.TotalQuestions, opt => opt.MapFrom(src => src.Questions.Count));
         CreateMap<AssignmentDto, Assignment>();
         CreateMap<UpdateAssignmentRequestDto, Assignment>();
         CreateMap<UpdateAssignmentRequestDto, Assignment>();
@@ -190,10 +191,10 @@ public class MappingProfile : Profile
         CreateMap<CreateExamAnswerRequestDto, ExamAnswer>();
 
         CreateMap<ExamSubmission, ExamSubmissionDto>()
-            .ForMember(dest=>dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname))
-            .ForMember(dest => dest.Questions , opt => opt.MapFrom(src => src.Exam.Questions))
-            .ForMember(dest=>dest.ExamDueDate, opt => opt.MapFrom(src => src.Exam.EndDate));
-        
+            .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname))
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Exam.Questions))
+            .ForMember(dest => dest.ExamDueDate, opt => opt.MapFrom(src => src.Exam.EndDate));
+
         CreateMap<ExamSubmissionDto, ExamSubmission>();
         CreateMap<ExamSubmission, ExamSubmissionResponseDto>()
             .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname));
@@ -218,7 +219,7 @@ public class MappingProfile : Profile
         CreateMap<ExamSubmission, ExamSubmissionMinimalDto>()
             .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Fullname))
             .ForMember(dest => dest.ExamDueDate, opt => opt.MapFrom(src => src.Exam.EndDate));
-        
+
         CreateMap<ExamSubmission, ExamSubmissionForStudentDto>()
             .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Exam.Questions));
         CreateMap<ExamSubmissionDto, ExamSubmissionForStudentDto>()
