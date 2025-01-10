@@ -297,7 +297,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='multiple-choice'>Multiple Choice</SelectItem>
-                <SelectItem value='fill-blank'>Fill In Blank</SelectItem>
+                <SelectItem value='fill-blank'>Open-ended</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -314,7 +314,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
         <div className='space-y-4'>
           {questions.map((question, index) => (
             <QuestionCard
-							selected={false}
+              selected={false}
               key={question.questionId}
               showButton={true}
               question={question}

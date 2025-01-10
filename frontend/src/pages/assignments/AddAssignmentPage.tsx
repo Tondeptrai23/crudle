@@ -24,13 +24,13 @@ const AddAssignmentPage = () => {
           courseId: courseId,
           name: '',
           content: '',
-          dueDate: null,
+          dueDate: new Date(),
           canViewScore: false,
           canRetry: false,
           type: 'questions',
         }}
         onSave={handleSave}
-        onCancel={() => navigate('../..?tab=assignments', { relative: 'path' })}
+        onCancel={() => navigate('..?tab=assignments', { relative: 'path' })}
       />
     </div>
   );
