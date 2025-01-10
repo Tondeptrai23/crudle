@@ -134,7 +134,10 @@ const GenericTable = <T extends { id: string }>({
                 onSave={() => handleSave(cell.id)}
                 onCancel={handleCancel}
                 disabledActions={disabledActions}
-                additionalActions={additionalActions}
+                additionalActions={additionalActions.map((action) => ({
+                  label: action.label,
+                  handler: () => action.handler(cell.id),
+                }))}
               />
             </TableCell>
           </TableRow>
