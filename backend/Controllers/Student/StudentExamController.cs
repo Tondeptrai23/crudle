@@ -131,7 +131,7 @@ public class StudentExamController : Controller
     
     [HttpGet]
     [Route("{examId:int}/Submissions")]
-    public async Task<IActionResult> GetExamSubmissionsAsync([FromRoute] int courseId,
+    public async Task<IActionResult> GetExamSubmissionsAsync([FromRoute] int courseId, [FromRoute] int examId,
         [FromQuery] ExamSubmissionQueryCollectionDto queryCollectionDto)
     {
         var user = await _userManager.GetUserAsync(User);
@@ -146,7 +146,7 @@ public class StudentExamController : Controller
         }
 
         var student = await _studentService.GetStudentByUserIdAsync(user.Id);
-        var (total, examSubmissions) = await _examSubmissionService.GetExamSubmissionsHistoryAsync(courseId, student.StudentId, queryCollectionDto);
+        var (total, examSubmissions) = await _examSubmissionService.GetExamSubmissionsHistoryAsync(courseId, examId, student.StudentId, queryCollectionDto);
 
         return Ok(new PaginationResponseDto<IEnumerable<ExamSubmissionMinimalDto>>(
             examSubmissions,
