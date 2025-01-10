@@ -1,12 +1,7 @@
-import { ExamProvider } from '@/components/exams/ExamContext';
 import ExamDetail from '@/components/exams/ExamDetail';
 
 const ExamDetailPage = () => {
-  return (
-    <ExamProvider>
-      <ExamDetail />
-    </ExamProvider>
-  );
+  return <ExamDetail />;
 };
 
 export default ExamDetailPage;

@@ -205,9 +205,9 @@ export default class ExamService {
     const response = await api.post(
       `/api/Student/Course/${courseId}/Exam/${data.examId}/Submit`,
       {
-        submissionId: data.submissionId,
-        submittedAt: data.submittedAt,
-        answers: data.answers.map((answer) => ({
+        examSubmissionId: data.submissionId,
+        submissionTime: data.submittedAt,
+        studentAnswers: data.answers.map((answer) => ({
           questionId: answer.questionId,
           value: answer.value,
         })),

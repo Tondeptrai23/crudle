@@ -1,4 +1,3 @@
-// components/exams/ExamDetail.tsx
 import {
   Accordion,
   AccordionContent,

@@ -220,9 +220,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.ExamDueDate, opt => opt.MapFrom(src => src.Exam.EndDate));
         
         CreateMap<ExamSubmission, ExamSubmissionForStudentDto>()
-            .ForMember(dest => dest.ExamQuestions, opt => opt.MapFrom(src => src.Exam.Questions));
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Exam.Questions));
         CreateMap<ExamSubmissionDto, ExamSubmissionForStudentDto>()
-            .ForMember(dest => dest.ExamQuestions, opt => opt.MapFrom(src => src.Questions));
+            .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
         CreateMap<ExamQuestion, ExamQuestionWithAnswerForStudentDto>()
             .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers));
         CreateMap<ExamQuestionDto, ExamQuestionWithAnswerForStudentDto>()

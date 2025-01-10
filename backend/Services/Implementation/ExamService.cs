@@ -230,29 +230,29 @@ public class ExamService : IExamService
         {
             throw new ForbiddenException("Exam has already ended");
         }
-
-        if (await _context.ExamSubmissions.AnyAsync(es => es.StudentId == studentId && es.ExamId == examId && es.SubmittedAt != null))
+        
+        var submission = await _context.ExamSubmissions
+            .FirstOrDefaultAsync(es => es.StudentId == studentId && es.ExamId == examId);
+        if (submission == null)
         {
-            throw new ForbiddenException("Student has already submitted the exam");
+            submission = new ExamSubmission
+            {
+                StudentId = studentId,
+                ExamId = examId,
+                StartedAt = DateTime.Now
+            };
+            await _context.ExamSubmissions.AddAsync(submission);
         }
         
-        var examSubmission = new ExamSubmission
-        {
-            StudentId = studentId,
-            ExamId = examId,
-            StartedAt = DateTime.Now
-        };
-
-        await _context.ExamSubmissions.AddAsync(examSubmission);
         await _context.SaveChangesAsync();
 
-        examSubmission = await _context.ExamSubmissions
+        submission = await _context.ExamSubmissions
             .Include(es => es.Exam)
             .ThenInclude(e => e.Questions)
             .ThenInclude(eq => eq.Answers)
-            .FirstOrDefaultAsync(es => es.SubmissionId == examSubmission.SubmissionId);
+            .FirstOrDefaultAsync(es => es.SubmissionId == submission.SubmissionId);
         
-        return _mapper.Map<ExamStartResponseDto>(examSubmission);
+        return _mapper.Map<ExamStartResponseDto>(submission);
     }
 
     public async Task<ExamSubmissionResponseDto> SubmitExamAsync(int courseId, int examId, int studentId,

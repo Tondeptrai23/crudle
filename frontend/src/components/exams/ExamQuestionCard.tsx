@@ -7,6 +7,7 @@ interface ExamQuestionCardProps {
   question: ExamQuestion;
   index: number;
   selectedAnswer: string;
+  disabled?: boolean;
   onAnswerSelect: (value: string) => void;
 }
 
@@ -15,6 +16,7 @@ const ExamQuestionCard = ({
   index,
   selectedAnswer,
   onAnswerSelect,
+  disabled,
 }: ExamQuestionCardProps) => {
   return (
     <Card className='p-6'>
@@ -26,6 +28,7 @@ const ExamQuestionCard = ({
       {question.type === 'Fill In Blank' ? (
         <div className='mt-4'>
           <Input
+            disabled={disabled}
             placeholder='Type your answer'
             value={selectedAnswer || ''}
             onChange={(e) => onAnswerSelect(e.target.value)}
@@ -42,7 +45,10 @@ const ExamQuestionCard = ({
                   ? 'border-blue-500 bg-blue-50'
                   : 'hover:bg-gray-50',
               )}
-              onClick={() => onAnswerSelect(answer.value)}
+              onClick={() => {
+                if (disabled) return;
+                onAnswerSelect(answer.value);
+              }}
             >
               <div className='flex items-center gap-3'>
                 <div

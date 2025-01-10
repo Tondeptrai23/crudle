@@ -78,6 +78,10 @@ export const getRole = () => {
   return sessionStorage.getItem('role') ?? '';
 };
 
+export const getUserId = () => {
+  return String(sessionStorage.getItem('user-id'));
+};
+
 api.interceptors.request.use(
   (config) => {
     config.headers['Content-Type'] = 'application/json';
