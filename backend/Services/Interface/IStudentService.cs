@@ -1,6 +1,4 @@
-using _3w1m.Dtos;
 using _3w1m.Dtos.Student;
-using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 
 namespace _3w1m.Services.Interface;
