@@ -137,7 +137,7 @@ const AdminCoursePage: React.FC = () => {
   const enrollmentsOption: AdditionalAction = {
     label: 'Enrollments',
     handler: (id: string) => {
-      navigate(`/admin/courses/${id}/enrollments`);
+      navigate(`/admin/course/${id}/enrollments`);
     },
   };
 

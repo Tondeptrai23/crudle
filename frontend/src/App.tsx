@@ -12,6 +12,7 @@ import AdminCoursePage from './pages/admin/AdminCoursePage.tsx';
 import AdminHomePage from './pages/admin/AdminHomePage.tsx';
 import AdminStudentPage from './pages/admin/AdminStudentPage.tsx';
 import AdminTeacherPage from './pages/admin/AdminTeacherPage.tsx';
+import AdminCourseEnrollmentPage from './pages/admin/AdminCourseEnrollmentsPage.tsx';
 import ArticleCreatePage from './pages/articles/ArticleCreatePage.tsx';
 import ArticleDetailPage from './pages/articles/ArticleDetailPage.tsx';
 import ArticleUpdatePage from './pages/articles/ArticleUpdatePage.tsx';
@@ -61,7 +62,13 @@ const App: React.FC = () => {
                     <MainLayout>
                       <Routes>
                         <Route path='/dashboard' element={<AdminHomePage />} />
-                        <Route path='/course' element={<AdminCoursePage />} />
+                        <Route path='/course'>
+                          <Route index element={<AdminCoursePage />} />
+                          <Route
+                            path=':courseId/enrollments'
+                            element={<AdminCourseEnrollmentPage />}
+                          />
+                        </Route>
                         <Route path='/student' element={<AdminStudentPage />} />
                         <Route path='/teacher' element={<AdminTeacherPage />} />
                         <Route path='*' element={<div>Not Found</div>} />
