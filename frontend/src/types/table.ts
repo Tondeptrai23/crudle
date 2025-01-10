@@ -37,7 +37,7 @@ export interface TablePaginationProps {
 
 export interface AdditionalAction {
   label: string;
-  handler: (index: string) => void;
+  handler: (id: string) => void;
 }
 
 export interface ActionCellProps {
@@ -72,7 +72,7 @@ export interface GenericTableProps<T extends { id: string }> {
   columns: Column<T>[];
   actions?: TableActions;
   formComponent: React.ComponentType<{
-    onSubmit: (data: any) => void;
+    onSubmit: () => void;
   }>;
   requireDeleteConfirmation?: boolean;
   disabledActions?: ActionCellProps['disabledActions'];

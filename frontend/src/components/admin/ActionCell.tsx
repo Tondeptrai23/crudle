@@ -116,7 +116,6 @@ const ActionCell: React.FC<ActionCellProps> = ({
               <DropdownMenuItem
                 onClick={() => {
                   action.handler();
-                  console.log(1);
                 }}
               >
                 <span className='flex items-center gap-2'>{action.label}</span>

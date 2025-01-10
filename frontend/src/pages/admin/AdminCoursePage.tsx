@@ -20,7 +20,7 @@ const AdminCoursePage: React.FC = () => {
   const createCourse = useCreateCourse();
   const updateCourse = useUpdateCourse();
   const navigate = useNavigate();
-  const [enrollmentsOpen, setEnrollmentsOpen] = useState(false);
+  const selectedRow = useState<Course | null>(null);
 
   const columns: Column<Course>[] = React.useMemo(
     () => [
@@ -136,9 +136,8 @@ const AdminCoursePage: React.FC = () => {
 
   const enrollmentsOption: AdditionalAction = {
     label: 'Enrollments',
-    handler: (index) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      navigate(`/admin/courses/${index}/enrollments`);
+    handler: () => {
+      navigate(`/admin/courses/${selectedRow[0]?.code}/enrollments`);
     },
   };
 
