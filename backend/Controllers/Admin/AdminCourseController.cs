@@ -46,18 +46,10 @@ public class CourseController(ICourseService courseService) : Controller
     }
 
     [HttpPut]
-    [Route("{courseId:int}/EnrollStudent")]
-    public async Task<IActionResult> EnrollStudentIntoCourse([FromRoute] int courseId, [FromBody] EnrollStudentToCourseRequestDto enrollRequest)
+    [Route("{courseId:int}/Enrollments")]
+    public async Task<IActionResult> ChangeCourseEnrollments([FromRoute] int courseId, [FromBody] EnrollmentRequestDto enrollRequest)
     {
-        var students = await courseService.EnrollStudentIntoCourseAsync(courseId, enrollRequest);
-        return Ok(new ResponseDto<IEnumerable<StudentDto>>(students));
-    }
-
-    [HttpPut]
-    [Route("{courseId:int}/EnrollTeacher")]
-    public async Task<IActionResult> EnrollTeacherIntoCourse([FromRoute] int courseId, [FromBody] EnrollTeacherToCourseRequestDto enrollRequest)
-    {
-        var teacher = await courseService.EnrollTeacherIntoCourseAsync(courseId, enrollRequest);
-        return Ok(new ResponseDto<TeacherDto>(teacher));
+        var students = await courseService.UpdateEnrollmentsAsync(courseId, enrollRequest);
+        return Ok(new ResponseDto<EnrollmentRequestDto>(enrollRequest));
     }
 }

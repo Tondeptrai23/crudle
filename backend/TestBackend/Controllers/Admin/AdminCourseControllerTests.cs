@@ -103,7 +103,7 @@ public class AdminCourseControllerTests
     {
         // Arrange
         int courseId = 1;
-        var enrollRequest = new EnrollStudentToCourseRequestDto();
+        var enrollRequest = new EnrollmentRequestDto();
         var students = new List<StudentDto>();
         _courseServiceMock.Setup(service => service.EnrollStudentIntoCourseAsync(courseId, enrollRequest))
             .ReturnsAsync(students);
@@ -135,7 +135,7 @@ public class AdminCourseControllerTests
         Assert.IsNotNull(okResult);
         Assert.AreEqual(200, okResult.StatusCode);
     }
-    
+
     [TestMethod]
     public async Task GetCourses_ReturnsNotFoundResult()
     {
@@ -143,15 +143,15 @@ public class AdminCourseControllerTests
         var queryDto = new CourseCollectionQueryDto();
         _courseServiceMock.Setup(service => service.GetCoursesAsync(queryDto))
             .ReturnsAsync((0, null));
-    
+
         // Act
         var result = await _controller.GetCourses(queryDto);
-    
+
         // Assert
         var notFoundResult = result as OkObjectResult;
         Assert.IsNotNull(notFoundResult);
     }
-    
+
     [TestMethod]
     public async Task GetStudentsInCourse_ReturnsNotFoundResult()
     {
@@ -159,10 +159,10 @@ public class AdminCourseControllerTests
         int courseId = 1;
         _courseServiceMock.Setup(service => service.GetStudentsInCourseAsync(courseId))
             .ReturnsAsync((0, null));
-    
+
         // Act
         var result = await _controller.GetStudentsInCourse(courseId);
-    
+
         // Assert
         var notFoundResult = result as OkObjectResult;
         Assert.IsNotNull(notFoundResult);
@@ -170,7 +170,7 @@ public class AdminCourseControllerTests
         var data = notFoundResult.Value as IEnumerable<StudentDto>;
         Assert.IsNull(data);
     }
-    
+
     [TestMethod]
     public async Task UpdateCourse_ReturnsNotFoundResult()
     {
@@ -179,10 +179,10 @@ public class AdminCourseControllerTests
         var requestCourseData = new UpdateRequestCourseDto();
         _courseServiceMock.Setup(service => service.UpdateCourseAsync(courseId, requestCourseData))
             .ReturnsAsync((CourseDto)null);
-    
+
         // Act
         var result = await _controller.UpdateCourse(courseId, requestCourseData);
-    
+
         // Assert
         var notFoundResult = result as OkObjectResult;
         Assert.IsNotNull(notFoundResult);

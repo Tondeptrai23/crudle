@@ -126,8 +126,8 @@ public class CourseService : ICourseService
         return (students.Count, _mapper.Map<IEnumerable<StudentDto>>(students));
     }
 
-    public async Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId,
-        EnrollStudentToCourseRequestDto enrollRequest)
+    public async Task<IEnumerable<StudentDto>> UpdateEnrollmentsAsync(int courseId,
+        EnrollmentRequestDto enrollRequest)
     {
         var studentIds = enrollRequest.StudentIds;
 
@@ -173,15 +173,15 @@ public class CourseService : ICourseService
             });
         }
 
+        EnrollTeacherIntoCourseAsync(courseId, enrollRequest.TeacherId);
         await _context.SaveChangesAsync();
         var (_, students) = await GetStudentsInCourseAsync(courseId);
 
         return students;
     }
 
-    public Task<TeacherDto> EnrollTeacherIntoCourseAsync(int courseId, EnrollTeacherToCourseRequestDto enrollRequest)
+    private void EnrollTeacherIntoCourseAsync(int courseId, int teacherId)
     {
-        var teacherId = enrollRequest.TeacherId;
         var course = _context.Courses.FirstOrDefault(c => c.CourseId == courseId);
         if (course == null)
         {
@@ -201,10 +201,6 @@ public class CourseService : ICourseService
 
         course.TeacherId = teacherId;
         course.Teacher = teacher;
-
-        _context.SaveChanges();
-
-        return Task.FromResult(_mapper.Map<TeacherDto>(teacher));
     }
 
     public async Task<bool> CourseEnrolledUserValidationAsync(int courseId, string userId)
