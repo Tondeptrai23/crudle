@@ -113,7 +113,12 @@ const ActionCell: React.FC<ActionCellProps> = ({
           {additionalActions?.map((action, index) => (
             <React.Fragment key={`action-${index}`}>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => action.handler()}>
+              <DropdownMenuItem
+                onClick={() => {
+                  action.handler();
+                  console.log(1);
+                }}
+              >
                 <span className='flex items-center gap-2'>{action.label}</span>
               </DropdownMenuItem>
             </React.Fragment>
