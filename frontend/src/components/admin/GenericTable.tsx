@@ -47,7 +47,7 @@ const GenericTable = <T extends { id: string }>({
     (column) => column.isDefaultSort,
   )?.header;
 
-  let { data, pagination, state, sort, filters } = useGenericTableData({
+  const { data, pagination, state, sort, filters } = useGenericTableData({
     useQueryHook: queryHook,
     filterOptions,
     defaultSortColumn,
