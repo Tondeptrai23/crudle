@@ -70,7 +70,7 @@ const AssignmentSessionPage = () => {
       </div>
       <AssignmentWorkspace
         assignmentId={assignmentId}
-        submissionId={submission.submissionId}
+        submissionId={Number.parseInt(submission.submissionId)}
         questions={submission.questions}
         onSubmit={handleSubmit}
         onCancel={() => navigate(-1)}

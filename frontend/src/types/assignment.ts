@@ -8,6 +8,7 @@ export default interface Assignment {
   updatedAt: Date;
   canViewScore: boolean;
   canRetry: boolean;
+	totalQuestions: number;
   type: 'file' | 'questions';
   questions: Question[];
 }
@@ -22,6 +23,7 @@ export interface AssignmentResponse {
   UpdatedAt: Date;
   CanViewScore: boolean;
   CanRetry: boolean;
+	TotalQuestions: number;
   Type: 'file' | 'questions';
   Questions: QuestionResponse[];
 }
@@ -119,6 +121,7 @@ export const mapToAssignment = (response: AssignmentResponse) => ({
   updatedAt: response.UpdatedAt,
   canViewScore: response.CanViewScore,
   canRetry: response.CanRetry,
+	totalQuestions: response.TotalQuestions,
   type: response.Type,
   questions: response.Questions?.map(mapToQuestion),
 });

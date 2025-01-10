@@ -48,8 +48,6 @@ const AssignmentDetailPage = () => {
   const startAssignment = useStartAssignment();
   const [isStarting, setIsStarting] = useState(false);
 
-	console.log(assignment);
-
   if (isLoading) {
     return (
       <CourseLayout>
@@ -243,7 +241,7 @@ const AssignmentDetailPage = () => {
                 <SubmissionsTable
                   courseId={courseId.toString()}
                   assignmentId={assignmentId.toString()}
-                  maxScore={assignment.questions?.length}
+                  maxScore={assignment.totalQuestions}
                   variant={
                     role === Role.Teacher
                       ? SubmissionsVariant.LATEST

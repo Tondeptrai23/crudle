@@ -61,7 +61,7 @@ const QuestionCard = ({
               <Button
                 variant='outline'
                 type='button'
-                onClick={() => onDelete(question.questionId)}
+                onClick={() => onDelete(Number.parseInt(question.questionId))}
               >
                 <Trash className='h-4 w-4' />
                 Delete

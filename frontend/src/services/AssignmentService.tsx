@@ -100,12 +100,12 @@ export default class AssignmentService {
     const response = await api.get(
       `/api/Teacher/Course/${courseId}/Assignment/${assignmentId}`,
     );
-
+		
     if (!response.data.Success) {
-      throw new Error(response.data.Message);
+			throw new Error(response.data.Message);
     }
-
-    return mapToAssignment(response.data.Data);
+		
+		return mapToAssignment(response.data.Data);
   }
 
   async getAssignmentForStudent(
@@ -119,6 +119,9 @@ export default class AssignmentService {
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
+
+		console.log(response.data.Data);
+    console.log(mapToAssignment(response.data.Data));
 
     return mapToAssignment(response.data.Data);
   }
@@ -344,13 +347,9 @@ export default class AssignmentService {
       throw new Error(response.data.Message);
     }
 
-    console.log(response.data.Data);
-
     const submissions = response.data.Data.map(
       mapFromStudentSubmissionResponseToSubmission,
     );
-
-    console.log(submissions);
 
     return submissions.map((submission: Submission) => ({
       ...submission,
