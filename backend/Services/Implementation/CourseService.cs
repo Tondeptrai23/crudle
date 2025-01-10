@@ -17,8 +17,7 @@ public class CourseService : ICourseService
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
 
-    public CourseService(ApplicationDbContext context, IMapper mapper, IStudentService studentService,
-        ITeacherService teacherService)
+    public CourseService(ApplicationDbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
@@ -129,7 +128,7 @@ public class CourseService : ICourseService
     public async Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId,
         EnrollStudentToCourseRequestDto enrollRequest)
     {
-        var studentIds = enrollRequest.StudentIds;
+        var studentIds = enrollRequest.StudentIds.ToList();
 
         var course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseId == courseId);
         if (course == null)
@@ -137,7 +136,7 @@ public class CourseService : ICourseService
             throw new ResourceNotFoundException($"Course with id {courseId} not found.");
         }
 
-        var (isExist, nonExistedStudent) = IsStudentExist(studentIds.ToList());
+        var (isExist, nonExistedStudent) = IsStudentExist(studentIds);
         if (isExist == false)
         {
             throw new ResourceNotFoundException($"Student with id {nonExistedStudent} not found");
@@ -208,13 +207,13 @@ public class CourseService : ICourseService
         }
 
         var enrollments = _context.Enrollments.Include(en => en.Student);
-        var isStudentEnrolled = await enrollments.AnyAsync(en => 
+        var isStudentEnrolled = await enrollments.AnyAsync(en =>
             en.CourseId == courseId && en.Student.UserId == userId);
-        
+
         var isTeacherEnrolled = course.Teacher!.UserId == userId;
-        
+
         var isEnrolled = isStudentEnrolled || isTeacherEnrolled;
-        
+
         return isEnrolled;
     }
 
