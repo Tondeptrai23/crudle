@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using _3w1m.Data;
 using _3w1m.Dtos.Article;
 using _3w1m.Models.Domain;
@@ -261,7 +257,7 @@ public class ArticleService : IArticleService
 
         if (!string.IsNullOrEmpty(queryDto.Summary))
         {
-            query = query.Where(x => x.Summary.Contains(queryDto.Summary));
+            query = query.Where(x => x.Summary != null && x.Summary.Contains(queryDto.Summary));
         }
 
         if (!string.IsNullOrEmpty(queryDto.Content))
@@ -284,7 +280,7 @@ public class ArticleService : IArticleService
 
     private IQueryable<Article> ApplyPagination(IQueryable<Article> query, ArticleCollectionQueryDto queryDto)
     {
-        if (queryDto.Page > 0 && queryDto.Size > 0)
+        if (queryDto is { Page: > 0, Size: > 0 })
         {
             query = query.Skip((queryDto.Page - 1) * queryDto.Size).Take(queryDto.Size);
         }

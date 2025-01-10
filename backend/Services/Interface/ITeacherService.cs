@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using _3w1m.Dtos.Teacher;
-using _3w1m.Models.Domain;
 using _3w1m.Models.Exceptions;
 
 namespace _3w1m.Services.Interface;
+
 public interface ITeacherService
 {
     /// <summary>
@@ -38,7 +34,7 @@ public interface ITeacherService
     /// <returns>The task result contains the updated teacher's information.</returns>
     /// <exception cref="ResourceNotFoundException">Thrown when the teacher is not found.</exception>
     Task<TeacherDto> UpdateTeacherAsync(int teacherId, UpdateTeacherRequestDto teacherData);
-        
+
     /// <summary>
     /// Get a teacher by user id
     /// </summary>

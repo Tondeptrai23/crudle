@@ -1,6 +1,3 @@
-using _3w1m.Models.Exceptions;
-using Microsoft.AspNetCore.Identity;
-
 namespace _3w1m.Services.Interface;
 
 /// <summary>
@@ -17,5 +14,4 @@ public interface IUserService
     /// <param name="role">User's role to be created</param>
     /// <returns>The UserId of the created user, or null if it cannot be created</returns>
     public Task<string?> CreateUserAsync(string email, string password, string role);
-
 }
