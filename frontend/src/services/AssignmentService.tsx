@@ -6,7 +6,13 @@ import Assignment, {
   mapToQuestion,
 } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
-import Submission, { mapToSubmission, SubmissionStatus, SubmissionWithStatus } from '@/types/submission';
+import Submission, {
+	mapFromStudentSubmissionResponseToSubmission,
+	mapFromSubmissionResponseToSubmission,
+  SubmissionStatus,
+  SubmissionsVariant,
+  SubmissionWithStatus,
+} from '@/types/submission';
 import api from '@/utils/api';
 import CourseService from '@/services/CourseService';
 
@@ -267,55 +273,116 @@ export default class AssignmentService {
     };
   }
 
-	async getLatestSubmissions(courseId: string, assignmentId: string): Promise<SubmissionWithStatus[]> {
-		const [response, course] = await Promise.all([
-			api.get(`/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions?OrderBy=SubmittedAt&OrderDirection=desc`),
-			courseService.getCourse('Teacher', courseId)
-		]);
+  async getLatestSubmissions(
+    courseId: string,
+    assignmentId: string,
+  ): Promise<SubmissionWithStatus[]> {
+    const [response, course] = await Promise.all([
+      api.get(
+        `/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions?OrderBy=SubmittedAt&OrderDirection=desc`,
+      ),
+      courseService.getCourse('Teacher', courseId),
+    ]);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    const students = course.students ?? [];
+    const submissions = response.data.Data.map(
+      mapFromSubmissionResponseToSubmission
+    );
+    const submissionsWithStatus: SubmissionWithStatus[] = [];
+
+    submissions.forEach((submission: Submission) => {
+      const possibleIndex = submissionsWithStatus.findIndex(
+        (submissionWithStatus) =>
+          submissionWithStatus.studentId === submission.studentId,
+      );
+      const status =
+        submission.score === null
+          ? SubmissionStatus.IN_PROGRESS
+          : SubmissionStatus.DONE;
+
+      if (possibleIndex === -1) {
+        submissionsWithStatus.push({ ...submission, status });
+      } else if (
+        submissionsWithStatus[possibleIndex].status ===
+          SubmissionStatus.IN_PROGRESS &&
+        status === SubmissionStatus.DONE
+      ) {
+        submissionsWithStatus[possibleIndex] = { ...submission, status };
+      }
+    });
+
+    students.forEach((student) => {
+      if (
+        !submissionsWithStatus.find(
+          (submission) => submission.studentId === student.id,
+        )
+      ) {
+        submissionsWithStatus.push({
+          studentId: student.id,
+          studentName: student.fullname,
+          status: SubmissionStatus.NOT_STARTED,
+        });
+      }
+    });
+
+    return submissionsWithStatus;
+  }
+
+	async getIndividualSubmissions(
+		courseId: string,
+		assignmentId: string,
+	): Promise<SubmissionWithStatus[]> {
+		const response = await api.get(`/api/Student/Course/${courseId}/Assignment/${assignmentId}/Submissions?OrderBy=SubmittedAt&OrderDirection=desc`);
 
 		if (!response.data.Success) {
 			throw new Error(response.data.Message);
 		}
 
-		const students = course.students ?? [];
-		const submissions = response.data.Data.map(mapToSubmission);
-		const submissionsWithStatus: SubmissionWithStatus[] = [];
+		console.log(response.data.Data);
 
-		submissions.forEach((submission : Submission) => {
-			const possibleIndex = submissionsWithStatus.findIndex(
-				(submissionWithStatus) => submissionWithStatus.studentId === submission.studentId
-			);
-			const status = submission.score === null 
-				? SubmissionStatus.IN_PROGRESS 
-				: SubmissionStatus.DONE;
+		const submissions = response.data.Data.map(mapFromStudentSubmissionResponseToSubmission);
 
-			if (possibleIndex === -1) {
-				submissionsWithStatus.push({ ...submission, status });
-			} else if (submissionsWithStatus[possibleIndex].status === SubmissionStatus.IN_PROGRESS && status === SubmissionStatus.DONE) {
-				submissionsWithStatus[possibleIndex] = { ...submission, status };
-			}
-		});
+		console.log(submissions);
 
-		students.forEach((student) => {
-			if (!submissionsWithStatus.find((submission) => submission.studentId === student.id)) {
-				submissionsWithStatus.push({
-					studentId: student.id,
-					studentName: student.fullname,
-					status: SubmissionStatus.NOT_STARTED,
-				});
-			}
-		});
+		return submissions.map((submission: Submission) => ({
+			...submission,
+			status: submission.score === null ? SubmissionStatus.IN_PROGRESS : SubmissionStatus.DONE,
+		}));
+	};
 
-		return submissionsWithStatus;
-	}
+  async getSubmissions(
+    courseId: string,
+    assignmentId: string,
+    variant: SubmissionsVariant,
+  ): Promise<SubmissionWithStatus[]> {
+    if (variant === SubmissionsVariant.LATEST) {
+      return this.getLatestSubmissions(courseId, assignmentId);
+    }
 
-	async getSubmission(courseId: string, assignmentId: string, submissionId: string): Promise<Submission> {
-		const response = await api.get(`/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions/${submissionId}`);
-
-		if (!response.data.Success) {
-			throw new Error(response.data.Message);
+		if (variant === SubmissionsVariant.INDIVIDUAL) {
+			return this.getIndividualSubmissions(courseId, assignmentId);
 		}
 
-		return mapToSubmission(response.data.Data);
-	}
+    throw new Error('Invalid variant');
+  }
+
+  async getSubmission(
+    courseId: string,
+    assignmentId: string,
+    submissionId: string,
+  ): Promise<Submission> {
+    const response = await api.get(
+      `/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions/${submissionId}`,
+    );
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return mapFromSubmissionResponseToSubmission(response.data.Data);
+  }
 }

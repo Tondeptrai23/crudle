@@ -17,6 +17,12 @@ export enum SubmissionStatus {
 	NOT_STARTED,
 }
 
+export enum SubmissionsVariant {
+	ALL,
+	LATEST,
+	INDIVIDUAL,
+}
+
 export interface SubmissionWithStatus extends Partial<Submission> {
 	status: SubmissionStatus
 }
@@ -42,6 +48,17 @@ export interface SubmissionResponse {
   QuestionWithStudentAnswer: AnsweredQuestionResponse[] | null;
 }
 
+export interface StudentSubmissionResponse {
+  SubmissionId: string;
+  AssignmentId: string;
+  StudentId: string;
+  StudentName: string;
+  StartedAt: string | null;
+  SubmittedAt: string | null;
+  Score: number | null;
+  Questions: AnsweredQuestionResponse[] | null;
+}
+
 interface AnsweredQuestionResponse {
 	QuestionId: string;
 	Content: string;
@@ -56,8 +73,10 @@ interface StudentAnswerResponse {
 	Value: string;
 }
 
-export function mapToSubmission(response: SubmissionResponse): Submission {
-	return {
+export function mapFromSubmissionResponseToSubmission(
+  response: SubmissionResponse,
+): Submission {
+  return {
     answeredQuestions:
       response.QuestionWithStudentAnswer?.map(mapToAnsweredQuestion) ?? null,
     submissionId: response.SubmissionId,
@@ -68,6 +87,21 @@ export function mapToSubmission(response: SubmissionResponse): Submission {
     submittedAt: response.SubmittedAt ? new Date(response.SubmittedAt) : null,
     score: response.Score,
   };
+}
+
+export function mapFromStudentSubmissionResponseToSubmission(
+	response: StudentSubmissionResponse,
+): Submission {
+	return {
+		answeredQuestions: response.Questions?.map(mapToAnsweredQuestion) ?? null,
+		submissionId: response.SubmissionId,
+		assignmentId: response.AssignmentId,
+		studentId: response.StudentId,
+		studentName: response.StudentName,
+		startedAt: response.StartedAt ? new Date(response.StartedAt) : null,
+		submittedAt: response.SubmittedAt ? new Date(response.SubmittedAt) : null,
+		score: response.Score,
+	};
 }
 
 function mapToAnsweredQuestion(response: AnsweredQuestionResponse): AnsweredQuestion {

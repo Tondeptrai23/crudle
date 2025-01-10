@@ -1,6 +1,7 @@
 import AssignmentService from '@/services/AssignmentService';
 import { AssignmentSubmitDto, CreateAssignmentDto } from '@/types/assignment';
 import { Role } from '@/types/enums';
+import { SubmissionsVariant } from '@/types/submission';
 import { QueryHookParams } from '@/types/table';
 import {
   keepPreviousData,
@@ -177,11 +178,11 @@ export const useSubmitAssignment = () => {
   });
 };
 
-export const useLatestSubmissions = (courseId: string, assignmentId: string) => {
+export const useSubmissions = (courseId: string, assignmentId: string, varient: SubmissionsVariant) => {
   return useQuery({
     queryKey: ['submissions', courseId, assignmentId],
     queryFn: () =>
-      assignmentService.getLatestSubmissions(courseId, assignmentId),
+      assignmentService.getSubmissions(courseId, assignmentId, varient),
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,

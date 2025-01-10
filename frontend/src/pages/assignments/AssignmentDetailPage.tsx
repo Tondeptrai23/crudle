@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SubmissionsVariant } from '@/types/submission';
 
 const AssignmentDetailPage = () => {
   const { assignmentId, courseId } = useCustomParams();
@@ -46,6 +47,8 @@ const AssignmentDetailPage = () => {
   } = useGetAssignment(courseId, assignmentId, role);
   const startAssignment = useStartAssignment();
   const [isStarting, setIsStarting] = useState(false);
+
+	console.log(assignment);
 
   if (isLoading) {
     return (
@@ -183,7 +186,7 @@ const AssignmentDetailPage = () => {
         </Card>
 
         {/* Questions Section */}
-        {role === Role.Teacher ? (
+        {role === Role.Teacher && (
           <>
             <Card className='border-2'>
               <Accordion type='single' collapsible className='w-full'>
@@ -201,7 +204,7 @@ const AssignmentDetailPage = () => {
                     <div className='space-y-4'>
                       {assignment.questions.map((question, index) => (
                         <QuestionCard
-													selected={false}
+                          selected={false}
                           key={question.questionId}
                           showButton={false}
                           question={question}
@@ -215,36 +218,44 @@ const AssignmentDetailPage = () => {
                 </AccordionItem>
               </Accordion>
             </Card>
-
-            <Card className='border-2'>
-              <Accordion
-                type='single'
-                collapsible
-                className='w-full'
-                defaultValue='assignment-details'
-              >
-                <AccordionItem
-                  value='assignment-details'
-                  className='border-none'
-                >
-                  <AccordionTrigger className='px-6 py-4 hover:no-underline'>
-                    <div className='flex items-center gap-2'>
-                      <ClipboardCheck className='h-5 w-5 text-blue-600' />
-                      <p className='text-base'>Students' Submissions</p>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className='px-6 pb-4'>
-										<SubmissionsTable
-											courseId={courseId.toString()}
-											assignmentId={assignmentId.toString()}
-											maxScore={assignment.questions.length}
-										/>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </Card>
           </>
-        ) : (
+        )}
+
+        <Card className='border-2'>
+          <Accordion
+            type='single'
+            collapsible
+            className='w-full'
+            defaultValue='assignment-details'
+          >
+            <AccordionItem value='assignment-details' className='border-none'>
+              <AccordionTrigger className='px-6 py-4 hover:no-underline'>
+                <div className='flex items-center gap-2'>
+                  <ClipboardCheck className='h-5 w-5 text-blue-600' />
+                  {role === Role.Teacher ? (
+                    <p className='text-base'>Submissions</p>
+                  ) : (
+                    <p className='text-base'>Your Submissions</p>
+                  )}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className='px-6 pb-4'>
+                <SubmissionsTable
+                  courseId={courseId.toString()}
+                  assignmentId={assignmentId.toString()}
+                  maxScore={assignment.questions?.length}
+                  variant={
+                    role === Role.Teacher
+                      ? SubmissionsVariant.LATEST
+                      : SubmissionsVariant.INDIVIDUAL
+                  }
+                />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </Card>
+
+        {role === Role.Student && (
           <div className='flex items-center justify-center'>
             <LoadingButton
               size='lg'
