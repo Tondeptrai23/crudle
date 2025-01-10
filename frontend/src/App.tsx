@@ -111,14 +111,6 @@ const App: React.FC = () => {
                           </RequireAuth>
                         }
                       />
-											<Route
-												path='/course/:courseId/assignment/:assignmentId/submission/:submissionId'
-												element={
-													<RequireAuth allowedRoles={[Role.Teacher]}>
-														<AssignmentSubmissionDetailPage />
-													</RequireAuth>
-												}
-											/>
                     </Routes>
 
                     <RequireAuth allowedRoles={[Role.User]}>
@@ -148,6 +140,10 @@ const App: React.FC = () => {
                         <Route
                           path='/course/:courseId/assignment/:assignmentId/session/:submissionId'
                           element={<AssignmentSessionPage />}
+                        />
+                        <Route
+                          path='/course/:courseId/assignment/:assignmentId/submission/:submissionId'
+                          element={<AssignmentSubmissionDetailPage />}
                         />
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path='/settings' element={<div>Settings</div>} />

@@ -374,15 +374,18 @@ export default class AssignmentService {
     courseId: string,
     assignmentId: string,
     submissionId: string,
+		role: string,
   ): Promise<Submission> {
     const response = await api.get(
-      `/api/Teacher/Course/${courseId}/Assignment/${assignmentId}/Submissions/${submissionId}`,
+      `/api/${role}/Course/${courseId}/Assignment/${assignmentId}/Submissions/${submissionId}`,
     );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
     }
 
-    return mapFromSubmissionResponseToSubmission(response.data.Data);
+    return role === 'Teacher' 
+			?	mapFromSubmissionResponseToSubmission(response.data.Data)
+			: mapFromStudentSubmissionResponseToSubmission(response.data.Data);
   }
 }

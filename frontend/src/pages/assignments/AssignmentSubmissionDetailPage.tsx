@@ -9,8 +9,9 @@ import QuestionCard from "@/components/assignments/QuestionCard";
 import { useNavigate } from "react-router-dom";
 import { CalendarDays, Clock, User2 } from "lucide-react";
 import { Separator } from "@/components/common/ui/separator";
+import { Role } from "@/types/enums";
 
-const AssignmentSubmissionDetail : React.FC = () => {
+const AssignmentSubmissionDetailPage : React.FC = () => {
 	const { assignmentId, courseId, submissionId } = useCustomParams();
   const { role } = useAuth();
 	const navigate = useNavigate();
@@ -28,6 +29,7 @@ const AssignmentSubmissionDetail : React.FC = () => {
     courseId.toString(),
     assignmentId.toString(),
     submissionId.toString(),
+		role
   );
 
   const isLoading = isAssignmentLoading || isSubmissionLoading;
@@ -120,10 +122,12 @@ const AssignmentSubmissionDetail : React.FC = () => {
                     key={question.questionId}
                     className={cn(
                       'flex h-10 w-10 cursor-pointer items-center justify-center rounded-full font-medium transition-colors',
-                      question.answers.filter((a) => a.isCorrect)[0].value 
-												=== (question.studentsAnswers?.at(0)?.value ?? '') 
-                        ? 'bg-green-500 text-white'
-                        : 'bg-red-500 text-white',
+											role === Role.Student 
+												? 'bg-gray-300 text-gray-700'
+												: question.answers.filter((a) => a.isCorrect).at(0)?.value 
+													=== (question.studentsAnswers?.at(0)?.value ?? '') 
+													? 'bg-green-500 text-white'
+													: 'bg-red-500 text-white',
                     )}
                     onClick={() => {
                       document
@@ -151,4 +155,4 @@ const AssignmentSubmissionDetail : React.FC = () => {
   );
 }
 
-export default AssignmentSubmissionDetail;
+export default AssignmentSubmissionDetailPage;

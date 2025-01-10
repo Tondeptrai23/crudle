@@ -178,7 +178,11 @@ export const useSubmitAssignment = () => {
   });
 };
 
-export const useSubmissions = (courseId: string, assignmentId: string, varient: SubmissionsVariant) => {
+export const useSubmissions = (
+  courseId: string,
+  assignmentId: string,
+  varient: SubmissionsVariant,
+) => {
   return useQuery({
     queryKey: ['submissions', courseId, assignmentId],
     queryFn: () =>
@@ -190,14 +194,19 @@ export const useSubmissions = (courseId: string, assignmentId: string, varient: 
   });
 };
 
-export const useSubmission = (courseId: string, assignmentId: string, submissionId: string) => {
-	return useQuery({
-		queryKey: ['submission', courseId, assignmentId, submissionId],
-		queryFn: () =>
-			assignmentService.getSubmission(courseId, assignmentId, submissionId),
-		staleTime: 5 * 60 * 1000,
-		placeholderData: keepPreviousData,
-		refetchOnWindowFocus: false,
-		retry: false,
-	});
-}
+export const useSubmission = (
+  courseId: string,
+  assignmentId: string,
+  submissionId: string,
+  role: string,
+) => {
+  return useQuery({
+    queryKey: ['submission', courseId, assignmentId, submissionId, role],
+    queryFn: () =>
+      assignmentService.getSubmission(courseId, assignmentId, submissionId, role),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+};

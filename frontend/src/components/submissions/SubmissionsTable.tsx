@@ -89,14 +89,13 @@ const SubmissionsTable: React.FC<SubmissionsTableProps> = ({
             <TableCell>{submission.studentName}</TableCell>
             <TableCell>{getStatusBadge(submission.status)}</TableCell>
             <TableCell className='text-right tabular-nums'>
-              {submission.score === null ? '-' : (submission.score ?? 0)} /{' '}
-              {maxScore}
+              {submission.score === null ? '0' : (submission.score ?? 0)} /{' '}
+              {maxScore ?? '?'}
             </TableCell>
             <TableCell className='text-right tabular-nums'>
-              {submission.score === null
-                ? '-'
-                : (((submission.score ?? 0) / maxScore) * 100).toFixed(2)}
-              %
+              {submission.score === null || maxScore === undefined
+                ? 'N/A'
+                : (((submission.score ?? 0) / maxScore) * 100).toFixed(2) + '%'}
             </TableCell>
             <TableCell className='text-right tabular-nums'>
               <div>{submission.startedAt?.toLocaleDateString('en-GB')}</div>
