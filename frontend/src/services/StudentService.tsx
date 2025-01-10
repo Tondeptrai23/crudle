@@ -1,9 +1,8 @@
-import Assignment, { UpcomingAssignment } from '@/types/assignment';
+import { UpcomingAssignment } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Student, {
   CreateStudentDTO,
   mapToStudent,
-  StudentResponse,
   UpdateStudentDTO,
 } from '@/types/student';
 import api from '@/utils/api';
@@ -32,7 +31,6 @@ export default class StudentService {
     if (page < 1) {
       page = 1;
     }
-
     let query = `page=${page}&size=${size}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
     query +=
       studentId || studentId?.length == 0 ? `&studentId=${studentId}` : '';
@@ -129,4 +127,3 @@ export default class StudentService {
       }
     };
 }
-

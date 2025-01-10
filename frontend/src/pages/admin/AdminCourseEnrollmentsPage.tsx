@@ -1,12 +1,4 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { Column } from '@/types/table';
-import { Student } from '@/types/student';
-import { Teacher } from '@/types/teacher';
-import { useStudents } from '@/hooks/api/useStudentApi';
-import { useTeachers } from '@/hooks/api/useTeacherApi';
-import { SearchFilterOption } from '@/types/filter';
-import { Search } from 'lucide-react';
+import { Checkbox } from '@/components/common/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -22,8 +14,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/common/ui/table';
-import { Checkbox } from '@/components/common/ui/checkbox';
 import { useEnrollStudents } from '@/hooks/api/useCourseApi';
+import { useStudents } from '@/hooks/api/useStudentApi';
+import { useTeachers } from '@/hooks/api/useTeacherApi';
+import { SearchFilterOption } from '@/types/filter';
+import Student from '@/types/student';
+import { Column } from '@/types/table';
+import Teacher from '@/types/teacher';
+import { Search } from 'lucide-react';
+import React from 'react';
+import { useParams } from 'react-router-dom';
 
 const AdminCourseEnrollmentPage: React.FC = () => {
   const { courseId } = useParams();
@@ -38,15 +38,24 @@ const AdminCourseEnrollmentPage: React.FC = () => {
   //     pageSize: 20,
   //     filters: {},
   //   });
-  const teachers = [
-    { id: '1', name: 'Teacher 1' },
-    { id: '2', name: 'Teacher 2' },
-  ];
+  const { data: teachers } = useTeachers({
+    page: 1,
+    pageSize: 20,
+    filters: {},
+    sort: {
+      key: 'teacherId',
+      direction: 'asc',
+    },
+  });
 
   const { data: students, isLoading } = useStudents({
     page: 1,
     pageSize: 20,
     filters: {},
+    sort: {
+      key: 'studentId',
+      direction: 'asc',
+    },
   });
 
   const handleSelectStudent = (studentId: string) => {
@@ -59,10 +68,10 @@ const AdminCourseEnrollmentPage: React.FC = () => {
   };
 
   const handleSelectAll = () => {
-    if (selectedStudents.length === students?.length) {
+    if (selectedStudents.length === students?.data.length) {
       setSelectedStudents([]);
     } else {
-      setSelectedStudents(students?.map((s) => s.id) ?? []);
+      setSelectedStudents(students?.data.map((s) => s.id) ?? []);
     }
   };
 
@@ -114,12 +123,12 @@ const AdminCourseEnrollmentPage: React.FC = () => {
   };
 
   return (
-    <div className='space-y-4 p-4'>
+    <div className='mx-auto max-w-4xl space-y-4 p-4'>
       <div className='flex items-center gap-4'>
         <Select
           value={selectedTeacher?.id}
           onValueChange={(value) => {
-            const teacher = teachers?.find((t) => t.id === value);
+            const teacher = teachers?.data.find((t) => t.id === value);
             setSelectedTeacher(teacher ?? null);
           }}
         >
@@ -127,9 +136,9 @@ const AdminCourseEnrollmentPage: React.FC = () => {
             <SelectValue placeholder='Select teacher...' />
           </SelectTrigger>
           <SelectContent>
-            {teachers?.map((teacher) => (
+            {teachers?.data.map((teacher) => (
               <SelectItem key={teacher.id} value={teacher.id}>
-                {teacher.id} - {teacher.name}
+                {teacher.id} - {teacher.fullname}
               </SelectItem>
             ))}
           </SelectContent>
@@ -150,7 +159,7 @@ const AdminCourseEnrollmentPage: React.FC = () => {
             <TableRow>
               <TableHead className='w-12'>
                 <Checkbox
-                  checked={selectedStudents.length === students?.length}
+                  checked={selectedStudents.length === students?.data.length}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
@@ -159,7 +168,7 @@ const AdminCourseEnrollmentPage: React.FC = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {students?.map((student) => (
+            {students?.data.map((student) => (
               <TableRow key={student.id}>
                 <TableCell>
                   <Checkbox
@@ -167,8 +176,8 @@ const AdminCourseEnrollmentPage: React.FC = () => {
                     onCheckedChange={() => handleSelectStudent(student.id)}
                   />
                 </TableCell>
-                <TableCell>{student.studentId}</TableCell>
-                <TableCell>{student.name}</TableCell>
+                <TableCell>{student.id}</TableCell>
+                <TableCell>{student.fullname}</TableCell>
               </TableRow>
             ))}
           </TableBody>

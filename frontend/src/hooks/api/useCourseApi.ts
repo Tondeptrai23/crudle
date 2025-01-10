@@ -69,7 +69,7 @@ export const useCreateCourse = () => {
     mutationFn: async (data: CreateCourseDTO) => {
       await courseService.createCourse(data);
 
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -83,8 +83,7 @@ export const useUpdateCourse = () => {
     mutationFn: async ({ id, data }: UpdateCourseParams) => {
       await courseService.updateCourse(id, data);
 
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: courseKeys.detail(id) });
+      queryClient.invalidateQueries();
     },
   });
 };

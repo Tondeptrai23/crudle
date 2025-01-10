@@ -9,11 +9,9 @@ import {
 } from '@/hooks/api/useCourseApi';
 import Course, { CreateCourseDTO, UpdateCourseDTO } from '@/types/course';
 import { DateRangeFilterOption, SearchFilterOption } from '@/types/filter';
-import { Column } from '@/types/table';
+import { AdditionalAction, Column } from '@/types/table';
 import { Calendar, Search } from 'lucide-react';
-import React from 'react';
-import { useState } from 'react';
-import { AdditionalAction } from '@/types/table';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AdminCoursePage: React.FC = () => {
@@ -123,7 +121,7 @@ const AdminCoursePage: React.FC = () => {
     label: 'Start Date',
     labelIcon: Calendar,
     minDate: new Date(2020, 0, 1),
-    maxDate: new Date(),
+    maxDate: new Date(2025, 12, 31),
     type: 'date',
   };
 

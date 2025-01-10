@@ -9,11 +9,6 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-const teacherKeys = {
-  lists: () => ['teachers'],
-  detail: (id: string) => ['teacher', id],
-};
-
 const teacherService = new TeacherService();
 
 export const useTeachers = (data: QueryHookParams) => {
@@ -61,7 +56,8 @@ export const useCreateTeacher = () => {
   return useMutation({
     mutationFn: async (data: CreateTeacherDTO) => {
       await teacherService.addTeacher(data);
-      queryClient.invalidateQueries({ queryKey: teacherKeys.lists() });
+
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -74,8 +70,8 @@ export const useUpdateTeacher = () => {
   return useMutation({
     mutationFn: async ({ id, data }: UpdateTeacherParams) => {
       await teacherService.updateTeacher(id, data);
-      queryClient.invalidateQueries({ queryKey: teacherKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: teacherKeys.detail(id) });
+
+      queryClient.invalidateQueries();
     },
   });
 };
