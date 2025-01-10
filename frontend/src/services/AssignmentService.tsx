@@ -120,9 +120,6 @@ export default class AssignmentService {
       throw new Error(response.data.Message);
     }
 
-		console.log(response.data.Data);
-    console.log(mapToAssignment(response.data.Data));
-
     return mapToAssignment(response.data.Data);
   }
 
@@ -388,7 +385,7 @@ export default class AssignmentService {
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
-    }
+		}
 
     return role === 'Teacher'
       ? mapFromSubmissionResponseToSubmission(response.data.Data)
