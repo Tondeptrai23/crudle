@@ -1,4 +1,3 @@
-import { Button } from '@/components/common/ui/button';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -7,7 +6,6 @@ import {
 } from '@/components/common/ui/navigation-menu';
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
-import { Bell } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
@@ -61,14 +59,6 @@ const Nav: React.FC<NavProps> = (props) => {
         </NavigationMenuList>
       </div>
       <div className='flex items-center gap-2'>
-        <Button
-          variant='ghost'
-          size='icon'
-          className='rounded-full'
-          onClick={props.handleNotification}
-        >
-          <Bell />
-        </Button>
         <Profile name='John Doe' role={role} items={props.profileItems} />
       </div>
     </NavigationMenu>

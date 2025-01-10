@@ -442,4 +442,17 @@ public class AssignmentService : IAssignmentService
         var count = await assignments.CountAsync();
         return (count, _mapper.Map<IEnumerable<UpcomingAssignmentDto>>(await assignments.ToListAsync()));
     }
+
+    public async Task<IEnumerable<UpcomingAssignmentDto>> GetNotDoneAssignments(int studentId)
+    {
+        var notDoneAssignments = await _dbContext.Assignments
+            .Include(a => a.Course)
+            .ThenInclude(c => c.Enrollments)
+            .Include(a => a.Submissions)
+            .Where(a => a.Submissions.All(s => s.StudentId != studentId)
+                        && a.Course.Enrollments.Any(e => e.StudentId == studentId))
+            .ToListAsync();
+        
+        return _mapper.Map<IEnumerable<UpcomingAssignmentDto>>(notDoneAssignments);
+    }
 }

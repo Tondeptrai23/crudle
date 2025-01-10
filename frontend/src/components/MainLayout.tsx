@@ -1,5 +1,5 @@
 import Nav from '@/components/nav/Nav.tsx';
-import { LucideLogOut, Settings, User } from 'lucide-react';
+import { LucideLogOut, User } from 'lucide-react';
 import React from 'react';
 import { Separator } from './common/ui/separator';
 import { getNavItems } from './nav/config';
@@ -22,11 +22,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             label: 'Profile',
             path: '/profile',
             icon: <User />,
-          },
-          {
-            label: 'Settings',
-            path: '/settings',
-            icon: <Settings />,
           },
           {
             label: 'Logout',

@@ -1,5 +1,6 @@
 import TeacherService from '@/services/TeacherService';
 import { UpcomingAssignment } from '@/types/assignment';
+import { UpcomingExam } from '@/types/exam';
 import { QueryHookParams } from '@/types/table';
 import { CreateTeacherDTO, UpdateTeacherDTO } from '@/types/teacher';
 import {
@@ -85,6 +86,15 @@ export const useUpcomingAssignments = (date: Date) => {
     queryKey: ['upcomingAssignments', date],
     queryFn: async () => {
       return await teacherService.getUpcomingAssignments(date);
+    },
+  });
+};
+
+export const useUpcomingExams = (date: Date) => {
+  return useQuery<UpcomingExam[], Error>({
+    queryKey: ['upcomingExams', date],
+    queryFn: async () => {
+      return await teacherService.getUpcomingExams(date);
     },
   });
 };

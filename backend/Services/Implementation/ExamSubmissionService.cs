@@ -63,8 +63,8 @@ public class ExamSubmissionService: IExamSubmissionService
             .Include(es => es.Student)
             .Include(es => es.StudentAnswers)
             .Include(es=>es.Exam)
-            .ThenInclude(e =>e.ExamQuestions)
-            .ThenInclude(eq => eq.ExamAnswers)
+            .ThenInclude(e =>e.Questions)
+            .ThenInclude(eq => eq.Answers)
             .FirstOrDefaultAsync(es => es.ExamId == examId && es.SubmissionId == examSubmissionId);
 
         if (examSubmission == null)
@@ -112,7 +112,7 @@ public class ExamSubmissionService: IExamSubmissionService
             .Include(es => es.Student)
             .Include(es => es.StudentAnswers)
             .ThenInclude(sq => sq.ExamQuestion)
-            .ThenInclude(eq => eq.ExamAnswers)
+            .ThenInclude(eq => eq.Answers)
             .FirstOrDefaultAsync(es => es.ExamId == examId && es.StudentId == studentId && es.SubmissionId == examSubmissionId);
 
         if (examSubmission == null)

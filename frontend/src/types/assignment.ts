@@ -114,7 +114,7 @@ export const mapToAssignment = (response: AssignmentResponse) => ({
   courseId: response.CourseId,
   name: response.Name,
   content: response.Content,
-  dueDate: response.DueDate,
+  dueDate: new Date(response.DueDate ?? ''),
   createdAt: response.CreatedAt,
   updatedAt: response.UpdatedAt,
   canViewScore: response.CanViewScore,

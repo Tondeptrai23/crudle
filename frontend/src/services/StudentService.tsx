@@ -1,9 +1,10 @@
-import Assignment, { UpcomingAssignment } from '@/types/assignment';
+import { Article } from '@/types/article';
+import { UpcomingAssignment } from '@/types/assignment';
+import { UpcomingExam } from '@/types/exam';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Student, {
   CreateStudentDTO,
   mapToStudent,
-  StudentResponse,
   UpdateStudentDTO,
 } from '@/types/student';
 import api from '@/utils/api';
@@ -128,5 +129,84 @@ export default class StudentService {
         throw error;
       }
     };
-}
 
+  getUpcomingExams: (date: Date) => Promise<UpcomingExam[]> = async (
+    date: Date,
+  ) => {
+    try {
+      const query = `month=${date.getMonth()}&year=${date.getFullYear()}`;
+      const response = await api.get(`api/student/exam/upcoming?${query}`);
+
+      if (!response.data.Success) {
+        throw new Error(response.data.Message);
+      }
+
+      return response.data.Data.map((exam: any) => {
+        return {
+          examId: exam.ExamId,
+          name: exam.Name,
+          startDate: new Date(exam.StartDate),
+          courseId: exam.CourseId,
+          courseName: exam.CourseName,
+          duration: exam.Duration,
+        };
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch exams: ${error.message}`);
+      }
+      throw error;
+    }
+  };
+
+  getNotSubmittedAssignments: () => Promise<UpcomingAssignment[]> =
+    async () => {
+      try {
+        const response = await api.get(`api/student/assignment/notdone`);
+
+        if (!response.data.Success) {
+          throw new Error(response.data.Message);
+        }
+
+        return response.data.Data.map((assignment: any) => {
+          return {
+            assignmentId: assignment.AssignmentId,
+            name: assignment.Name,
+            dueDate: new Date(assignment.DueDate),
+            courseId: assignment.CourseId,
+            courseName: assignment.CourseName,
+          };
+        });
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Error(`Failed to fetch assignments: ${error.message}`);
+        }
+        throw error;
+      }
+    };
+
+  getNotReadArticles: () => Promise<Article[]> = async () => {
+    try {
+      const response = await api.get(`api/student/article/notread`);
+
+      if (!response.data.Success) {
+        throw new Error(response.data.Message);
+      }
+
+      return response.data.Data.map((article: any) => {
+        return {
+          id: article.ArticleId,
+          title: article.Title,
+          summary: article.Summary,
+          courseId: article.CourseId,
+          courseName: article.CourseName,
+        };
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch assignments: ${error.message}`);
+      }
+      throw error;
+    }
+  };
+}
