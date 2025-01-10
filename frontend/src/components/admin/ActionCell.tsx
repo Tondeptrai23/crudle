@@ -110,14 +110,14 @@ const ActionCell: React.FC<ActionCellProps> = ({
               </DropdownMenuItem>
             </>
           )}
-          {additionalActions.map((action, index) => (
-            <>
+          {additionalActions?.map((action, index) => (
+            <React.Fragment key={`action-${index}`}>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleDeleteClick}>
-                Delete
+              <DropdownMenuItem onClick={() => action.handler()}>
+                <span className='flex items-center gap-2'>{action.label}</span>
               </DropdownMenuItem>
-            </>
-          )}
+            </React.Fragment>
+          ))}
         </DropdownMenuContent>
       </DropdownMenu>
 
