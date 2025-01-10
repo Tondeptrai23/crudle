@@ -7,6 +7,6 @@ public class ExamQuestion
     public string Content { get; set; }
     public string Type { get; set; }
     public Exam Exam { get; set; }
-    public ICollection<ExamAnswer> ExamAnswers { get; set; }
+    public ICollection<ExamAnswer> Answers { get; set; }
     public ICollection<StudentAnswerExam> StudentAnswers { get; set; }
 }

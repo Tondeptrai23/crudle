@@ -9,6 +9,7 @@ export interface ArticleResponse {
   CreatedAt: string;
   UpdatedAt: string;
   ReadAt: Date | null;
+  CourseName: string;
 }
 
 export interface Article {
@@ -22,6 +23,7 @@ export interface Article {
   updatedAt: string;
   isRead: boolean;
   readAt: Date | null;
+  courseName: string;
 }
 
 export interface ArticleRequest {

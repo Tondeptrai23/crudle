@@ -18,9 +18,7 @@ const AddAssignmentPage = () => {
 
   return (
     <div className='mx-auto max-w-4xl space-y-6 p-6'>
-      <h1 className='text-2xl font-bold'>
-        Object Oriented Programming - Add Assignment
-      </h1>
+      <h1 className='text-2xl font-bold'>Add Assignment</h1>
       <AddAssignmentForm
         initialData={{
           courseId: courseId,

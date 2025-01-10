@@ -34,4 +34,5 @@ public interface IAssignmentService
 
     Task<(int count, IEnumerable<UpcomingAssignmentDto>)> GetAssignmentsByTeacherId(int teacherId, int year, int month);
 
+    Task<IEnumerable<UpcomingAssignmentDto>> GetNotDoneAssignments(int studentId);
 }

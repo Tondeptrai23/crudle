@@ -21,6 +21,8 @@ public class StudentControllerTests
     private readonly Mock<UserManager<User>> _userManagerMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<IAssignmentService> _assignmentServiceMock;
+    private readonly Mock<IExamService> _examServiceMock;
+    private readonly Mock<IArticleService> _articleServiceMock;
     private readonly StudentController _controller;
 
     public StudentControllerTests()
@@ -29,7 +31,12 @@ public class StudentControllerTests
         _userManagerMock = new Mock<UserManager<User>>(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
         _mapperMock = new Mock<IMapper>();
         _assignmentServiceMock = new Mock<IAssignmentService>();
-        _controller = new StudentController(_userManagerMock.Object, _studentServiceMock.Object, _mapperMock.Object, _assignmentServiceMock.Object);
+        _controller = new StudentController(_userManagerMock.Object, 
+            _studentServiceMock.Object,
+            _mapperMock.Object,
+            _assignmentServiceMock.Object,
+            _examServiceMock.Object,
+            _articleServiceMock.Object);
     }
 
     [TestMethod]

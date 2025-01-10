@@ -3,6 +3,8 @@
 public class ExamSubmissionRequestDto
 {
     public int ExamSubmissionId { get; set; }
+
+    public DateTime SubmissionTime { get; set; }
     
     public ICollection<ExamStudentAnswerRequestDto> StudentAnswers { get; set; }
 }

@@ -24,7 +24,7 @@ public class Exam
     
     public Course Course { get; set; }
 
-    public ICollection<ExamQuestion> ExamQuestions { get; set; }
+    public ICollection<ExamQuestion> Questions { get; set; }
     
     public ICollection<ExamSubmission> Submissions { get; set; }
 }

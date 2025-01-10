@@ -1,3 +1,4 @@
+import CourseService from '@/services/CourseService';
 import Assignment, {
   AssignmentStartDto,
   AssignmentSubmitDto,
@@ -7,14 +8,13 @@ import Assignment, {
 } from '@/types/assignment';
 import { ApiResponse } from '@/types/paginationApiResponse';
 import Submission, {
-	mapFromStudentSubmissionResponseToSubmission,
-	mapFromSubmissionResponseToSubmission,
+  mapFromStudentSubmissionResponseToSubmission,
+  mapFromSubmissionResponseToSubmission,
   SubmissionStatus,
   SubmissionsVariant,
   SubmissionWithStatus,
 } from '@/types/submission';
 import api from '@/utils/api';
-import CourseService from '@/services/CourseService';
 
 const courseService = new CourseService();
 
@@ -290,7 +290,7 @@ export default class AssignmentService {
 
     const students = course.students ?? [];
     const submissions = response.data.Data.map(
-      mapFromSubmissionResponseToSubmission
+      mapFromSubmissionResponseToSubmission,
     );
     const submissionsWithStatus: SubmissionWithStatus[] = [];
 
@@ -332,27 +332,34 @@ export default class AssignmentService {
     return submissionsWithStatus;
   }
 
-	async getIndividualSubmissions(
-		courseId: string,
-		assignmentId: string,
-	): Promise<SubmissionWithStatus[]> {
-		const response = await api.get(`/api/Student/Course/${courseId}/Assignment/${assignmentId}/Submissions?OrderBy=SubmittedAt&OrderDirection=desc`);
+  async getIndividualSubmissions(
+    courseId: string,
+    assignmentId: string,
+  ): Promise<SubmissionWithStatus[]> {
+    const response = await api.get(
+      `/api/Student/Course/${courseId}/Assignment/${assignmentId}/Submissions?OrderBy=SubmittedAt&OrderDirection=desc`,
+    );
 
-		if (!response.data.Success) {
-			throw new Error(response.data.Message);
-		}
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
 
-		console.log(response.data.Data);
+    console.log(response.data.Data);
 
-		const submissions = response.data.Data.map(mapFromStudentSubmissionResponseToSubmission);
+    const submissions = response.data.Data.map(
+      mapFromStudentSubmissionResponseToSubmission,
+    );
 
-		console.log(submissions);
+    console.log(submissions);
 
-		return submissions.map((submission: Submission) => ({
-			...submission,
-			status: submission.score === null ? SubmissionStatus.IN_PROGRESS : SubmissionStatus.DONE,
-		}));
-	};
+    return submissions.map((submission: Submission) => ({
+      ...submission,
+      status:
+        submission.score === null
+          ? SubmissionStatus.IN_PROGRESS
+          : SubmissionStatus.DONE,
+    }));
+  }
 
   async getSubmissions(
     courseId: string,
@@ -363,9 +370,9 @@ export default class AssignmentService {
       return this.getLatestSubmissions(courseId, assignmentId);
     }
 
-		if (variant === SubmissionsVariant.INDIVIDUAL) {
-			return this.getIndividualSubmissions(courseId, assignmentId);
-		}
+    if (variant === SubmissionsVariant.INDIVIDUAL) {
+      return this.getIndividualSubmissions(courseId, assignmentId);
+    }
 
     throw new Error('Invalid variant');
   }
@@ -374,7 +381,7 @@ export default class AssignmentService {
     courseId: string,
     assignmentId: string,
     submissionId: string,
-		role: string,
+    role: string,
   ): Promise<Submission> {
     const response = await api.get(
       `/api/${role}/Course/${courseId}/Assignment/${assignmentId}/Submissions/${submissionId}`,
@@ -384,8 +391,8 @@ export default class AssignmentService {
       throw new Error(response.data.Message);
     }
 
-    return role === 'Teacher' 
-			?	mapFromSubmissionResponseToSubmission(response.data.Data)
-			: mapFromStudentSubmissionResponseToSubmission(response.data.Data);
+    return role === 'Teacher'
+      ? mapFromSubmissionResponseToSubmission(response.data.Data)
+      : mapFromStudentSubmissionResponseToSubmission(response.data.Data);
   }
 }

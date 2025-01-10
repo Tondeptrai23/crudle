@@ -1,13 +1,4 @@
 import { Button } from '@/components/common/ui/button';
-import { Checkbox } from '@/components/common/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/common/ui/select';
-
 import {
   Form,
   FormControl,
@@ -17,48 +8,55 @@ import {
   FormMessage,
 } from '@/components/common/ui/form';
 import { Input } from '@/components/common/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/common/ui/select';
 import { Textarea } from '@/components/common/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorMessage } from '@/lib/utils';
-import {
-  CreateAssignmentDto,
-  CreateQuestionDto,
-  QuestionType,
-} from '@/types/assignment';
+import { CreateQuestionDto, QuestionType } from '@/types/assignment';
+import { CreateExamDto } from '@/types/exam';
 import { generateUniqueId } from '@/utils/helper';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import QuestionCard from '../assignments/QuestionCard';
 import LoadingButton from '../common/ui/LoadingButton';
 import { Separator } from '../common/ui/separator';
-import QuestionCard from './QuestionCard';
 
-// Define the form schema
-const assignmentFormSchema = z.object({
+// Define the form schema with exam-specific fields
+const examFormSchema = z.object({
   courseId: z.number(),
   name: z.string().min(1, 'Name is required'),
-  dueDate: z.date(),
   content: z.string().min(1, 'Content is required'),
-  canViewScore: z.boolean().default(false),
-  canRetry: z.boolean().default(false),
-  type: z.string().default('questions'),
+  duration: z.number().min(1, 'Duration must be at least 1 minute'),
+  startDate: z
+    .union([z.date(), z.string().transform((str) => new Date(str))])
+    .refine((date) => date > new Date(), {
+      message: 'Start date must be in the future',
+    }),
 });
 
-// Infer the type from the schema
-type AssignmentFormValues = z.infer<typeof assignmentFormSchema>;
+type ExamFormValues = z.infer<typeof examFormSchema>;
 
-interface AssignmentFormProps {
-  initialData: CreateAssignmentDto;
-  onSave: (formData: CreateAssignmentDto) => Promise<void>;
+interface ExamFormProps {
+  initialData: CreateExamDto;
+  onSave: (formData: CreateExamDto) => Promise<void>;
   onCancel: () => void;
+  isEdit?: boolean;
 }
 
-const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
+const AddExamForm: React.FC<ExamFormProps> = ({
   initialData,
   onSave,
   onCancel,
+  isEdit = false,
 }) => {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
@@ -68,54 +66,60 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   const [selectedType, setSelectedType] =
     useState<QuestionType>('Multiple Choice');
 
-  const form = useForm<AssignmentFormValues>({
-    resolver: zodResolver(assignmentFormSchema),
+  const form = useForm<ExamFormValues>({
+    resolver: zodResolver(examFormSchema),
     defaultValues: {
       courseId: initialData.courseId,
       name: initialData.name,
-      dueDate: initialData.dueDate
+      content: initialData.content,
+      duration: initialData.duration || 60, // Default 60 minutes
+      startDate: initialData.startDate
         ? new Date(
-            initialData.dueDate.getTime() -
-              initialData.dueDate.getTimezoneOffset() * 60000,
+            new Date(initialData.startDate).getTime() -
+              new Date().getTimezoneOffset() * 60000,
           )
         : new Date(),
-      content: initialData.content,
-      canViewScore: initialData.canViewScore,
-      canRetry: initialData.canRetry,
     },
   });
 
-  const onSubmit = async (values: AssignmentFormValues) => {
+  const onSubmit = async (values: ExamFormValues) => {
     if (isSaving) return;
 
-    setIsSaving(true);
-    const result = values as CreateAssignmentDto;
-    result.questions = questions;
-
-    if (result.dueDate) {
-      result.dueDate = new Date(result.dueDate);
+    if (questions.length === 0) {
+      toast({
+        title: 'Error',
+        description: 'Please add at least one question',
+        variant: 'destructive',
+      });
+      return;
     }
 
-    if (result.questions.some((q) => q.isNew)) {
+    if (questions.some((q) => q.isNew)) {
       toast({
         title: 'Error',
         description: 'Please complete all questions',
         variant: 'destructive',
       });
-
-      setIsSaving(false);
       return;
     }
+
+    setIsSaving(true);
     try {
-      await onSave(result);
+      const examData: CreateExamDto = {
+        ...values,
+        questions: questions,
+      };
+
+      await onSave(examData);
 
       toast({
-        title: 'Saved',
-        description: 'Successfully saved the assignment',
+        title: 'Success',
+        description: `Exam ${isEdit ? 'updated' : 'created'} successfully`,
       });
     } catch (error) {
+      console.error(error);
       toast({
-        title: 'Failed to save',
+        title: 'Error',
         description: getErrorMessage(error),
         variant: 'destructive',
       });
@@ -153,9 +157,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   };
 
   const handleDeleteQuestion = (questionId: number) => {
-    const result = questions.filter((q) => q.questionId !== questionId);
-
-    setQuestions(result);
+    setQuestions(questions.filter((q) => q.questionId !== questionId));
   };
 
   const formatDate = (date: string | Date, format: 'display' | 'input') => {
@@ -196,10 +198,10 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
 
             <FormField
               control={form.control}
-              name='dueDate'
+              name='startDate'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Due Date</FormLabel>
+                  <FormLabel>Start Date</FormLabel>
                   <FormControl>
                     <Input
                       type='datetime-local'
@@ -227,6 +229,25 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
 
           <FormField
             control={form.control}
+            name='duration'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Duration (minutes)</FormLabel>
+                <FormControl>
+                  <Input
+                    type='number'
+                    min={1}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name='content'
             render={({ field }) => (
               <FormItem>
@@ -238,47 +259,11 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
               </FormItem>
             )}
           />
-
-          <div className='flex space-x-6 pt-4'>
-            <FormField
-              control={form.control}
-              name='canViewScore'
-              render={({ field }) => (
-                <FormItem className='flex items-center space-x-2 space-y-0'>
-                  <FormControl>
-                    <Checkbox
-                      className='data-[state=checked]:border-blue-500 data-[state=checked]:bg-blue-500'
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormLabel>Can View Score</FormLabel>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='canRetry'
-              render={({ field }) => (
-                <FormItem className='flex items-center space-x-2 space-y-0'>
-                  <FormControl>
-                    <Checkbox
-                      className='data-[state=checked]:border-blue-500 data-[state=checked]:bg-blue-500'
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormLabel>Can Retry</FormLabel>
-                </FormItem>
-              )}
-            />
-          </div>
         </div>
 
         <Separator />
 
-        {/* Questions section  */}
+        {/* Questions section */}
         <div className='flex flex-row items-center justify-between'>
           <h2 className='text-lg font-semibold'>Questions</h2>
           <div className='flex gap-2'>
@@ -313,15 +298,15 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
 
         <div className='space-y-4'>
           {questions.map((question, index) => (
-            <QuestionCard
-							selected={false}
-              key={question.questionId}
-              showButton={true}
-              question={question}
-              index={index}
-              onDelete={handleDeleteQuestion}
-              onQuestionChange={handleQuestionContentChange}
-            />
+            <div key={question.questionId}>
+              <QuestionCard
+                showButton={true}
+                question={question}
+                index={index}
+                onDelete={handleDeleteQuestion}
+                onQuestionChange={handleQuestionContentChange}
+              />
+            </div>
           ))}
         </div>
 
@@ -336,7 +321,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
             className='bg-blue-500 hover:bg-blue-700'
             isLoading={isSaving}
           >
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? 'Saving...' : isEdit ? 'Update' : 'Create'}
           </LoadingButton>
         </div>
       </form>
@@ -344,4 +329,4 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
   );
 };
 
-export default AddAssignmentForm;
+export default AddExamForm;

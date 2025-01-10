@@ -1,46 +1,103 @@
+import { cn } from '@/lib/utils';
+import { Calendar, Clock } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar } from 'lucide-react';
+import { Badge } from '../common/ui/badge';
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from '../common/ui/card';
 
 interface EventCardProps {
-  assignmentName: string;
+  type: 'assignment' | 'exam';
+  name: string;
   dueTime: Date;
   courseName: string;
-  courseId: number;
-  assignmentId: number;
+  courseId: string;
+  id: string;
+  duration?: number;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
-  assignmentName,
+  type,
+  name,
   dueTime,
   courseName,
   courseId,
-  assignmentId,
+  id,
+  duration,
 }) => {
+  const isExam = type === 'exam';
+  const now = new Date();
+  const examEndTime = new Date(dueTime.getTime() + (duration || 0) * 60000);
+  const canAccess = isExam ? now >= dueTime && now <= examEndTime : true;
+
+  const getStatusBadge = () => {
+    if (!isExam) return null;
+
+    if (now < dueTime) {
+      return <Badge variant='outline'>Scheduled</Badge>;
+    }
+
+    if (now > examEndTime) {
+      return <Badge variant='destructive'>Ended</Badge>;
+    }
+
+    if (canAccess) {
+      return <Badge variant='default'>In Progress</Badge>;
+    }
+
+    return <Badge variant='secondary'>Unavailable</Badge>;
+  };
+
+  const getTypeLabel = () => {
+    return (
+      <Badge variant='outline' className='mr-2'>
+        {type.charAt(0).toUpperCase() + type.slice(1)}
+      </Badge>
+    );
+  };
+
   return (
     <Link
-      to={`/course/${courseId}/assignment/${assignmentId}`}
-      className='block'
+      to={`/course/${courseId}/${type}/${id}`}
+      className={cn('block', !canAccess && 'opacity-60')}
     >
       <Card className='w-full shadow-lg transition-shadow hover:shadow-xl'>
-        <div className='flex flex-col'>
-          <CardHeader className='space-y-2'>
+        <CardHeader className='relative pb-2'>
+          {/* Course info moved to top right */}
+          <div className='absolute right-6 top-6'>
+            <Link
+              to={`/course/${courseId}`}
+              className='inline-flex items-center'
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className='text-sm text-gray-600 hover:text-gray-900 hover:underline'>
+                Course: {courseName}
+              </div>
+            </Link>
+          </div>
+
+          <div className='space-y-2'>
             <div className='flex items-center gap-3'>
               <CardTitle className='text-xl font-semibold'>
-                {assignmentName}
+                {getTypeLabel()}
+                {name}
+                <div className='ml-2 inline-block'>{getStatusBadge()}</div>
               </CardTitle>
             </div>
-            <CardDescription className='flex items-center gap-2'>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <CardDescription className='flex flex-col gap-2'>
+            <div className='flex items-center gap-2'>
               <Calendar className='h-4 w-4' />
               <span className='font-medium'>
-                Due Date:{' '}
+                {isExam ? 'Start Time: ' : 'Due Date: '}
                 {dueTime.toLocaleString('en-US', {
                   weekday: 'long',
                   year: 'numeric',
@@ -50,24 +107,17 @@ const EventCard: React.FC<EventCardProps> = ({
                   minute: '2-digit',
                 })}
               </span>
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className='pt-0'>
-            <div className='mt-4 flex items-center gap-2'>
-              <div className='text-lg font-medium'>Course:</div>
-              <Link
-                to={`/course/${courseId}`}
-                className='inline-flex items-center'
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className='flex items-center gap-2 text-lg text-gray-600 hover:text-gray-900 hover:underline'>
-                  {courseName}
-                </div>
-              </Link>
             </div>
-          </CardContent>
-        </div>
+            {isExam && duration && (
+              <div className='flex items-center gap-2'>
+                <Clock className='h-4 w-4' />
+                <span className='font-medium'>
+                  Duration: {duration} minutes
+                </span>
+              </div>
+            )}
+          </CardDescription>
+        </CardContent>
       </Card>
     </Link>
   );

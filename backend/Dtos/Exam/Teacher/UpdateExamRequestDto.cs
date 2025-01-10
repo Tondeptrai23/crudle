@@ -10,5 +10,5 @@ public class UpdateExamRequestDto
     
     public DateTime? StartDate { get; set; }
     
-    public ICollection<ExamQuestionDto>? ExamQuestions { get; set; }
+    public ICollection<ExamQuestionDto>? Questions { get; set; }
 }
