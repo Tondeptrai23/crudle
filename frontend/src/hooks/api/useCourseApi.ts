@@ -98,7 +98,7 @@ export const useStudentCourses = () => {
 
 export const useRoleBasedCourses = (
   role: string,
-  options?: { enabled?: boolean } 
+  options?: { enabled?: boolean },
 ) => {
   const queryFn =
     role === Role.Student
@@ -109,7 +109,28 @@ export const useRoleBasedCourses = (
     queryKey: ['courses', role],
     queryFn: queryFn,
     retry: 3,
-    staleTime: 5 * 60 * 1000,
-    enabled: options?.enabled ?? true, 
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: options?.enabled ?? true,
+  });
+};
+
+export const useEnrollStudents = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (request: any) => {
+      return courseService.updateCourseEnrollments(request.courseId, {
+        studentIds: request.studentIds,
+        teacherId: request.teacherId,
+      });
+    },
+    retry: 3,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
+      queryClient.invalidateQueries({ queryKey: ['enrollments'] });
+    },
+    onError: (error) => {
+      console.error('Failed to update enrollments:', error);
+    },
   });
 };
