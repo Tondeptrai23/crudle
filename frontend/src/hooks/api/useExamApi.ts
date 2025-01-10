@@ -22,6 +22,7 @@ const examKeys = {
     'submissions',
     submissionId,
   ],
+  submissions: (examId: string) => ['exams', examId, 'submissions'],
 };
 
 export const useExams = (
@@ -171,4 +172,42 @@ export const useCanModifyExam = (exam: Exam | undefined) => {
   const endDate = new Date(startDate.getTime() + exam.duration * 60 * 1000);
 
   return now < startDate;
+};
+
+export const useExamSubmissions = (
+  courseId: string,
+  examId: string,
+  role: string,
+) => {
+  return useQuery({
+    queryKey: examKeys.submissions(examId),
+    queryFn: () =>
+      examService.getExamSubmissions(Number(courseId), Number(examId), role),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+};
+
+export const useExamSubmission = (
+  courseId: string,
+  examId: string,
+  submissionId: string,
+  role: string,
+) => {
+  return useQuery({
+    queryKey: examKeys.submission(examId, submissionId),
+    queryFn: () =>
+      examService.getExamSubmission(
+        Number(courseId),
+        Number(examId),
+        Number(submissionId),
+        role,
+      ),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
 };

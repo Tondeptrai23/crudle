@@ -130,7 +130,7 @@ public class StudentExamController : Controller
     }
     
     [HttpGet]
-    [Route("Submissions")]
+    [Route("{examId:int}/Submissions")]
     public async Task<IActionResult> GetExamSubmissionsAsync([FromRoute] int courseId,
         [FromQuery] ExamSubmissionQueryCollectionDto queryCollectionDto)
     {
@@ -156,7 +156,7 @@ public class StudentExamController : Controller
     }
     
     [HttpGet]
-    [Route("{examId:int}/Submission/{examSubmissionId:int}")]
+    [Route("{examId:int}/Submissions/{examSubmissionId:int}")]
     public async Task<IActionResult> GetDetailExamSubmissionAsync([FromRoute] int courseId, [FromRoute] int examId,
         [FromRoute] int examSubmissionId)
     {

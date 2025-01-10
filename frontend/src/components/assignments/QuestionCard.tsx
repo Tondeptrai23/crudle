@@ -20,7 +20,7 @@ const QuestionCard = ({
   question,
   index,
   showButton,
-	selected,
+  selected,
   onDelete,
   onQuestionChange,
 }: QuestionCardProps) => {

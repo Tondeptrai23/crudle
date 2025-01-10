@@ -5,6 +5,9 @@ import {
   ExamQuestionResponse,
   ExamResponse,
   ExamStartDto,
+  ExamSubmission,
+  ExamSubmissionDto,
+  ExamSubmissionStatus,
   ExamSubmitDto,
 } from '@/types/exam';
 import { ApiResponse } from '@/types/paginationApiResponse';
@@ -21,7 +24,7 @@ export default class ExamService {
       orderDirection: string;
     },
   ): Promise<ApiResponse<Exam>> {
-    const response = await api.get(`/api/Teacher/${courseId}/Exam`, {
+    const response = await api.get(`/api/Teacher/Course/${courseId}/Exam`, {
       params: {
         Page: serviceData.page || 1,
         Size: serviceData.size || 10,
@@ -80,7 +83,9 @@ export default class ExamService {
   }
 
   async getExam(courseId: number, examId: number): Promise<Exam> {
-    const response = await api.get(`/api/Teacher/${courseId}/Exam/${examId}`);
+    const response = await api.get(
+      `/api/Teacher/Course/${courseId}/Exam/${examId}`,
+    );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
@@ -118,7 +123,10 @@ export default class ExamService {
       })),
     };
 
-    const response = await api.post(`/api/Teacher/${courseId}/Exam`, body);
+    const response = await api.post(
+      `/api/Teacher/Course/${courseId}/Exam`,
+      body,
+    );
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);
@@ -155,7 +163,7 @@ export default class ExamService {
     };
 
     const response = await api.put(
-      `/api/Teacher/${courseId}/Exam/${examId}`,
+      `/api/Teacher/Course/${courseId}/Exam/${examId}`,
       body,
     );
 
@@ -173,7 +181,7 @@ export default class ExamService {
       throw new Error('Cannot delete an exam that has already started');
     }
 
-    await api.delete(`/api/Teacher/${courseId}/Exam/${examId}`);
+    await api.delete(`/api/Teacher/Course/${courseId}/Exam/${examId}`);
   }
 
   async startExam(courseId: number, examId: number): Promise<ExamStartDto> {
@@ -224,6 +232,39 @@ export default class ExamService {
       submittedAt: response.data.Data.SubmittedAt,
     };
   }
+
+  async getExamSubmissions(
+    courseId: number,
+    examId: number,
+    role: string,
+  ): Promise<ExamSubmission[]> {
+    const response = await api.get(
+      `/api/${role}/Course/${courseId}/Exam/${examId}/Submissions`,
+    );
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data.map(mapFromExamSubmissionResponseToSubmission);
+  }
+
+  async getExamSubmission(
+    courseId: number,
+    examId: number,
+    submissionId: number,
+    role: string,
+  ): Promise<ExamSubmission> {
+    const response = await api.get(
+      `/api/${role}/Course/${courseId}/Exam/${examId}/Submissions/${submissionId}`,
+    );
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return mapFromExamSubmissionResponseToSubmission(response.data.Data);
+  }
 }
 
 // Mapping functions
@@ -254,4 +295,25 @@ export const mapToAnswer = (response: ExamAnswerResponse) => ({
   questionId: response.ExamQuestionId,
   value: response.Value,
   isCorrect: response.IsCorrect,
+});
+
+export const mapFromExamSubmissionResponseToSubmission = (
+  response: ExamSubmissionDto,
+): ExamSubmission => ({
+  submissionId: response.SubmissionId,
+  examId: response.ExamId,
+  studentId: response.StudentId,
+  studentName: response.StudentName,
+  score: response.Score,
+  startedAt: response.StartedAt ? new Date(response.StartedAt) : undefined,
+  submittedAt: response.SubmittedAt
+    ? new Date(response.SubmittedAt)
+    : undefined,
+  status:
+    response.Score !== null
+      ? ExamSubmissionStatus.DONE
+      : response.StartedAt
+        ? ExamSubmissionStatus.IN_PROGRESS
+        : ExamSubmissionStatus.NOT_STARTED,
+  questions: response.Questions?.map(mapToQuestion),
 });
