@@ -10,6 +10,7 @@ public interface IAssignmentSubmissionService
     /// <param name="courseId">The unique identifier of the course</param>
     /// <param name="assignmentId">The unique identifier of the assignment</param>
     /// <param name="teacherId">The unique identifier of the teacher</param>
+    /// <param name="queryDto">The query parameters for filtering, ordering, and pagination</param>
     /// <returns>The task contain list of submissions</returns>
     Task<(int, IEnumerable<AssignmentSubmissionMinimalDto>)> GetSubmissionsAsync(int courseId, int assignmentId,
         int teacherId, AssignmentSubmissionCollectionQueryDto queryDto);
@@ -44,6 +45,7 @@ public interface IAssignmentSubmissionService
     /// <param name="courseId">The unique identifier of the course</param>
     /// <param name="assignmentId">The unique identifier of the assignment</param>
     /// <param name="studentId">The unique identifier of the teacher</param>
+    /// <param name="queryDto">The query parameters for filtering, ordering, and pagination</param>
     /// <returns>The task contain list of submissions</returns>
     Task<(int, IEnumerable<AssignmentSubmissionMinimalDto>)> GetSubmissionsHistoryAsync(int courseId, int assignmentId,
         int studentId, AssignmentSubmissionCollectionQueryDto queryDto);
