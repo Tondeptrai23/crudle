@@ -91,11 +91,7 @@ const EditingQuestionCard = ({
             setQuestionContent(e.target.value);
             setQuestionError(null);
           }}
-          placeholder={
-            question.type === 'Fill In Blank'
-              ? "Enter question with ___ for blank (e.g., 'The capital of France is ___')"
-              : 'Enter your question'
-          }
+          placeholder={'Enter your question'}
         />
         {questionError && (
           <p className='text-sm text-red-500'>{questionError}</p>
