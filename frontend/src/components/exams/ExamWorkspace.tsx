@@ -87,8 +87,8 @@ const ExamWorkspace = ({
     examId,
     submissionId,
     answers: questions.map((q) => ({
-      questionId: q.questionId,
-      value: selectedAnswers[q.questionId] || '',
+      questionId: Number(q.questionId),
+      value: selectedAnswers[Number(q.questionId)] || '',
     })),
     submittedAt: new Date(),
   });
@@ -128,9 +128,9 @@ const ExamWorkspace = ({
               <WorkspaceQuestionCard
                 question={question}
                 index={index}
-                selectedAnswer={selectedAnswers[question.questionId]}
+                selectedAnswer={selectedAnswers[Number(question.questionId)]}
                 onAnswerSelect={(value) =>
-                  handleAnswerSelect(question.questionId, value)
+                  handleAnswerSelect(Number(question.questionId), value)
                 }
               />
             </div>
@@ -165,7 +165,7 @@ const ExamWorkspace = ({
                     currentQuestionIndex === index
                       ? 'ring-2 ring-blue-500'
                       : '',
-                    selectedAnswers[question.questionId]
+                    selectedAnswers[Number(question.questionId)]
                       ? 'bg-green-500 text-white hover:bg-green-600'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
                   )}

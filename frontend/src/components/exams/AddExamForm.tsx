@@ -300,6 +300,7 @@ const AddExamForm: React.FC<ExamFormProps> = ({
           {questions.map((question, index) => (
             <div key={question.questionId}>
               <QuestionCard
+								selected={false}
                 showButton={true}
                 question={question}
                 index={index}

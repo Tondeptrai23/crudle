@@ -76,7 +76,7 @@ public class ExamSubmissionService: IExamSubmissionService
         return examSubmissionDto;
     }
 
-    public async Task<(int, ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsHistoryAsync(int courseId, int studentId,
+    public async Task<(int, ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsHistoryAsync(int courseId, int examId, int studentId,
         ExamSubmissionQueryCollectionDto queryCollectionDto)
     {
         if (!await _context.Courses.AnyAsync(c => c.CourseId == courseId))
@@ -85,7 +85,7 @@ public class ExamSubmissionService: IExamSubmissionService
         }
         
         var examSubmission = _context.ExamSubmissions
-            .Where(es => es.StudentId == studentId);
+            .Where(es => es.StudentId == studentId && es.ExamId == examId);
             
         examSubmission = ApplyFilter(examSubmission, queryCollectionDto);
         examSubmission = ApplyOrder(examSubmission, queryCollectionDto);

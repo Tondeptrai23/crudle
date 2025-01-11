@@ -35,7 +35,7 @@ public interface IExamSubmissionService
     /// <param name="queryCollectionDto">The query parameters for filtering, ordering, and pagination</param>
     /// <returns>The task contain list of submissions</returns>
     /// <exception cref="ResourceNotFoundException">Thrown if the course or student is not found</exception>
-    Task<(int , ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsHistoryAsync(int courseId, int studentId, ExamSubmissionQueryCollectionDto queryCollectionDto);
+    Task<(int , ICollection<ExamSubmissionMinimalDto>)> GetExamSubmissionsHistoryAsync(int courseId, int examId, int studentId, ExamSubmissionQueryCollectionDto queryCollectionDto);
     
     /// <summary>
     /// Get detail exam submission for the student

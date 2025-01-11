@@ -82,6 +82,35 @@ export interface ExamStartDto {
   questions: ExamQuestion[];
 }
 
+export enum ExamSubmissionStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+}
+
+export interface ExamSubmission {
+  submissionId: number;
+  examId: number;
+  studentId: string;
+  studentName: string;
+  score: number | null;
+  startedAt?: Date;
+  submittedAt?: Date;
+  status: ExamSubmissionStatus;
+  questions: ExamQuestion[];
+}
+
+export interface ExamSubmissionDto {
+  SubmissionId: number;
+  ExamId: number;
+  StudentId: string;
+  StudentName: string;
+  Score: number | null;
+  StartedAt?: string;
+  SubmittedAt?: string;
+  Questions: ExamQuestionResponse[];
+}
+
 export interface ExamResponse {
   ExamId: number;
   CourseId: number;

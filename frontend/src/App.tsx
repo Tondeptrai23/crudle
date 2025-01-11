@@ -30,6 +30,7 @@ import AddExamPage from './pages/exams/AddExamPage.tsx';
 import EditExamPage from './pages/exams/EditExamPage.tsx';
 import ExamDetailPage from './pages/exams/ExamDetailPage.tsx';
 import ExamSessionPage from './pages/exams/ExamSessionPage.tsx';
+import ExamSubmissionPage from './pages/exams/ExamSubmissionPage.tsx';
 import { Role } from './types/enums.ts';
 import {
   ForbiddenError,
@@ -178,6 +179,10 @@ const App: React.FC = () => {
                         <Route
                           path='/course/:courseId/exam/:examId/session/:submissionId'
                           element={<ExamSessionPage />}
+                        />
+                        <Route
+                          path='/course/:courseId/exam/:examId/submission/:submissionId'
+                          element={<ExamSubmissionPage />}
                         />
                         <Route path='/profile' element={<ProfilePage />} />
                         <Route path='*' element={<NotFound />} />
