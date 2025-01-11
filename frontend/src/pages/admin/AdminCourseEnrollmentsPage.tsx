@@ -35,7 +35,7 @@ const AdminCourseEnrollmentPage: React.FC = () => {
     null,
   );
   const [selectedStudents, setSelectedStudents] = React.useState<string[]>([]);
-  const { data: course } = useCourseDetail(Role.Admin, courseId ?? ''); // TODO: Fix
+  const { data: course } = useCourseDetail(Role.Admin, courseId ?? '');
   const enrollStudents = useEnrollStudents();
   const { data: teachers } = useTeachers({
     page: 1,
@@ -125,7 +125,7 @@ const AdminCourseEnrollmentPage: React.FC = () => {
         description: 'Successfully updated enrollments',
       });
 
-      navigate('/admin/courses');
+      navigate('/admin/course');
     } catch (error: any) {
       toast({
         title: 'Error',

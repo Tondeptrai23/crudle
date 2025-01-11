@@ -21,6 +21,14 @@ public class CourseController(ICourseService courseService) : Controller
         var (count, courses) = await courseService.GetCoursesAsync(queryDto);
         return Ok(new PaginationResponseDto<IEnumerable<CourseDto>>(courses, count, queryDto.Page, queryDto.Size));
     }
+    
+    [HttpGet]
+    [Route("{courseId:int}")]
+    public async Task<IActionResult> GetCourse([FromRoute] int courseId)
+    {
+        var course = await courseService.GetCourseByIdAsync(courseId);
+        return Ok(new ResponseDto<CourseDto>(course));
+    }
 
     [HttpGet]
     [Route("{courseId:int}/Students")]
