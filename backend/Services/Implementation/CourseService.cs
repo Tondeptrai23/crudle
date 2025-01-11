@@ -145,11 +145,6 @@ public class CourseService : ICourseService
 
         var enrolledStudent = _context.Enrollments.Where(en => en.CourseId == courseId)
             .Where(en => studentIds.Contains(en.StudentId)).ToList();
-        if (enrolledStudent.Count != 0)
-        {
-            var enrolledStudentIds = string.Join(", ", enrolledStudent.Select(s => s.StudentId));
-            throw new ConflictException($"Students with IDs: {enrolledStudentIds} are already enrolled in the course");
-        }
 
         var existingEnrollments = await _context.Enrollments
             .Where(e => e.CourseId == courseId)
@@ -192,11 +187,6 @@ public class CourseService : ICourseService
         if (teacher == null)
         {
             throw new ResourceNotFoundException($"Teacher with id {teacherId} not found.");
-        }
-
-        if (course.TeacherId == teacherId)
-        {
-            throw new ConflictException($"Teacher with id {teacherId} is already teaching the course.");
         }
 
         course.TeacherId = teacherId;
