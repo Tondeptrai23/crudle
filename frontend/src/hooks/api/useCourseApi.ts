@@ -125,8 +125,7 @@ export const useEnrollStudents = () => {
     },
     retry: 3,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['courses'] });
-      queryClient.invalidateQueries({ queryKey: ['enrollments'] });
+      queryClient.invalidateQueries();
     },
     onError: (error) => {
       console.error('Failed to update enrollments:', error);

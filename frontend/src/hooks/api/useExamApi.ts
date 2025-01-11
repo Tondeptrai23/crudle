@@ -77,7 +77,7 @@ export const useCreateExam = () => {
   return useMutation({
     mutationFn: async (data: CreateExamDto) => {
       await examService.createExam(data.courseId, data);
-      queryClient.invalidateQueries({ queryKey: examKeys.lists() });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -87,7 +87,6 @@ export const useUpdateExam = () => {
 
   return useMutation({
     mutationFn: async (data: { examId: number; exam: CreateExamDto }) => {
-      // eslint-disable-next-line no-useless-catch
       try {
         await examService.updateExam(
           data.exam.courseId,
@@ -95,10 +94,7 @@ export const useUpdateExam = () => {
           data.exam,
         );
 
-        queryClient.invalidateQueries({ queryKey: examKeys.lists() });
-        queryClient.invalidateQueries({
-          queryKey: examKeys.detail(data.examId.toString()),
-        });
+        queryClient.invalidateQueries();
       } catch (error) {
         // Re-throw the error to be handled by the UI
         throw error;
@@ -112,14 +108,10 @@ export const useDeleteExam = () => {
 
   return useMutation({
     mutationFn: async (data: { courseId: number; examId: number }) => {
-      // eslint-disable-next-line no-useless-catch
       try {
         await examService.deleteExam(data.courseId, data.examId);
 
-        queryClient.invalidateQueries({ queryKey: examKeys.lists() });
-        queryClient.invalidateQueries({
-          queryKey: examKeys.detail(data.examId.toString()),
-        });
+        queryClient.invalidateQueries();
       } catch (error) {
         // Re-throw the error to be handled by the UI
         throw error;
@@ -135,9 +127,7 @@ export const useStartExam = () => {
     mutationFn: async (data: { courseId: number; examId: number }) => {
       const response = await examService.startExam(data.courseId, data.examId);
 
-      queryClient.invalidateQueries({
-        queryKey: ['startExam', data.courseId, data.examId],
-      });
+      queryClient.invalidateQueries();
 
       return response;
     },
@@ -151,15 +141,7 @@ export const useSubmitExam = () => {
     mutationFn: async (data: { courseId: number; request: ExamSubmitDto }) => {
       const res = await examService.submitExam(data.courseId, data.request);
 
-      queryClient.invalidateQueries({
-        queryKey: examKeys.detail(data.request.examId.toString()),
-      });
-      queryClient.invalidateQueries({
-        queryKey: examKeys.submission(
-          data.request.examId.toString(),
-          data.request.submissionId.toString(),
-        ),
-      });
+      queryClient.invalidateQueries();
 
       return res;
     },
