@@ -8,6 +8,7 @@ import {
 
 import StudentService from '@/services/StudentService';
 import { UpcomingAssignment } from '@/types/assignment';
+import { UpcomingExam } from '@/types/exam';
 import { QueryHookParams } from '@/types/table';
 
 const studentService = new StudentService();
@@ -95,6 +96,30 @@ export const useUpcomingAssignments = (date: Date) => {
     },
   });
 };
+
+export const useUpcomingExams = (date: Date) => {
+  return useQuery<UpcomingExam[], Error>({
+    queryKey: ['upcomingExams', date],
+    queryFn: async () => {
+      return await studentService.getUpcomingExams(date);
+    },
+  });
+};
+
+export const useNotReadArticles = () => {
+  return useQuery({
+    queryKey: ['notReadArticles'],
+    queryFn: () => studentService.getNotReadArticles(),
+  });
+};
+
+export const useNotSubmittedAssignments = () => {
+  return useQuery({
+    queryKey: ['notSubmittedAssignments'],
+    queryFn: () => studentService.getNotSubmittedAssignments(),
+  });
+};
+
 // export const useDeleteStudent = () => {
 //   const queryClient = useQueryClient();
 

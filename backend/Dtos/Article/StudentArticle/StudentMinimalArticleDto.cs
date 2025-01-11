@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace _3w1m.Dtos.Article;
+﻿namespace _3w1m.Dtos.Article;
 
 public class StudentMinimalArticleDto
 {

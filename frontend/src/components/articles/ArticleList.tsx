@@ -57,7 +57,6 @@ const ArticleList = () => {
   const readArticle = useReadArticle(courseId);
 
   const handleReadArticle = async (article: Article) => {
-    if (role !== Role.Student || article.isRead) return;
     readArticle.mutate({ articleId: article.id });
   };
 

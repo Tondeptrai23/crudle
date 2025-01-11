@@ -6,8 +6,9 @@ import {
   TabsTrigger,
 } from '@/components/common/ui/tabs';
 import AssignmentList from '../assignments/AssignmentList';
+import ExamList from '../exams/ExamList';
 
-type CourseTab = 'articles' | 'assignments';
+type CourseTab = 'articles' | 'assignments' | 'exams';
 
 interface CourseTabsProps {
   activeTab: CourseTab;
@@ -24,12 +25,16 @@ const CourseTabs: React.FC<CourseTabsProps> = ({ activeTab, setActiveTab }) => {
         <TabsList>
           <TabsTrigger value='articles'>Articles</TabsTrigger>
           <TabsTrigger value='assignments'>Assignments</TabsTrigger>
+          <TabsTrigger value='exams'>Exams</TabsTrigger>
         </TabsList>
         <TabsContent value='articles'>
           <ArticleList />
         </TabsContent>
         <TabsContent value='assignments'>
           <AssignmentList />
+        </TabsContent>
+        <TabsContent value='exams'>
+          <ExamList />
         </TabsContent>
       </Tabs>
     </div>

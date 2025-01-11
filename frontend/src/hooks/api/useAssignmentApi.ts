@@ -1,6 +1,7 @@
 import AssignmentService from '@/services/AssignmentService';
 import { AssignmentSubmitDto, CreateAssignmentDto } from '@/types/assignment';
 import { Role } from '@/types/enums';
+import { SubmissionsVariant } from '@/types/submission';
 import { QueryHookParams } from '@/types/table';
 import {
   keepPreviousData,
@@ -21,7 +22,7 @@ export const useAssignments = (
   role: string,
   data: QueryHookParams,
 ) => {
-  let { page } = data;
+  const { page } = data;
   const { pageSize, filters, sort } = data;
   const nameFilter = filters.name as string;
 
@@ -85,7 +86,7 @@ export const useUpdateAssignment = () => {
 
   return useMutation({
     mutationFn: async (data: {
-      assignmentId: number;
+      assignmentId: string;
       assignment: CreateAssignmentDto;
     }) => {
       await assignmentService.updateAssignment(
@@ -174,5 +175,38 @@ export const useSubmitAssignment = () => {
 
       return res;
     },
+  });
+};
+
+export const useSubmissions = (
+  courseId: string,
+  assignmentId: string,
+  varient: SubmissionsVariant,
+) => {
+  return useQuery({
+    queryKey: ['submissions', courseId, assignmentId],
+    queryFn: () =>
+      assignmentService.getSubmissions(courseId, assignmentId, varient),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+};
+
+export const useSubmission = (
+  courseId: string,
+  assignmentId: string,
+  submissionId: string,
+  role: string,
+) => {
+  return useQuery({
+    queryKey: ['submission', courseId, assignmentId, submissionId, role],
+    queryFn: () =>
+      assignmentService.getSubmission(courseId, assignmentId, submissionId, role),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 };

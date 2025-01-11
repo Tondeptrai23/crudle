@@ -1,7 +1,6 @@
 using _3w1m.Constants;
 using _3w1m.Dtos;
 using _3w1m.Dtos.Student;
-using _3w1m.Models.Domain;
 using _3w1m.Services.Interface;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -16,12 +15,10 @@ namespace _3w1m.Controllers.Admin;
 public class StudentController : ControllerBase
 {
     private readonly IStudentService _studentService;
-    private readonly IMapper _mapper;
     
-    public StudentController(IStudentService studentService, IMapper mapper)
+    public StudentController(IStudentService studentService)
     {
         _studentService = studentService;
-        _mapper = mapper;
     }
     
     [HttpGet]

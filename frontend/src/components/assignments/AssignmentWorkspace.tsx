@@ -49,8 +49,8 @@ const AssignmentWorkspace = ({
     try {
       setIsSubmitting(true);
       const submitData = {
-        assignmentId,
-        submissionId,
+        assignmentId: assignmentId.toString(),
+        submissionId: submissionId.toString(),
         answers: questions.map((q) => ({
           questionId: q.questionId,
           value: selectedAnswers[q.questionId] || '',

@@ -13,26 +13,24 @@ const AddAssignmentPage = () => {
   const handleSave = async (formData: CreateAssignmentDto) => {
     await createAssignment.mutateAsync(formData);
 
-    navigate(`/course/${courseId}/assignment`);
+    navigate(`/course/${courseId}`);
   };
 
   return (
     <div className='mx-auto max-w-4xl space-y-6 p-6'>
-      <h1 className='text-2xl font-bold'>
-        Object Oriented Programming - Add Assignment
-      </h1>
+      <h1 className='text-2xl font-bold'>Add Assignment</h1>
       <AddAssignmentForm
         initialData={{
           courseId: courseId,
           name: '',
           content: '',
-          dueDate: null,
+          dueDate: new Date(),
           canViewScore: false,
           canRetry: false,
           type: 'questions',
         }}
         onSave={handleSave}
-        onCancel={() => navigate('../..?tab=assignments', { relative: 'path' })}
+        onCancel={() => navigate('..?tab=assignments', { relative: 'path' })}
       />
     </div>
   );

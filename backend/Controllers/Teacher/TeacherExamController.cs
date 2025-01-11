@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace _3w1m.Controllers.Teacher;
 
-[Route("api/Teacher/{courseId:int}/Exam")]
+[Route("api/Teacher/Course/{courseId:int}/Exam")]
 [ApiController]
 [Authorize(Roles = CourseRoles.Teacher)]
 [Tags("Teacher Exam")]
@@ -105,7 +105,7 @@ public class TeacherExamController : Controller
     [HttpPut]
     [Route("{examId:int}")]
     public async Task<IActionResult> UpdateExamAsync([FromRoute] int courseId, [FromRoute] int examId,
-        [FromBody] UpdateExamRequestDto updateExamRequestDto)
+        [FromBody] CreateExamRequestDto updateExamRequestDto)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -120,7 +120,7 @@ public class TeacherExamController : Controller
             throw new ForbiddenException("You are not enrolled in this course");
         }
 
-        var exam = await _examService.UpdateExamAsync(courseId, teacher.TeacherId, examId, updateExamRequestDto);
+        var exam = await _examService.ReplaceExamAsync(courseId, teacher.TeacherId, examId, updateExamRequestDto);
         return Ok(new ResponseDto<ExamDto>(exam));
     }
 
@@ -195,7 +195,7 @@ public class TeacherExamController : Controller
     }
     
     [HttpGet]
-    [Route("{examId:int}/Submission/{examSubmissionId:int}")]
+    [Route("{examId:int}/Submissions/{examSubmissionId:int}")]
     public async Task<IActionResult> GetDetailExamSubmissionAsync([FromRoute] int courseId, [FromRoute] int examId,
         [FromRoute] int examSubmissionId)
     {

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-
-namespace _3w1m.Dtos.Teacher;
+﻿namespace _3w1m.Dtos.Teacher;
 
 public class TeacherMinimalDto
 {
