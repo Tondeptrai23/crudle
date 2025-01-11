@@ -35,6 +35,11 @@ export interface TablePaginationProps {
   onPageSizeChange?: (pageSize: number) => void;
 }
 
+export interface AdditionalAction {
+  label: string;
+  handler: (id: string) => void;
+}
+
 export interface ActionCellProps {
   requireDeleteConfirmation?: boolean;
   isEditing?: boolean;
@@ -48,6 +53,7 @@ export interface ActionCellProps {
     edit?: boolean;
     delete?: boolean;
   };
+  additionalActions?: AdditionalAction[];
 }
 
 export type QueryHook<T> = (
@@ -66,10 +72,11 @@ export interface GenericTableProps<T extends { id: string }> {
   columns: Column<T>[];
   actions?: TableActions;
   formComponent: React.ComponentType<{
-    onSubmit: (data: any) => void;
+    onSubmit: () => void;
   }>;
   requireDeleteConfirmation?: boolean;
   disabledActions?: ActionCellProps['disabledActions'];
   queryHook: QueryHook<T>;
   filterOptions: FilterOption[];
+  additionalActions?: AdditionalAction[];
 }

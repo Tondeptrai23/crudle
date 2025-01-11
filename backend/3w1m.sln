@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "3w1m", "3w1m.csproj", "{B4A9CF8F-B198-4472-9029-B1C7C9A38FEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBackend", "TestBackend\TestBackend.csproj", "{3CAEA05B-96F6-441B-8A64-4BB37B436A46}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

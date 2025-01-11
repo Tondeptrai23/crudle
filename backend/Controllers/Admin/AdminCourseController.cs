@@ -21,10 +21,19 @@ public class CourseController(ICourseService courseService) : Controller
         var (count, courses) = await courseService.GetCoursesAsync(queryDto);
         return Ok(new PaginationResponseDto<IEnumerable<CourseDto>>(courses, count, queryDto.Page, queryDto.Size));
     }
+    
+    [HttpGet]
+    [Route("{courseId:int}")]
+    public async Task<IActionResult> GetCourse([FromRoute] int courseId)
+    {
+        var course = await courseService.GetCourseByIdAsync(courseId);
+        return Ok(new ResponseDto<CourseDto>(course));
+    }
 
     [HttpGet]
     [Route("{courseId:int}/Students")]
-    public async Task<IActionResult> GetStudentsInCourse([FromRoute] int courseId) {
+    public async Task<IActionResult> GetStudentsInCourse([FromRoute] int courseId)
+    {
         var (_, students) = await courseService.GetStudentsInCourseAsync(courseId);
         return Ok(new ResponseDto<IEnumerable<StudentDto>>(students));
     }
@@ -42,21 +51,13 @@ public class CourseController(ICourseService courseService) : Controller
     {
         var course = await courseService.UpdateCourseAsync(courseId, requestCourseData);
         return Ok(new ResponseDto<CourseDto>(course));
-    } 
-
-    [HttpPost]
-    [Route("{courseId:int}/EnrollStudent")]
-    public async Task<IActionResult> EnrollStudentIntoCourse([FromRoute] int courseId, [FromBody] EnrollStudentToCourseRequestDto enrollRequest)
-    {
-        var students = await courseService.EnrollStudentIntoCourseAsync(courseId, enrollRequest);
-        return Ok(new ResponseDto<IEnumerable<StudentDto>>(students));
     }
 
-    [HttpPost]
-    [Route("{courseId:int}/EnrollTeacher")]
-    public async Task<IActionResult> EnrollTeacherIntoCourse([FromRoute] int courseId, [FromBody] EnrollTeacherToCourseRequestDto enrollRequest)
+    [HttpPut]
+    [Route("{courseId:int}/Enrollments")]
+    public async Task<IActionResult> ChangeCourseEnrollments([FromRoute] int courseId, [FromBody] EnrollmentRequestDto enrollRequest)
     {
-        var teacher = await courseService.EnrollTeacherIntoCourseAsync(courseId, enrollRequest);
-        return Ok(new ResponseDto<TeacherDto>(teacher));
+        var students = await courseService.UpdateEnrollmentsAsync(courseId, enrollRequest);
+        return Ok(new ResponseDto<EnrollmentRequestDto>(enrollRequest));
     }
 }

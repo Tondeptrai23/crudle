@@ -4,6 +4,7 @@ import {
   // NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/common/ui/navigation-menu';
+import { useProfileData } from '@/hooks/api/useProfileApi';
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import React from 'react';
@@ -21,6 +22,7 @@ export interface NavProps {
 const Nav: React.FC<NavProps> = (props) => {
   const { pathname } = useLocation();
   const { role } = useAuth();
+  const { data } = useProfileData('', role);
 
   const generateNavigationItem = (path: string, label: string) => {
     const baseClass = 'px-3 py-1 font-semibold cursor-pointer';
@@ -59,7 +61,11 @@ const Nav: React.FC<NavProps> = (props) => {
         </NavigationMenuList>
       </div>
       <div className='flex items-center gap-2'>
-        <Profile name='John Doe' role={role} items={props.profileItems} />
+        <Profile
+          name={data?.fullname ?? 'Admin'}
+          role={role}
+          items={props.profileItems}
+        />
       </div>
     </NavigationMenu>
   );

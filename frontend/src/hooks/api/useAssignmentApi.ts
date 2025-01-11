@@ -76,7 +76,7 @@ export const useCreateAssignment = () => {
     mutationFn: async (data: CreateAssignmentDto) => {
       await assignmentService.createAssignment(data.courseId, data);
 
-      queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -95,10 +95,7 @@ export const useUpdateAssignment = () => {
         data.assignment,
       );
 
-      queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
-      queryClient.invalidateQueries({
-        queryKey: assignmentKeys.detail(data.assignmentId.toString()),
-      });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -113,10 +110,7 @@ export const useDeleteAssignment = () => {
         data.assignmentId,
       );
 
-      queryClient.invalidateQueries({ queryKey: assignmentKeys.lists() });
-      queryClient.invalidateQueries({
-        queryKey: assignmentKeys.detail(data.assignmentId.toString()),
-      });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -147,9 +141,7 @@ export const useStartAssignment = () => {
         data.assignmentId,
       );
 
-      queryClient.invalidateQueries({
-        queryKey: ['startAssignment', data.courseId, data.assignmentId],
-      });
+      queryClient.invalidateQueries();
 
       return response;
     },
@@ -169,9 +161,7 @@ export const useSubmitAssignment = () => {
         data.request,
       );
 
-      queryClient.invalidateQueries({
-        queryKey: ['startAssignment', data.courseId, data.request.assignmentId],
-      });
+      queryClient.invalidateQueries();
 
       return res;
     },
@@ -203,7 +193,12 @@ export const useSubmission = (
   return useQuery({
     queryKey: ['submission', courseId, assignmentId, submissionId, role],
     queryFn: () =>
-      assignmentService.getSubmission(courseId, assignmentId, submissionId, role),
+      assignmentService.getSubmission(
+        courseId,
+        assignmentId,
+        submissionId,
+        role,
+      ),
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,

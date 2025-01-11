@@ -125,8 +125,8 @@ public class CourseService : ICourseService
         return (students.Count, _mapper.Map<IEnumerable<StudentDto>>(students));
     }
 
-    public async Task<IEnumerable<StudentDto>> EnrollStudentIntoCourseAsync(int courseId,
-        EnrollStudentToCourseRequestDto enrollRequest)
+    public async Task<IEnumerable<StudentDto>> UpdateEnrollmentsAsync(int courseId,
+        EnrollmentRequestDto enrollRequest)
     {
         var studentIds = enrollRequest.StudentIds.ToList();
 
@@ -144,16 +144,19 @@ public class CourseService : ICourseService
 
         var enrolledStudent = _context.Enrollments.Where(en => en.CourseId == courseId)
             .Where(en => studentIds.Contains(en.StudentId)).ToList();
-        if (enrolledStudent.Count != 0)
-        {
-            var enrolledStudentIds = string.Join(", ", enrolledStudent.Select(s => s.StudentId));
-            throw new ConflictException($"Students with IDs: {enrolledStudentIds} are already enrolled in the course");
-        }
 
-        var nonEnrolledStudents = studentIds.Except(enrolledStudent.Select(student => student.StudentId)).ToList();
+        var existingEnrollments = await _context.Enrollments
+            .Where(e => e.CourseId == courseId)
+            .ToListAsync();
+
+        var enrollmentsToRemove = existingEnrollments
+            .Where(e => !studentIds.Contains(e.StudentId));
+        _context.Enrollments.RemoveRange(enrollmentsToRemove);
+
+        var newEnrolledStudents = studentIds.Except(enrolledStudent.Select(student => student.StudentId)).ToList();
         var enrollments = _context.Enrollments;
 
-        for (var i = 0; i < nonEnrolledStudents.Count; i++)
+        for (var i = 0; i < newEnrolledStudents.Count; i++)
         {
             var now = DateTime.Now;
             await enrollments.AddAsync(new Enrollment
@@ -164,15 +167,15 @@ public class CourseService : ICourseService
             });
         }
 
+        EnrollTeacherIntoCourseAsync(courseId, enrollRequest.TeacherId);
         await _context.SaveChangesAsync();
         var (_, students) = await GetStudentsInCourseAsync(courseId);
 
         return students;
     }
 
-    public Task<TeacherDto> EnrollTeacherIntoCourseAsync(int courseId, EnrollTeacherToCourseRequestDto enrollRequest)
+    private void EnrollTeacherIntoCourseAsync(int courseId, int teacherId)
     {
-        var teacherId = enrollRequest.TeacherId;
         var course = _context.Courses.FirstOrDefault(c => c.CourseId == courseId);
         if (course == null)
         {
@@ -185,17 +188,8 @@ public class CourseService : ICourseService
             throw new ResourceNotFoundException($"Teacher with id {teacherId} not found.");
         }
 
-        if (course.TeacherId == teacherId)
-        {
-            throw new ConflictException($"Teacher with id {teacherId} is already teaching the course.");
-        }
-
         course.TeacherId = teacherId;
         course.Teacher = teacher;
-
-        _context.SaveChanges();
-
-        return Task.FromResult(_mapper.Map<TeacherDto>(teacher));
     }
 
     public async Task<bool> CourseEnrolledUserValidationAsync(int courseId, string userId)

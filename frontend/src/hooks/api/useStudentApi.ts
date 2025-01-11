@@ -11,18 +11,13 @@ import { UpcomingAssignment } from '@/types/assignment';
 import { UpcomingExam } from '@/types/exam';
 import { QueryHookParams } from '@/types/table';
 
-const studentKeys = {
-  lists: () => ['students'],
-  detail: (id: string) => ['student', id],
-};
-
 const studentService = new StudentService();
 
 export const useStudents = (data: QueryHookParams) => {
   let { page, pageSize, filters, sort } = data;
-  const idFilter = filters.id as string;
-  const nameFilter = filters.fullname as string;
-  const dobRangeFilter = filters.dob as Date[];
+  const idFilter = (filters.id as string) ?? '';
+  const nameFilter = (filters.fullname as string) ?? '';
+  const dobRangeFilter = (filters.dob as Date[]) ?? [];
 
   if (page < 1) {
     page = 1;
@@ -64,7 +59,7 @@ export const useCreateStudent = () => {
     mutationFn: async (data: CreateStudentDTO) => {
       await studentService.addStudent(data);
 
-      queryClient.invalidateQueries({ queryKey: studentKeys.lists() });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -78,8 +73,7 @@ export const useUpdateStudent = () => {
     mutationFn: async ({ id, data }: UpdateStudentParams) => {
       await studentService.updateStudent(id, data);
 
-      queryClient.invalidateQueries({ queryKey: studentKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: studentKeys.detail(id) });
+      queryClient.invalidateQueries();
     },
   });
 };

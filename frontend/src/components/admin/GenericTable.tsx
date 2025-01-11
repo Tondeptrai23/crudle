@@ -41,12 +41,13 @@ const GenericTable = <T extends { id: string }>({
   queryHook,
   filterOptions,
   requireDeleteConfirmation,
+  additionalActions = [],
 }: GenericTableProps<T>) => {
   const defaultSortColumn = columns.find(
     (column) => column.isDefaultSort,
   )?.header;
 
-  let { data, pagination, state, sort, filters } = useGenericTableData({
+  const { data, pagination, state, sort, filters } = useGenericTableData({
     useQueryHook: queryHook,
     filterOptions,
     defaultSortColumn,
@@ -133,6 +134,10 @@ const GenericTable = <T extends { id: string }>({
                 onSave={() => handleSave(cell.id)}
                 onCancel={handleCancel}
                 disabledActions={disabledActions}
+                additionalActions={additionalActions.map((action) => ({
+                  label: action.label,
+                  handler: () => action.handler(cell.id),
+                }))}
               />
             </TableCell>
           </TableRow>

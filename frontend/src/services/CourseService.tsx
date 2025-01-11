@@ -127,5 +127,27 @@ export default class CourseService {
 
     return response.data.Data;
   };
-}
 
+  updateCourseEnrollments = async (
+    id: string,
+    data: { studentIds: number[]; teacherId?: number },
+  ) => {
+    const response = await api.put(`/api/admin/course/${id}/enrollments`, data);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
+  };
+
+  getCourseEnrollments = async (id: string) => {
+    const response = await api.get(`/api/admin/course/${id}/students`);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
+  };
+}

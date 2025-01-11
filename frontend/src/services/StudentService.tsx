@@ -33,7 +33,6 @@ export default class StudentService {
     if (page < 1) {
       page = 1;
     }
-
     let query = `page=${page}&size=${size}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
     query +=
       studentId || studentId?.length == 0 ? `&studentId=${studentId}` : '';

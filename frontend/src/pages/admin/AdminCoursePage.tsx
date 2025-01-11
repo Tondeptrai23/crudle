@@ -9,13 +9,16 @@ import {
 } from '@/hooks/api/useCourseApi';
 import Course, { CreateCourseDTO, UpdateCourseDTO } from '@/types/course';
 import { DateRangeFilterOption, SearchFilterOption } from '@/types/filter';
-import { Column } from '@/types/table';
+import { AdditionalAction, Column } from '@/types/table';
 import { Calendar, Search } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminCoursePage: React.FC = () => {
   const createCourse = useCreateCourse();
   const updateCourse = useUpdateCourse();
+  const navigate = useNavigate();
+  const selectedRow = useState<Course | null>(null);
 
   const columns: Column<Course>[] = React.useMemo(
     () => [
@@ -118,7 +121,7 @@ const AdminCoursePage: React.FC = () => {
     label: 'Start Date',
     labelIcon: Calendar,
     minDate: new Date(2020, 0, 1),
-    maxDate: new Date(),
+    maxDate: new Date(2025, 12, 31),
     type: 'date',
   };
 
@@ -127,6 +130,13 @@ const AdminCoursePage: React.FC = () => {
     label: 'Teacher',
     labelIcon: Search,
     type: 'search',
+  };
+
+  const enrollmentsOption: AdditionalAction = {
+    label: 'Enrollments',
+    handler: (id: string) => {
+      navigate(`/admin/course/${id}/enrollments`);
+    },
   };
 
   return (
@@ -147,6 +157,7 @@ const AdminCoursePage: React.FC = () => {
           startDateFilter,
           teacherNameFilter,
         ]}
+        additionalActions={[enrollmentsOption]}
       />
     </div>
   );

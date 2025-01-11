@@ -104,9 +104,7 @@ export const useReadArticle = (courseId: string) => {
       await articleService.readArticle(courseId, articleId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: articleKeys.articles(courseId),
-      });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -119,9 +117,7 @@ export const useCreateArticle = (courseId: string) => {
       await articleService.createArticle(courseId, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: articleKeys.articles(courseId),
-      });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -140,9 +136,7 @@ export const useUpdateArticle = (courseId: string) => {
       await articleService.updateArticle(courseId, articleId, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: articleKeys.articles(courseId),
-      });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -155,9 +149,7 @@ export const useDeleteArticle = (courseId: string) => {
       await articleService.deleteArticle(courseId, articleId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: articleKeys.articles(courseId),
-      });
+      queryClient.invalidateQueries();
     },
   });
 };

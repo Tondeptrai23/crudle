@@ -69,7 +69,7 @@ export const useCreateCourse = () => {
     mutationFn: async (data: CreateCourseDTO) => {
       await courseService.createCourse(data);
 
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -83,8 +83,7 @@ export const useUpdateCourse = () => {
     mutationFn: async ({ id, data }: UpdateCourseParams) => {
       await courseService.updateCourse(id, data);
 
-      queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: courseKeys.detail(id) });
+      queryClient.invalidateQueries();
     },
   });
 };
@@ -98,7 +97,7 @@ export const useStudentCourses = () => {
 
 export const useRoleBasedCourses = (
   role: string,
-  options?: { enabled?: boolean } 
+  options?: { enabled?: boolean },
 ) => {
   const queryFn =
     role === Role.Student
@@ -109,7 +108,34 @@ export const useRoleBasedCourses = (
     queryKey: ['courses', role],
     queryFn: queryFn,
     retry: 3,
-    staleTime: 5 * 60 * 1000,
-    enabled: options?.enabled ?? true, 
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: options?.enabled ?? true,
+  });
+};
+
+export const useEnrollStudents = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (request: any) => {
+      return courseService.updateCourseEnrollments(request.courseId, {
+        studentIds: request.studentIds,
+        teacherId: request.teacherId,
+      });
+    },
+    retry: 3,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+    onError: (error) => {
+      console.error('Failed to update enrollments:', error);
+    },
+  });
+};
+
+export const useStudentsInCourse = (courseId: string) => {
+  return useQuery({
+    queryKey: ['courses', courseId, 'students'],
+    queryFn: () => courseService.getCourseEnrollments(courseId),
   });
 };
