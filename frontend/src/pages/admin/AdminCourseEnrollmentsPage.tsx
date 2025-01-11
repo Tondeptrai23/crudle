@@ -14,10 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/common/ui/table';
-import { useEnrollStudents } from '@/hooks/api/useCourseApi';
+import { useCourseDetail, useEnrollStudents } from '@/hooks/api/useCourseApi';
 import { useStudents } from '@/hooks/api/useStudentApi';
 import { useTeachers } from '@/hooks/api/useTeacherApi';
 import { useToast } from '@/hooks/use-toast';
+import { Role } from '@/types/enums';
 import { SearchFilterOption } from '@/types/filter';
 import Student from '@/types/student';
 import { Column } from '@/types/table';
@@ -34,7 +35,7 @@ const AdminCourseEnrollmentPage: React.FC = () => {
     null,
   );
   const [selectedStudents, setSelectedStudents] = React.useState<string[]>([]);
-
+  const { data: course } = useCourseDetail(Role.Admin, courseId ?? ''); // TODO: Fix
   const enrollStudents = useEnrollStudents();
   const { data: teachers } = useTeachers({
     page: 1,
@@ -136,7 +137,13 @@ const AdminCourseEnrollmentPage: React.FC = () => {
 
   return (
     <div className='mx-auto max-w-4xl space-y-4 p-4'>
+      <div className='mb-4'>
+        <h1 className='text-2xl font-bold'>
+          Course: {course?.code} - {course?.name}
+        </h1>
+      </div>
       <div className='flex items-center gap-4'>
+        <div>Teacher: </div>
         <Select
           value={selectedTeacher?.id}
           onValueChange={(value) => {
