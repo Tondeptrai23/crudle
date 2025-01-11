@@ -1,4 +1,5 @@
 import QuestionCard from '@/components/assignments/QuestionCard';
+import SubmissionsTable from '@/components/submissions/SubmissionsTable';
 import {
   Accordion,
   AccordionContent,
@@ -22,6 +23,7 @@ import { Role } from '@/types/enums';
 import { useCustomParams } from '@/utils/helper';
 import {
   Calendar,
+  ClipboardCheck,
   Clock,
   Edit,
   FileQuestion,
@@ -31,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SubmissionsVariant } from '@/types/submission';
 
 const AssignmentDetailPage = () => {
   const { assignmentId, courseId } = useCustomParams();
@@ -181,34 +184,76 @@ const AssignmentDetailPage = () => {
         </Card>
 
         {/* Questions Section */}
-        {role === Role.Teacher ? (
-          <Card className='border-2'>
-            <Accordion type='single' collapsible className='w-full'>
-              <AccordionItem value='questions-section' className='border-none'>
-                <AccordionTrigger className='px-6 py-4 hover:no-underline'>
-                  <div className='flex items-center gap-2'>
-                    <FileQuestion className='h-5 w-5 text-blue-600' />
-                    <p className='text-base'>Questions Section</p>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className='px-6 pb-4'>
-                  <div className='space-y-4'>
-                    {assignment.questions.map((question, index) => (
-                      <QuestionCard
-                        key={question.questionId}
-                        showButton={false}
-                        question={question}
-                        index={index}
-                        onDelete={() => {}}
-                        onQuestionChange={() => {}}
-                      />
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </Card>
-        ) : (
+        {role === Role.Teacher && (
+          <>
+            <Card className='border-2'>
+              <Accordion type='single' collapsible className='w-full'>
+                <AccordionItem
+                  value='questions-section'
+                  className='border-none'
+                >
+                  <AccordionTrigger className='px-6 py-4 hover:no-underline'>
+                    <div className='flex items-center gap-2'>
+                      <FileQuestion className='h-5 w-5 text-blue-600' />
+                      <p className='text-base'>Questions Section</p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className='px-6 pb-4'>
+                    <div className='space-y-4'>
+                      {assignment.questions.map((question, index) => (
+                        <QuestionCard
+                          selected={false}
+                          key={question.questionId}
+                          showButton={false}
+                          question={question}
+                          index={index}
+                          onDelete={() => {}}
+                          onQuestionChange={() => {}}
+                        />
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </Card>
+          </>
+        )}
+
+        <Card className='border-2'>
+          <Accordion
+            type='single'
+            collapsible
+            className='w-full'
+            defaultValue='assignment-details'
+          >
+            <AccordionItem value='assignment-details' className='border-none'>
+              <AccordionTrigger className='px-6 py-4 hover:no-underline'>
+                <div className='flex items-center gap-2'>
+                  <ClipboardCheck className='h-5 w-5 text-blue-600' />
+                  {role === Role.Teacher ? (
+                    <p className='text-base'>Submissions</p>
+                  ) : (
+                    <p className='text-base'>Your Submissions</p>
+                  )}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className='px-6 pb-4'>
+                <SubmissionsTable
+                  courseId={courseId.toString()}
+                  assignmentId={assignmentId.toString()}
+                  maxScore={assignment.totalQuestions}
+                  variant={
+                    role === Role.Teacher
+                      ? SubmissionsVariant.LATEST
+                      : SubmissionsVariant.INDIVIDUAL
+                  }
+                />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </Card>
+
+        {role === Role.Student && (
           <div className='flex items-center justify-center'>
             <LoadingButton
               size='lg'

@@ -1,18 +1,16 @@
-import { Button } from '@/components/common/ui/button';
 import {
   NavigationMenu,
   NavigationMenuItem,
   // NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/common/ui/navigation-menu';
+import { useProfileData } from '@/hooks/api/useProfileApi';
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
-import { Bell } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import Profile, { ProfileMenuItem } from './Profile';
-import { useProfileData } from '@/hooks/api/useProfileApi';
 
 export interface NavProps {
   className?: string;
@@ -63,14 +61,6 @@ const Nav: React.FC<NavProps> = (props) => {
         </NavigationMenuList>
       </div>
       <div className='flex items-center gap-2'>
-        <Button
-          variant='ghost'
-          size='icon'
-          className='rounded-full'
-          onClick={props.handleNotification}
-        >
-          <Bell />
-        </Button>
         <Profile
           name={data?.fullname ?? 'Admin'}
           role={role}

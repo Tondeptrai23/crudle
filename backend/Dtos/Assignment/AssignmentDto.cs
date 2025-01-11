@@ -10,6 +10,7 @@ public class AssignmentDto
     public string Content { get; set; }
     public bool CanViewScore { get; set; }
     public bool CanRetry { get; set; }
+    public int TotalQuestions {get; set;}
     public DateTime DueDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

@@ -18,5 +18,5 @@ public class ExamStudentResponseDto
     
     public DateTime UpdatedAt { get; set; }
     
-    public ICollection<ExamQuestionForStudentDto> ExamQuestions { get; set; }
+    public ICollection<ExamQuestionForStudentDto> Questions { get; set; }
 }

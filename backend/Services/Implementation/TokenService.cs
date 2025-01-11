@@ -29,12 +29,12 @@ public class TokenService : ITokenService
     public async Task<string> GenerateAccessToken(User user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
+
         var authClaims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
-
         authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));

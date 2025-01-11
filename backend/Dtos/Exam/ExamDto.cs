@@ -4,6 +4,6 @@ namespace _3w1m.Dtos.Exam;
 
 public class ExamDto : ExamMinimalDto
 {
-    public ICollection<ExamQuestionDto> ExamQuestions { get; set; }
+    public ICollection<ExamQuestionDto> Questions { get; set; }
     public int NumberOfSubmissions { get; set; }
 }

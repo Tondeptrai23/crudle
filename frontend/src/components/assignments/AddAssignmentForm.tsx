@@ -39,9 +39,7 @@ import QuestionCard from './QuestionCard';
 const assignmentFormSchema = z.object({
   courseId: z.number(),
   name: z.string().min(1, 'Name is required'),
-  dueDate: z
-    .union([z.date(), z.string().transform((str) => new Date(str)), z.null()])
-    .transform((val) => (val ? new Date(val) : null)),
+  dueDate: z.date(),
   content: z.string().min(1, 'Content is required'),
   canViewScore: z.boolean().default(false),
   canRetry: z.boolean().default(false),
@@ -75,7 +73,12 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
     defaultValues: {
       courseId: initialData.courseId,
       name: initialData.name,
-      dueDate: initialData.dueDate || new Date(),
+      dueDate: initialData.dueDate
+        ? new Date(
+            initialData.dueDate.getTime() -
+              initialData.dueDate.getTimezoneOffset() * 60000,
+          )
+        : new Date(),
       content: initialData.content,
       canViewScore: initialData.canViewScore,
       canRetry: initialData.canRetry,
@@ -88,6 +91,10 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
     setIsSaving(true);
     const result = values as CreateAssignmentDto;
     result.questions = questions;
+
+    if (result.dueDate) {
+      result.dueDate = new Date(result.dueDate);
+    }
 
     if (result.questions.some((q) => q.isNew)) {
       toast({
@@ -151,6 +158,23 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
     setQuestions(result);
   };
 
+  const formatDate = (date: string | Date, format: 'display' | 'input') => {
+    const d = new Date(date);
+
+    if (format === 'input') {
+      return d.toISOString().slice(0, -8);
+    }
+
+    const pad = (num: number) => num.toString().padStart(2, '0');
+    const day = pad(d.getDate());
+    const month = pad(d.getMonth() + 1);
+    const year = d.getFullYear();
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
@@ -180,15 +204,15 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
                     <Input
                       type='datetime-local'
                       {...field}
-                      value={
-                        field.value
-                          ? new Date(field.value).toISOString().slice(0, 16)
-                          : ''
-                      }
+                      value={formatDate(field.value, 'input')}
                       onChange={(e) => {
                         if (e.target.value) {
-                          const date = new Date(e.target.value);
-                          field.onChange(date);
+                          field.onChange(
+                            new Date(
+                              new Date(e.target.value).getTime() -
+                                new Date().getTimezoneOffset() * 60000,
+                            ),
+                          );
                         } else {
                           field.onChange(null);
                         }
@@ -273,7 +297,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='multiple-choice'>Multiple Choice</SelectItem>
-                <SelectItem value='fill-blank'>Fill In Blank</SelectItem>
+                <SelectItem value='fill-blank'>Open-ended</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -290,6 +314,7 @@ const AddAssignmentForm: React.FC<AssignmentFormProps> = ({
         <div className='space-y-4'>
           {questions.map((question, index) => (
             <QuestionCard
+              selected={false}
               key={question.questionId}
               showButton={true}
               question={question}

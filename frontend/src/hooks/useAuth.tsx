@@ -1,6 +1,7 @@
 import {
   authenticate,
   getRole,
+  getUserId,
   invalidateSession,
   isAuthenticated,
 } from '@/utils/api';
@@ -23,10 +24,12 @@ const AuthContext = createContext<AuthContextType>({
 function useAuth() {
   const [authed, setAuthed] = useState<boolean>(Boolean(isAuthenticated()));
   const [role, setRole] = useState<string>(getRole());
+  const [userId] = useState<string>(getUserId());
 
   return {
     authed,
     role,
+    userId,
     login: async (username: string, password: string) => {
       await authenticate(username, password);
       setAuthed(true);

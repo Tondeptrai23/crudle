@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using _3w1m.Data;
 using _3w1m.Dtos.Article;
 using _3w1m.Models.Domain;
@@ -218,7 +214,7 @@ public class ArticleService : IArticleService
         var course = await _dbContext.Courses.Include(course => course.Teacher)
             .FirstOrDefaultAsync(c => c.CourseId == courseId);
         if (course == null)
-        {
+       {
             throw new ResourceNotFoundException("Course not found");
         }
 
@@ -239,6 +235,19 @@ public class ArticleService : IArticleService
         return _mapper.Map<IEnumerable<ArticleDto>>(articles);
     }
 
+    public async Task<IEnumerable<NotReadArticleDto>> GetNotReadArticlesAsync(int studentId)
+    {
+        var notReadArticles = await _dbContext.Articles
+            .Include(a => a.Course)
+            .ThenInclude(c => c.Enrollments)
+            .Include(a => a.ArticleProgresses)
+            .Where(a =>  a.ArticleProgresses.All(ap => ap.StudentId != studentId)
+                        && a.Course.Enrollments.Any(e => e.StudentId == studentId))
+            .ToListAsync();
+        
+        return _mapper.Map<IEnumerable<NotReadArticleDto>>(notReadArticles);
+    }
+
     private IQueryable<Article> ApplyFilter(IQueryable<Article> query, ArticleCollectionQueryDto queryDto)
     {
         if (!string.IsNullOrEmpty(queryDto.Title))
@@ -248,12 +257,12 @@ public class ArticleService : IArticleService
 
         if (!string.IsNullOrEmpty(queryDto.Summary))
         {
-            query = query.Where(x => x.Summary.Contains(queryDto.Summary));
+            query = query.Where(x => x.Summary != null && x.Summary.Contains(queryDto.Summary));
         }
 
         if (!string.IsNullOrEmpty(queryDto.Content))
         {
-            query = query.Where(x => x.Content.Contains(queryDto.Content));
+           query = query.Where(x => x.Content.Contains(queryDto.Content));
         }
 
         if (queryDto is { CreatedAtFrom: not null, CreatedAtTo: not null })
@@ -271,7 +280,7 @@ public class ArticleService : IArticleService
 
     private IQueryable<Article> ApplyPagination(IQueryable<Article> query, ArticleCollectionQueryDto queryDto)
     {
-        if (queryDto.Page > 0 && queryDto.Size > 0)
+        if (queryDto is { Page: > 0, Size: > 0 })
         {
             query = query.Skip((queryDto.Page - 1) * queryDto.Size).Take(queryDto.Size);
         }

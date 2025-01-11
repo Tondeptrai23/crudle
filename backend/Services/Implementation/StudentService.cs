@@ -89,7 +89,7 @@ public class StudentService : IStudentService
                 
             return _mapper.Map<StudentDto>(createdStudent.Entity);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await transaction.RollbackAsync();
             throw;
