@@ -132,7 +132,7 @@ export default class CourseService {
     id: string,
     data: { studentIds: number[]; teacherId?: number },
   ) => {
-    const response = await api.put(`/api/courses/${id}/enrollments`, data);
+    const response = await api.put(`/api/admin/course/${id}/enrollments`, data);
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);

@@ -17,27 +17,25 @@ import {
 import { useEnrollStudents } from '@/hooks/api/useCourseApi';
 import { useStudents } from '@/hooks/api/useStudentApi';
 import { useTeachers } from '@/hooks/api/useTeacherApi';
+import { useToast } from '@/hooks/use-toast';
 import { SearchFilterOption } from '@/types/filter';
 import Student from '@/types/student';
 import { Column } from '@/types/table';
 import Teacher from '@/types/teacher';
 import { Search } from 'lucide-react';
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const AdminCourseEnrollmentPage: React.FC = () => {
   const { courseId } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedTeacher, setSelectedTeacher] = React.useState<Teacher | null>(
     null,
   );
   const [selectedStudents, setSelectedStudents] = React.useState<string[]>([]);
 
   const enrollStudents = useEnrollStudents();
-  //   const { data: teachers } = useTeachers({
-  //     page: 1,
-  //     pageSize: 20,
-  //     filters: {},
-  //   });
   const { data: teachers } = useTeachers({
     page: 1,
     pageSize: 20,
@@ -99,15 +97,6 @@ const AdminCourseEnrollmentPage: React.FC = () => {
     [],
   );
 
-  const handleSubmit = async () => {
-    if (!courseId) return;
-    await enrollStudents.mutateAsync({
-      courseId,
-      studentIds: selectedStudents,
-      teacherId: selectedTeacher?.id,
-    });
-  };
-
   const idFilter: SearchFilterOption = {
     id: 'studentId',
     label: 'Student ID',
@@ -120,6 +109,29 @@ const AdminCourseEnrollmentPage: React.FC = () => {
     label: 'Name',
     labelIcon: Search,
     type: 'search',
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      await enrollStudents.mutateAsync({
+        courseId,
+        studentIds: selectedStudents,
+        teacherId: selectedTeacher?.id,
+      });
+
+      toast({
+        title: 'Success',
+        description: 'Successfully updated enrollments',
+      });
+
+      navigate('/admin/courses');
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: `Failed to update enrollments: ${error.message}`,
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -145,11 +157,15 @@ const AdminCourseEnrollmentPage: React.FC = () => {
         </Select>
 
         <button
-          className='rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
-          onClick={handleSubmit}
-          disabled={!selectedTeacher || selectedStudents.length === 0}
+          className='rounded bg-primary px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50'
+          onClick={handleSaveChanges}
+          disabled={
+            enrollStudents.isPending ||
+            !selectedTeacher ||
+            selectedStudents.length === 0
+          }
         >
-          Save Changes
+          {enrollStudents.isPending ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
 
