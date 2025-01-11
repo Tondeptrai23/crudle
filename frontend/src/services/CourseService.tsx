@@ -142,7 +142,7 @@ export default class CourseService {
   };
 
   getCourseEnrollments = async (id: string) => {
-    const response = await api.get(`/api/admin/course/${id}/enrollments`);
+    const response = await api.get(`/api/admin/course/${id}/students`);
 
     if (!response.data.Success) {
       throw new Error(response.data.Message);

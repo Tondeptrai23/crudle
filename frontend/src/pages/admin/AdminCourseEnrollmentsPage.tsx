@@ -14,7 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/common/ui/table';
-import { useCourseDetail, useEnrollStudents } from '@/hooks/api/useCourseApi';
+import {
+  useCourseDetail,
+  useEnrollStudents,
+  useStudentsInCourse,
+} from '@/hooks/api/useCourseApi';
 import { useStudents } from '@/hooks/api/useStudentApi';
 import { useTeachers } from '@/hooks/api/useTeacherApi';
 import { useToast } from '@/hooks/use-toast';
@@ -48,6 +52,8 @@ const AdminCourseEnrollmentPage: React.FC = () => {
     },
   });
 
+  const { data: enrolledStudents } = useStudentsInCourse(courseId ?? '');
+
   React.useEffect(() => {
     if (!course?.teacherId || !teachers?.data) {
       return;
@@ -68,6 +74,20 @@ const AdminCourseEnrollmentPage: React.FC = () => {
       direction: 'asc',
     },
   });
+
+  React.useEffect(() => {
+    if (!enrolledStudents || !students?.data) {
+      return;
+    }
+
+    const enrolledIds = enrolledStudents.map((student) => student.StudentId);
+
+    const enrolledStudentsInList = students.data
+      .filter((student) => enrolledIds.includes(student.id))
+      .map((student) => student.id);
+
+    setSelectedStudents(enrolledStudentsInList);
+  }, [enrolledStudents, students?.data]);
 
   const handleSelectStudent = (studentId: string) => {
     setSelectedStudents((prev) => {
