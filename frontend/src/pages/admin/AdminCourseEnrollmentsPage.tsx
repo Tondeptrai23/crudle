@@ -53,7 +53,7 @@ const AdminCourseEnrollmentPage: React.FC = () => {
       return;
     }
 
-    const matchedTeacher = teachers.data.find((t) => t.id === course.teacherId);
+    const matchedTeacher = teachers.data.find((t) => t.id == course.teacherId);
     if (matchedTeacher) {
       setSelectedTeacher(matchedTeacher);
     }
