@@ -37,6 +37,7 @@ const AdminCourseEnrollmentPage: React.FC = () => {
   const [selectedStudents, setSelectedStudents] = React.useState<string[]>([]);
   const { data: course } = useCourseDetail(Role.Admin, courseId ?? '');
   const enrollStudents = useEnrollStudents();
+
   const { data: teachers } = useTeachers({
     page: 1,
     pageSize: 20,
@@ -46,6 +47,17 @@ const AdminCourseEnrollmentPage: React.FC = () => {
       direction: 'asc',
     },
   });
+
+  React.useEffect(() => {
+    if (!course?.teacherId || !teachers?.data) {
+      return;
+    }
+
+    const matchedTeacher = teachers.data.find((t) => t.id === course.teacherId);
+    if (matchedTeacher) {
+      setSelectedTeacher(matchedTeacher);
+    }
+  }, [course?.teacherId, teachers?.data]);
 
   const { data: students, isLoading } = useStudents({
     page: 1,

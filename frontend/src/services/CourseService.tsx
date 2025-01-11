@@ -140,4 +140,14 @@ export default class CourseService {
 
     return response.data.Data;
   };
+
+  getCourseEnrollments = async (id: string) => {
+    const response = await api.get(`/api/admin/course/${id}/enrollments`);
+
+    if (!response.data.Success) {
+      throw new Error(response.data.Message);
+    }
+
+    return response.data.Data;
+  };
 }

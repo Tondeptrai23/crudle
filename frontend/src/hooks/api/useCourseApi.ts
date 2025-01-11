@@ -133,3 +133,10 @@ export const useEnrollStudents = () => {
     },
   });
 };
+
+export const useStudentInCourse = (courseId: string) => {
+  return useQuery({
+    queryKey: ['courses', courseId, 'students'],
+    queryFn: () => courseService.getCourseEnrollments(courseId),
+  });
+};
